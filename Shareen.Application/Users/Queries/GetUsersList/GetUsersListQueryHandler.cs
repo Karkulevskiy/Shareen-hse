@@ -14,11 +14,15 @@ public class GetUsersListQueryHandler(IAppDbContext _dbContext, IMapper _mapper)
     public async Task<UsersListVm> Handle(GetUsersListQuery request,
         CancellationToken cancellationToken)
     {
-        var lobby = await _dbContext.Lobbies
-            .FirstOrDefaultAsync(id =>
-                id.Id == request.LobbyId, cancellationToken);
-        if (lobby == null)
-            throw new NotFoundException(request.LobbyId.ToString(), nameof(Lobby));
-        //return with mapping
+        var users = _dbContext.Users;
+        if (users == null)
+            throw new NotFoundException(request.LobbyId.ToString(),
+                nameof(Lobby));
+        return new UsersListVm
+        {
+            Users = await _mapper
+                .ProjectTo<UserDto>(users)
+                .ToListAsync(cancellationToken)
+        };
     }
 }

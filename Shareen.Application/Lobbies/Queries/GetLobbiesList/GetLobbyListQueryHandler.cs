@@ -11,10 +11,12 @@ public class GetLobbyListQueryHandler(IAppDbContext _dbContext, IMapper _mapper)
     public async Task<LobbiesListVm> Handle(GetLobbyListQuery request,
         CancellationToken cancellationToken)
     {
-        var lobbies = await _dbContext.Lobbies.ToListAsync(cancellationToken);
-        return new LobbiesListVm()
+        var lobbies = _dbContext.Lobbies;
+        return new LobbiesListVm
         {
-            //Lobbies = _mapper.ProjectTo<LobbyDto>(lobbies).ToListAsync(cancellationToken);
-        }//таже хуйня
+            Lobbies = await _mapper
+                .ProjectTo<LobbyDto>(lobbies)
+                .ToListAsync(cancellationToken)
+        };
     }
 }
