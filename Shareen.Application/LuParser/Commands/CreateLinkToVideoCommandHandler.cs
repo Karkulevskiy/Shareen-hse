@@ -3,8 +3,15 @@
 namespace Shareen.Application.LuParser.Commands;
 public class CreateLinkToVideoCommandHandler 
     : IRequestHandler<CreateLinkToVideoCommand, string>
-        
+
 {
+    private static HttpClient _httpClient;
+    static CreateLinkToVideoCommandHandler()
+        => _httpClient = new HttpClient(new SocketsHttpHandler
+            {
+                PooledConnectionLifetime = TimeSpan.FromMinutes(2)
+            });
+    
     public async Task<string> Handle(CreateLinkToVideoCommand request,
         CancellationToken cancellationToken)
     {
@@ -39,7 +46,55 @@ public class CreateLinkToVideoCommandHandler
                     "webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>";
             //case lordfilms, нужно сделать запрос к страничке и получить html, а дальше парсить
             default:
-                return string.Empty;
+               var link =  GetHtml(request.link);
+               if (link == String.Empty)
+               {
+                   Console.WriteLine("Any working players not found");
+                   //правильно ли отправлять контроллеру невалидную ссылку для проверки??
+                   //может надо создать exception или делегировать действие 
+                   return string.Empty;
+               }
+               
+               return link;
+        }
+    }
+
+    private string GetHtml(string url)
+    {
+        var html = _httpClient.GetStringAsync(url).Result;
+        var index = 0;
+        List<string> links = [];
+        
+        while (index < html.Length)
+        {
+            var findIndex = html.IndexOf("iframe src=", index, StringComparison.Ordinal);
+            if (findIndex == -1)
+                break;
+            findIndex += 12; // skip "iframe src="
+            var lastIndex = html.IndexOf("\"", findIndex, StringComparison.Ordinal);
+            var str = html.Substring(findIndex, lastIndex - findIndex - 1);
+            links.Add(str);
+            index = lastIndex + 1;
+        }
+        
+        foreach (var link in links.Where(link => UrlIsValid(link)))
+        {
+            return link;
+        }
+        return string.Empty;
+    }
+    private bool UrlIsValid(string url)
+    {
+        try
+        {
+            var response = _httpClient
+                .SendAsync(new HttpRequestMessage(HttpMethod.Get, url));
+            return response.Result.IsSuccessStatusCode;
+        }
+        catch
+        {
+            Console.WriteLine("Link is not valid or resource is closed!");
+            return false;
         }
     }
 }
