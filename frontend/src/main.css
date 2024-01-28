@@ -1,0 +1,52 @@
+#app{
+    position: relative;
+}
+
+
+.search-form{
+    position: absolute;
+    border: 1px solid tomato;
+    display: inline-flex;
+    padding: 10px;
+    justify-content: space-between;
+    align-items: center;
+    height: 50px;
+    border-radius: 5px;
+    overflow: hidden;
+    background-color: wheat;
+    top:40%;
+    left: 50%;
+    transform: translate(-50%,50%);
+
+}
+
+.search-form:hover > .search-form__txt{
+    width: 250px;
+    padding: 0 6px;
+}
+
+.search-form__txt{
+    border: none;
+    width: 0px;
+    outline: none;
+    font-size: 20px;
+    padding-right: 10px;
+    background-color: transparent;
+    transition: 0.4s;
+}
+
+.search-form__btn{
+    border: none;
+    width: 30px;
+    height: 40px;
+    background-color: wheat;
+}
+
+.search-form__img{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 25px;
+    height: 23px;
+    
+}
