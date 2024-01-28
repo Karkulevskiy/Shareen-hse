@@ -11,17 +11,15 @@ public class CreateLinkToVideoCommandHandler
             {
                 PooledConnectionLifetime = TimeSpan.FromMinutes(2)
             });
-    
+    private const string https = "https://";
+    private const string embed = "/embed/";
+    private const string video = "video";
     public async Task<string> Handle(CreateLinkToVideoCommand request,
         CancellationToken cancellationToken)
     {
         var parsedLinkList = request.link.Split('/');
         var parsedLinkSite = parsedLinkList[2];
         var resultLink = string.Empty;
-        const string https = "https://";
-        const string embed = "/embed/";
-        const string video = "video";
-        const string youtubeTemplate = "";
         switch (parsedLinkSite)
         {
             case "www.youtube.com":
@@ -29,7 +27,7 @@ public class CreateLinkToVideoCommandHandler
                 resultLink = https + parsedLinkSite
                                    + embed
                                    + request.link[lastSplash..];
-                return "<iframe width=\"560\" height=\"315\" src=" + 
+                  return "<iframe width=\"560\" height=\"315\" src=" + 
                        $"\"{resultLink}\"" +
                 "title=\"YouTube video player\"" +
                 "frameborder=\"0\"" +

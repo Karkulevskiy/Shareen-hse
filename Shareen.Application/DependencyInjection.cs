@@ -5,15 +5,15 @@ using MediatR;
 namespace Shareen.Application;
 
 /// <summary>
-/// Класс для добавления Application в WebApi
-/// Добавляем MediatR
+/// 
 /// </summary>
 public static class DependencyInjection
 {
     public static IServiceCollection AddApplication(
         this IServiceCollection serviceCollection)
     {
-        serviceCollection.AddMediatR(Assembly.GetExecutingAssembly());
+        serviceCollection.AddMediatR(cfg 
+        => cfg.RegisterServicesFromAssemblies(Assembly.GetExecutingAssembly()));
         return serviceCollection;
     }
 }
