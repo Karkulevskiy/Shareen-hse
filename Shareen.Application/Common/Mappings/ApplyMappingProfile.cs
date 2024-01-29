@@ -1,12 +1,11 @@
 using System.Reflection;
-using System.Security.Cryptography.X509Certificates;
 using AutoMapper;
 /// <summary>
 /// Apply all mappings implementing interface IMapWith
 /// </summary>
-public class ApplyMappingProfile : Profile
+public class AssemblyMappingProfile : Profile
 {
-    public ApplyMappingProfile(Assembly assembly) 
+    public AssemblyMappingProfile(Assembly assembly) 
         => ApplyMappingsFromAssembly(assembly);
 
     public void ApplyMappingsFromAssembly(Assembly assembly)
@@ -20,9 +19,7 @@ public class ApplyMappingProfile : Profile
         {
             var instance = Activator.CreateInstance(type);
             var methodInfo = type.GetMethod("Mapping");
-            methodInfo?.Invoke(instance, new object[]{this});
+            methodInfo?.Invoke(instance, [this]);
         }    
-    }
-
-    
+    }   
 }

@@ -15,8 +15,5 @@ public class AppDbContext : DbContext, IAppDbContext
     
     public AppDbContext(DbContextOptions<AppDbContext> dbContext)
         : base(dbContext) => Database.EnsureCreated();
-
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
-        => base.OnModelCreating(modelBuilder);
     
 }
