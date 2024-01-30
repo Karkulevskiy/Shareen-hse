@@ -17,21 +17,21 @@ public class CreateLinkToVideoCommandHandler
     public async Task<string> Handle(CreateLinkToVideoCommand request,
         CancellationToken cancellationToken)
     {
-        var parsedLinkList = request.link.Split('/');
+        var parsedLinkList = request.Url.Split('/');
         var parsedLinkSite = parsedLinkList[2];
         var resultLink = string.Empty;
         switch (parsedLinkSite)
         {
             case "www.youtube.com":
-                var lastSplash = request.link.LastIndexOf('/');
+                var lastSplash = request.Url.LastIndexOf('=') + 1;
                 resultLink = https + parsedLinkSite
                                    + embed
-                                   + request.link[lastSplash..];
+                                   + request.Url[lastSplash..];
                   return "<iframe width=\"560\" height=\"315\" src=" + 
                        $"\"{resultLink}\"" +
-                "title=\"YouTube video player\"" +
-                "frameborder=\"0\"" +
-                "allow=\"accelerometer; autoplay; clipboard-write;" +
+                " title=\"YouTube video player\"" +
+                " frameborder=\"0\"" +
+                " allow=\"accelerometer; autoplay; clipboard-write;" +
                        " encrypted-media; gyroscope; picture-in-picture; web-share\"" +
                 "allowfullscreen></iframe>";
 
@@ -44,7 +44,7 @@ public class CreateLinkToVideoCommandHandler
                     "webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>";
             //case lordfilms, нужно сделать запрос к страничке и получить html, а дальше парсить
             default:
-               var link =  GetHtml(request.link);
+               var link =  GetHtml(request.Url);
                if (link == String.Empty)
                {
                    Console.WriteLine("Any working players not found");
@@ -62,7 +62,6 @@ public class CreateLinkToVideoCommandHandler
         var html = _httpClient.GetStringAsync(url).Result;
         var index = 0;
         List<string> links = [];
-        
         while (index < html.Length)
         {
             var findIndex = html.IndexOf("iframe src=", index, StringComparison.Ordinal);
@@ -75,7 +74,7 @@ public class CreateLinkToVideoCommandHandler
             index = lastIndex + 1;
         }
         
-        foreach (var link in links.Where(link => UrlIsValid(link)))
+        foreach (var link in links.Where(UrlIsValid))
         {
             return link;
         }

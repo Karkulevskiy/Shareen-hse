@@ -1,6 +1,5 @@
 using Shareen.Persistence;
-using Shareen.Application;
-using AutoMapper;
+using Shareen.Application;using AutoMapper;
 using Swashbuckle.AspNetCore.Swagger;
 using System.Reflection;
 using Shareen.Application.Interfaces;
@@ -15,7 +14,9 @@ builder.Services.AddPersistence(builder.Configuration);
 builder.Services.AddApplication();
 builder.Services.AddControllers();
 builder.Services.AddSwaggerGen();
+builder.Services.AddCors();
 var app = builder.Build();
+app.UseCors(cfg => cfg.AllowAnyOrigin()); // потому нужно настроить cors
 app.UseSwagger();
 app.UseSwaggerUI();
 app.UseRouting();

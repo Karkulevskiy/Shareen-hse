@@ -26,8 +26,8 @@ function sendRequest(method, URL, data = null){
 function takeButton(){
     const input = document.getElementById('input-form');
     const link = input.value;
-    const MaxURL='https://jsonplaceholder.typicode.com/users'
-
+    const template = 'http://localhost:5233/api/VideoPlayer/CreateLinkToVideo?url=';
+    let MaxURL = template + link;
     sendRequest('POST',MaxURL,link)
     .then(data => console.log(data))
     .catch(err => console.log(err))
