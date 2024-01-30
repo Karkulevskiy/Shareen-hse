@@ -8,15 +8,14 @@
     border: 1px solid tomato;
     display: inline-flex;
     padding: 10px;
-    justify-content: space-between;
     align-items: center;
     height: 50px;
     border-radius: 5px;
     overflow: hidden;
     background-color: wheat;
-    top:40%;
+    top:5%;
     left: 50%;
-    transform: translate(-50%,50%);
+    transform: translate(-50%);
 
 }
 
@@ -49,4 +48,11 @@
     width: 25px;
     height: 23px;
     
+}
+
+.content{
+    position: fixed;
+    left:50%;
+    top:50%;
+    transform: translate(-50%,-50%);
 }

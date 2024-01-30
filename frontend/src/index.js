@@ -26,9 +26,16 @@ function sendRequest(method, URL, data = null){
 function takeButton(){
     const input = document.getElementById('input-form');
     const link = input.value;
-    const MaxURL='https://jsonplaceholder.typicode.com/users'
+    const MaxURL='?'
 
     sendRequest('POST',MaxURL,link)
-    .then(data => console.log(data))
+    .then(data => insertVideo(data))
     .catch(err => console.log(err))
+}
+
+function insertVideo(EmbedHTML){
+    const $player=document.querySelector('#player');
+
+    $player.insertAdjacentHTML('afterbegin',EmbedHTML);
+
 }
