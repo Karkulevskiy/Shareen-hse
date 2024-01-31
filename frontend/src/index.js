@@ -26,9 +26,16 @@ function sendRequest(method, URL, data = null){
 function takeButton(){
     const input = document.getElementById('input-form');
     const link = input.value;
-    const template = 'http://localhost:5233/api/VideoPlayer/CreateLinkToVideo?url=';
-    let MaxURL = template + link;
-    sendRequest('POST',MaxURL,link)
-    .then(data => console.log(data))
+    const MaxURL='http://localhost:5233/api/VideoPlayer/CreateLinkToVideo?url='
+    let template = MaxURL + link;
+    sendRequest('POST',template,link)
+    .then(data => insertVideo(data))
     .catch(err => console.log(err))
+}
+
+function insertVideo(EmbedHTML){
+    const $player=document.querySelector('#player');
+
+    $player.insertAdjacentHTML('afterbegin', EmbedHTML);
+
 }
