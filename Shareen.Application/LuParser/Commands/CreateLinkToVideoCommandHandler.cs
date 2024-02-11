@@ -1,85 +1,68 @@
-﻿using MediatR;
-
+﻿using System.Reflection.Metadata;
+using AngleSharp;
+using AngleSharp.Html.Parser;
+using MediatR;
+using Shareen.Domain;
 namespace Shareen.Application.LuParser.Commands;
 public class CreateLinkToVideoCommandHandler 
     : IRequestHandler<CreateLinkToVideoCommand, string>
 
 {
     private static HttpClient _httpClient;
+    private readonly static IConfiguration _config = Configuration.Default.WithDefaultLoader();
+    private readonly static IBrowsingContext _context = BrowsingContext.New(_config); 
+    private readonly static List<string> _attributes = ["src","data-src"];
     static CreateLinkToVideoCommandHandler()
         => _httpClient = new HttpClient(new SocketsHttpHandler
             {
                 PooledConnectionLifetime = TimeSpan.FromMinutes(2)
             });
-    private const string https = "https://";
-    private const string embed = "/embed/";
-    private const string video = "video";
     public async Task<string> Handle(CreateLinkToVideoCommand request,
         CancellationToken cancellationToken)
     {
-        var parsedLinkList = request.Url.Split('/');
-        var parsedLinkSite = parsedLinkList[2];
-        var resultLink = string.Empty;
-        switch (parsedLinkSite)
-        {
-            case "www.youtube.com":
-                var lastSplash = request.Url.LastIndexOf('=') + 1;
-                resultLink = https + parsedLinkSite
-                                   + embed
-                                   + request.Url[lastSplash..];
-                  return "<iframe width=\"560\" height=\"315\" src=" + 
-                       $"\"{resultLink}\"" +
-                " title=\"YouTube video player\"" +
-                " frameborder=\"0\"" +
-                " allow=\"accelerometer; autoplay; clipboard-write;" +
-                       " encrypted-media; gyroscope; picture-in-picture; web-share\"" +
-                "allowfullscreen></iframe>";
+        if (!UrlIsValid(request.Url))
+            return string.Empty;
 
-            case "rutube.ru":
-                resultLink = https + video + embed + parsedLinkList[^2] + '/';
-                return "<iframe width=\"720\" height=\"405\" src=" +
-                    $"\"{resultLink}\"" + 
-                    "frameBorder=\"0\"" +
-                    "allow=\"clipboard-write; autoplay\"" +
-                    "webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>";
-            //case lordfilms, нужно сделать запрос к страничке и получить html, а дальше парсить
-            default:
-               var link =  GetHtml(request.Url);
-               if (link == String.Empty)
-               {
-                   Console.WriteLine("Any working players not found");
-                   //правильно ли отправлять контроллеру невалидную ссылку для проверки??
-                   //может надо создать exception или делегировать действие 
-                   return string.Empty;
-               }
-               
-               return link;
-        }
+        var site = GetSite(request.Url);
+        return site?.GetIframe!;
     }
 
-    private string GetHtml(string url)
+    private Site? GetSite(string url)
     {
-        var html = _httpClient.GetStringAsync(url).Result;
-        var index = 0;
-        List<string> links = [];
-        while (index < html.Length)
+        if (url.Contains("youtube"))
+            return new YouTube(url);
+        if (url.Contains("rutube"))
+            return new RuTube(url);
+        if (url.Contains("vk.com"))
+            return new VkVideo(url);
+        if (url.Contains("twitch"))
+            return new Twitch(url);
+        var _url = TryParseSite(url).Result;
+        if (_url is not null)
+            return new LordFilm(_url);
+        return null;
+    }
+
+    private async Task<string?> TryParseSite(string url)
+    {
+        var validSites = new List<string>();
+        var document = await _context.OpenAsync(url);
+        foreach(var el in document.QuerySelectorAll("iframe"))
         {
-            var findIndex = html.IndexOf("iframe src=", index, StringComparison.Ordinal);
-            if (findIndex == -1)
-                break;
-            findIndex += 12; // skip "iframe src="
-            var lastIndex = html.IndexOf("\"", findIndex, StringComparison.Ordinal);
-            var str = html.Substring(findIndex, lastIndex - findIndex - 1);
-            links.Add(str);
-            index = lastIndex + 1;
+            foreach(var atr in _attributes)
+            {
+                var res = el.GetAttribute(atr);
+                if (res is null || !UrlIsValid(res)) continue;
+                validSites.Add(res);
+            }
         }
         
-        foreach (var link in links.Where(UrlIsValid))
-        {
-            return link;
-        }
-        return string.Empty;
+        if (validSites.Count == 0)
+            return null;
+
+        return validSites[0];
     }
+
     private bool UrlIsValid(string url)
     {
         try
