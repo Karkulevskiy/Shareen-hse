@@ -5,7 +5,7 @@ public class UpdateUserDto : IMapWith<UpdateUserCommand>
 {
     public Guid Id { get; set; }
     public string Name { get; set; }
-    void Mapping(Profile profile){
+    public void Mapping(Profile profile){
         profile.CreateMap<UpdateUserDto, UpdateUserCommand>()
             .ForMember(userDto => userDto.Name,
                  userCommand => userCommand.MapFrom(prop => prop.Name))

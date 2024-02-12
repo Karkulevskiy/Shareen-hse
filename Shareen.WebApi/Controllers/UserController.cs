@@ -1,11 +1,10 @@
 using AutoMapper;
-using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Mvc;
 using Shareen.Application.Users.Commands.CreateUser;
 using Shareen.Application.Users.Commands.DeleteUser;
 using Shareen.Application.Users.Queries.GetUser;
 
-[Microsoft.AspNetCore.Mvc.Route("api/[controller]/[action]")]
+[Route("api/[controller]/[action]")]
 public class UserController(IMapper mapper) : BaseController
 {
     private readonly IMapper _mapper = mapper;
