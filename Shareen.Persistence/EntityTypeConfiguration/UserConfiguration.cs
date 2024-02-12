@@ -1,15 +1,15 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
 using Shareen.Domain;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Shareen.Persistence.EntityTypeConfiguration;
-
-public class UserConfiguration : IEntityTypeConfiguration<User>
+class UserConfiguration : IEntityTypeConfiguration<User>
 {
     public void Configure(EntityTypeBuilder<User> builder)
     {
-        builder.HasKey(key => key.Id);
-        builder.HasIndex(ind => ind.Id).IsUnique();
-        builder.Property(prop => prop.Name).HasMaxLength(20);
+        builder.HasIndex(id => id.Id).IsUnique();
+        builder.HasKey(id => id.Id);
+        builder.Property(n => n.Name).IsRequired().HasMaxLength(30);
+        builder.HasMany(l => l.Lobbies).WithMany(u => u.Users);
     }
 }

@@ -16,12 +16,15 @@ public class UpdateLobbyCommandHandler(IAppDbContext _dbContext)
         var lobby = await _dbContext.Lobbies
             .FirstOrDefaultAsync(lobby =>
                 lobby.Id == request.Id, cancellationToken);
+
         if (lobby == null)
             throw new NotFoundException(request.Id.ToString(), nameof(Lobby));
+        
         lobby.Users = request.Users;
-        lobby.NumberOfUsers = request.NumberOfUsers;
         lobby.Name = request.Name;
+
         await _dbContext.SaveChangesAsync(cancellationToken);
+        
         return Unit.Value;
     }
 }

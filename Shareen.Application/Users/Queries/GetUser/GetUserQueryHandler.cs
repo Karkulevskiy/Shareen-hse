@@ -16,8 +16,10 @@ public class GetUserQueryHandler(IAppDbContext _dbContext, IMapper _mapper)
         var user = await _dbContext.Users
             .FirstOrDefaultAsync(user =>
                 user.Id == request.Id, cancellationToken);
+
         if (user == null)
             throw new NotFoundException(request.Id.ToString(),nameof(User));
+        
         return _mapper.Map<UserDto>(user);
     }
 }

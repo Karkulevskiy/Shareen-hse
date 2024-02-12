@@ -1,13 +1,14 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Shareen.Domain;
 
-namespace Shareen.Persistence.EntityTypeConfiguration;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-public class ChatConfiguration : IEntityTypeConfiguration<Chat>
+class ChatConfiguration : IEntityTypeConfiguration<Chat>
 {
     public void Configure(EntityTypeBuilder<Chat> builder)
     {
-        builder.HasKey(key => key.Id);
+        builder.HasIndex(id => id.Id).IsUnique();
+        builder.HasKey(id => id.Id);
+        builder.HasOne(l => l.Lobby).WithOne(c => c.Chat).IsRequired();
     }
 }

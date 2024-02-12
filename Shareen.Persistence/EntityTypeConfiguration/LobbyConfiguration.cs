@@ -1,15 +1,17 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
 using Shareen.Domain;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using System.Security.Cryptography;
 
-namespace Shareen.Persistence.EntityTypeConfiguration;
-
-public class LobbyConfiguration : IEntityTypeConfiguration<Lobby>
+class LobbyConfiguration : IEntityTypeConfiguration<Lobby>
 {
     public void Configure(EntityTypeBuilder<Lobby> builder)
     {
-        builder.HasKey(key => key.Id);
-        builder.HasIndex(ind => ind.Id).IsUnique();
-        builder.Property(prop => prop.TimeCreated).IsRequired();
+        builder.HasIndex(id => id.Id).IsUnique();
+        builder.HasKey(id => id.Id);
+        builder.HasOne(c => c.Chat).WithOne(l => l.Lobby).HasForeignKey<Chat>(c => c.LobbyId);
+        builder.Property(n => n.Name).IsRequired().HasMaxLength(30);
+        builder.Property(t => t.TimeCreated).IsRequired();
     }
 }

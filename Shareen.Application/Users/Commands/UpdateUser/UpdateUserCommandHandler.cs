@@ -15,11 +15,12 @@ public class UpdateUserCommandHandler(IAppDbContext _dbContext) :
         var user = await _dbContext.Users
             .FirstOrDefaultAsync(user => 
                 user.Id == request.Id, cancellationToken);
+
         if (user == null)
             throw new NotFoundException(request.Id.ToString(), nameof(User));
+        
         user.Name = request.Name;
-        user.Lobby = request.Lobby;
-        user.LobbyId = request.LobbyId;
+        
         await _dbContext.SaveChangesAsync(cancellationToken);
         return Unit.Value;
     }

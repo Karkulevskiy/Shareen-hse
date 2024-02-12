@@ -15,9 +15,11 @@ public class GetUsersListQueryHandler(IAppDbContext _dbContext, IMapper _mapper)
         CancellationToken cancellationToken)
     {
         var users = _dbContext.Users;
+
         if (users == null)
             throw new NotFoundException(request.LobbyId.ToString(),
                 nameof(Lobby));
+        
         return new UsersListVm
         {
             Users = await _mapper

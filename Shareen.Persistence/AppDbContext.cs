@@ -14,6 +14,12 @@ public class AppDbContext : DbContext, IAppDbContext
     public DbSet<Chat> Chats { get; set; }
     
     public AppDbContext(DbContextOptions<AppDbContext> dbContext)
-        : base(dbContext) => Database.EnsureCreated();
-    
+        : base(dbContext) { }
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        //modelBuilder.ApplyConfiguration(new ChatConfiguration());
+        modelBuilder.ApplyConfiguration(new UserConfiguration());
+        modelBuilder.ApplyConfiguration(new LobbyConfiguration());
+        base.OnModelCreating(modelBuilder);
+    }
 }

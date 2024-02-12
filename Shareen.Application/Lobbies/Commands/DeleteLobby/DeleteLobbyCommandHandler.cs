@@ -17,10 +17,13 @@ public class DeleteLobbyCommandHandler(IAppDbContext _dbContext) :
         var lobby = await _dbContext.Lobbies
             .FirstOrDefaultAsync(lobby => 
                 lobby.Id == request.Id, cancellationToken);
+
         if (lobby == null)
             throw new NotFoundException(request.Id.ToString(), nameof(Lobby));
+        
         _dbContext.Lobbies.Remove(lobby);
         await _dbContext.SaveChangesAsync(cancellationToken);
+        
         return Unit.Value;
     }
 }

@@ -15,11 +15,14 @@ public class DeleteUserCommandHandler(IAppDbContext _dbContext)
         var user = await _dbContext.Users
             .FirstOrDefaultAsync(user => 
                 user.Id == request.Id, cancellationToken);
+
         if (user == null)
             throw new NotFoundException(request.Id.ToString(),
                 nameof(User));
+        
         _dbContext.Users.Remove(user);
         await _dbContext.SaveChangesAsync(cancellationToken);
+        
         return Unit.Value;
     }
 }

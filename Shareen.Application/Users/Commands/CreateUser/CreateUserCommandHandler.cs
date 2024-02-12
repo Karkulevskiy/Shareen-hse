@@ -14,10 +14,12 @@ public class CreateUserCommandHandler(IAppDbContext _dbContext)
         {
             Name = request.Name,
             Id = Guid.NewGuid(),
-            Lobby = null
+            Lobbies = new()
         };
+        
         await _dbContext.Users.AddAsync(user, cancellationToken);
         await _dbContext.SaveChangesAsync(cancellationToken);
+
         return user.Id;
     }
 }
