@@ -9,7 +9,7 @@ public class LobbyDto : IMapWith<Lobby>
     public DateTime TimeCreated { get; set; }
     public List<User> Users { get; set; }
 
-    void Mapping(Profile profile)
+    public void Mapping(Profile profile)
     {
         profile.CreateMap<Lobby, LobbyDto>()
             .ForMember(lobbyDto => lobbyDto.Name,

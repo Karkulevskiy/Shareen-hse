@@ -2,6 +2,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Shareen.Application.Users.Commands.CreateUser;
 using Shareen.Application.Users.Commands.DeleteUser;
+using Shareen.Application.Users.Commands.UpdateUser;
 using Shareen.Application.Users.Queries.GetUser;
 
 [Route("api/[controller]/[action]")]
@@ -28,7 +29,7 @@ public class UserController(IMapper mapper) : BaseController
     [HttpPut]
     public async Task<IActionResult> UpdateUser([FromBody] UpdateUserDto updateUserDto)
     {
-        var command = _mapper.Map<UpdateUserDto>(updateUserDto);
+        var command = _mapper.Map<UpdateUserCommand>(updateUserDto);
         await Mediator.Send(command);
         return NoContent();
     }

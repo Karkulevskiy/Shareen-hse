@@ -9,9 +9,9 @@ using Shareen.Domain;
 namespace Shareen.Application.Lobbies.Commands.DeleteLobby;
 
 public class DeleteLobbyCommandHandler(IAppDbContext _dbContext) :
-    IRequestHandler<DeleteUserCommand, Unit>
+    IRequestHandler<DeleteLobbyCommand, Unit>
 {
-    public async Task<Unit> Handle(DeleteUserCommand request,
+    public async Task<Unit> Handle(DeleteLobbyCommand request,
         CancellationToken cancellationToken)
     {
         var lobby = await _dbContext.Lobbies
