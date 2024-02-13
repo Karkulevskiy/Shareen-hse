@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using System.Text;
+using MediatR;
 using Shareen.Application.Interfaces;
 using Shareen.Application.Users.Commands.CreateUser;
 using Shareen.Domain;
@@ -11,12 +12,14 @@ public class CreateLobbyCommandHandler(IAppDbContext _dbContext)
     public async Task<Guid> Handle(CreateLobbyCommand request,
         CancellationToken cancellationToken)
     {
+        var lobbyId = Guid.NewGuid();
         var lobby = new Lobby()
         {
-            Id = Guid.NewGuid(),
+            Id = lobbyId,
             Name = request.Name,
             TimeCreated = DateTime.Now,
-            Users = new()
+            Users = new(),
+            UniqueLink = GenerateUniqueUrl(8, lobbyId.ToString())
         };
 
         var chat = new Chat
@@ -35,5 +38,17 @@ public class CreateLobbyCommandHandler(IAppDbContext _dbContext)
         await _dbContext.SaveChangesAsync(cancellationToken);
 
         return lobby.Id;
+    }
+
+    private string GenerateUniqueUrl(int length, string guid)
+    {
+        var strBuilder = new StringBuilder();
+        var rnd = new Random();
+        while(length > 0)
+        {
+            strBuilder.Append(guid[(int)(rnd.NextDouble() * guid.Length)]);
+            length--;
+        }
+        return strBuilder.ToString();
     }
 }

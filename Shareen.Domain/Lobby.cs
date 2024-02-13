@@ -8,4 +8,5 @@ public class Lobby
     public List<User> Users { get; set; }
     public string Name { get; set; }
     public DateTime TimeCreated { get; set; }
+    public string UniqueLink { get; set; }
 }
