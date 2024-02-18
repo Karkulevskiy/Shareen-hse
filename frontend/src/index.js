@@ -34,8 +34,7 @@ function takeButton(){
 }
 
 function insertVideo(EmbedHTML){
-    const $player=document.querySelector('#player');
+    var player=document.getElementById('player');
 
-    $player.insertAdjacentHTML('afterbegin', EmbedHTML);
-
+    player.innerHTML=EmbedHTML
 }
