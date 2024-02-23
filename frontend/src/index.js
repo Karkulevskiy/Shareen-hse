@@ -1,40 +1,10 @@
-function sendRequest(method, URL, data = null){
-    return new Promise((resolve,reject) => {
-        const xhr = new XMLHttpRequest();
+import { model } from './model.js'
+import { App } from './classes/app.js'
+import {Handler} from './choicehandler.js'
 
-        xhr.open(method,URL);
 
-        
+new App(model).render();
 
-        xhr.onload = () => {
-            if (xhr.status>=400)
-                reject(xhr.response)
-            else
-                resolve(xhr.response)
-        }
+const $buttons = document.querySelector("#start-choice");
 
-        xhr.onerror = () => {
-            reject(xhr.response)
-        }
-qq
-        xhr.send(data)
-
-    });
-
-}
-
-function takeButton(){
-    const input = document.getElementById('input-form');
-    const link = input.value;
-    const MaxURL='http://localhost:5233/api/VideoPlayer/CreateLinkToVideo?url='
-    let template = MaxURL + link;
-    sendRequest('POST',template,link)
-    .then(data => insertVideo(data))
-    .catch(err => console.log(err))
-}
-
-function insertVideo(EmbedHTML){
-    var player=document.getElementById('player');
-
-    player.innerHTML=EmbedHTML
-}
+$buttons.addEventListener("click",Handler,{once:"True"});
