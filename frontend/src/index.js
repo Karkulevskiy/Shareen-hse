@@ -16,7 +16,7 @@ function sendRequest(method, URL, data = null){
         xhr.onerror = () => {
             reject(xhr.response)
         }
-
+qq
         xhr.send(data)
 
     });
