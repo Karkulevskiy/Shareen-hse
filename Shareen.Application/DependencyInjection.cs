@@ -4,9 +4,6 @@ using Microsoft.Extensions.DependencyInjection;
 using MediatR;
 namespace Shareen.Application;
 
-/// <summary>
-/// 
-/// </summary>
 public static class DependencyInjection
 {
     public static IServiceCollection AddApplication(

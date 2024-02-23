@@ -35,6 +35,7 @@ public class LobbyController(IMapper mapper) : BaseController
         var lobbyId = await Mediator.Send(command);
         return Ok(lobbyId);
     }
+    
     [HttpPatch]
     public async Task<IActionResult> UpdateLobby([FromBody] LobbyDto lobbyDto)
     {
@@ -42,11 +43,28 @@ public class LobbyController(IMapper mapper) : BaseController
         await Mediator.Send(command);
         return NoContent();
     }
+    
     [HttpDelete]
     public async Task<IActionResult> DeleteLobby(Guid id)
     {
         var command = new DeleteLobbyCommand{Id = id};
         await Mediator.Send(command);
         return NoContent();
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> GetLobbyUniqueId(Guid id)
+    {
+        var query = new GetLobbyUniqueLinkQuery{LobbyId = id};
+        var uniqueLink = await Mediator.Send(query);
+        return Ok(uniqueLink);
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> GetLobbyUsers(Guid id)
+    {
+        var query = new GetLobbyUsersQuery{LobbyId = id};
+        var lobbyUsers = await Mediator.Send(query);
+        return Ok(lobbyUsers);
     }
 }
