@@ -1,0 +1,95 @@
+#app{
+    position: relative;
+}
+
+#up-panel{
+    box-shadow: 0 0.5em 0.5em -0.1em #000000;
+    background: linear-gradient(to right, #000000 300px, rgb(255, 130, 28) 1700px),
+    linear-gradient(0deg,#080607,#ffffff 90%);
+    height: 50px;
+}
+
+#start-choice{
+        margin: 0;
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+}
+
+.choice__btn{
+    color: #ffa260;
+    transition: 0.25s;
+    background: none;
+    border: 2px solid;
+    font: inherit;
+    line-height: 5;
+    width: 200px;
+    margin: 0.5em;
+    padding: 1em 2em;
+}
+
+.choice__btn:hover{
+  box-shadow: 0 0.5em 0.5em -0.4em #ff0202;
+  transform: translateY(-0.25em);
+  border-color: #ff0202;
+  color:#000000
+}
+
+.search-form{
+    position: absolute;
+    border: 1px solid rgb(0, 0, 0);
+    display: inline-flex;
+    padding: 10px;
+    align-items: center;
+    height: 50px;
+    border-radius: 5px;
+    overflow: hidden;
+    background-color: rgb(255, 130, 28);
+    top:5%;
+    left: 50%;
+    transform: translate(-50%);
+
+}
+
+.search-form:hover > .search-form__txt{
+    width: 250px;
+    padding: 0 6px;
+}
+
+.search-form__txt::placeholder{
+    color:#000000
+}
+.search-form__txt{
+    border: none;
+    width: 0px;
+    outline: none;
+    font-size: 20px;
+    padding-right: 10px;
+    color: black;
+    background-color: transparent;
+    transition: 0.4s;
+}
+
+.search-form__btn{
+    border: none;
+    width: 30px;
+    height: 40px;
+    background-color: transparent;
+}
+
+.search-form__img{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 25px;
+    height: 23px;
+    
+}
+
+.content{
+    position: fixed;
+    left:50%;
+    top:50%;
+    transform: translate(-50%,-50%);
+}
