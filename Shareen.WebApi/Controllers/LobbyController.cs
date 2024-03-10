@@ -6,6 +6,7 @@ using Shareen.Application.Lobbies.Commands.DeleteLobby;
 using Shareen.Application.Lobbies.Commands.UpdateLobby;
 using Shareen.Application.Lobbies.Queries.GetLobbiesList;
 using Shareen.Application.Lobbies.Queries.GetLobby;
+using Shareen.Application.Lobbies.Queries;
 
 [Route("api/[controller]/[action]")]
 public class LobbyController(IMapper mapper) : BaseController
@@ -13,9 +14,9 @@ public class LobbyController(IMapper mapper) : BaseController
     private readonly IMapper _mapper = mapper;
 
     [HttpGet]
-    public async Task<IActionResult> GetLobbyById(Guid id)
+    public async Task<IActionResult> GetLobbyById(string link)
     {
-        var query = new GetLobbyQuery{Id = id};
+        var query = new GetLobbyQuery{Link = link};
         var lobby = await Mediator.Send(query);
         return Ok(lobby);
     }

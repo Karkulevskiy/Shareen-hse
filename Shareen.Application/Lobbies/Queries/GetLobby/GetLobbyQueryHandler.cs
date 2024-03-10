@@ -15,9 +15,9 @@ public class GetLobbyQueryHandler(IAppDbContext _dbContext, IMapper _mapper)
     {
         var lobby = await _dbContext.Lobbies
             .FirstOrDefaultAsync(lobby =>
-                lobby.Id == request.Id, cancellationToken);
+                lobby.UniqueLink == request.Link, cancellationToken);
         if (lobby == null)
-            throw new NotFoundException(request.Id.ToString(), nameof(Lobby));
+            throw new NotFoundException(request.Link.ToString(), nameof(Lobby));
         return _mapper.Map<LobbyDto>(lobby);
     }
 }

@@ -19,7 +19,7 @@ public class CreateLobbyCommandHandler(IAppDbContext _dbContext)
             Name = request.Name,
             TimeCreated = DateTime.Now,
             Users = new(),
-            UniqueLink = GenerateUniqueUrl(8, lobbyId.ToString())
+            UniqueLink = GenerateUniqueUrl("www.shareen.ru", lobbyId.ToString())
         };
 
         var chat = new Chat
@@ -40,15 +40,6 @@ public class CreateLobbyCommandHandler(IAppDbContext _dbContext)
         return lobby.Id;
     }
 
-    private string GenerateUniqueUrl(int length, string guid)
-    {
-        var strBuilder = new StringBuilder();
-        var rnd = new Random();
-        while(length > 0)
-        {
-            strBuilder.Append(guid[(int)(rnd.NextDouble() * guid.Length)]);
-            length--;
-        }
-        return strBuilder.ToString();
-    }
+    private string GenerateUniqueUrl(string domain, string guid)
+        => domain + guid;
 }
