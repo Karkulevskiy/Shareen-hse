@@ -1,9 +1,13 @@
 import { App } from "./classes/app.js";
-import { DivBlock,InputBlock,ButtonBlock,ImageBlock } from "./classes/blocks.js";
+import * as handlers from "./clickhandler.js";
+import { DivBlock,InputBlock,ButtonBlock,ImageBlock,FormBlock, ScriptBlock } from "./classes/blocks.js";
 import { model } from "./model.js";
 
 
-export function Handler(event){
+export function choiceHandler(event){
+    if (event.target.tagName=="DIV"){
+        return;
+    }
     const value = event.target.innerText;
     if (value==="CREATE"){
         model.length=0;
@@ -15,8 +19,9 @@ export function Handler(event){
                 },
                 [
                     new InputBlock(
-                        "Enter the link",
+                        "",
                         {
+                            placeholder:"Enter the link...",
                             class:"search-form__txt",
                             type:"text",
                             id:"input-form"
@@ -26,8 +31,6 @@ export function Handler(event){
                         "",
                         {
                             type:"submit",
-                            onclick:"javascript: takeButton()",
-                            script:"clickhandler.js",
                             class:"search-form__btn"
                         },
                         [
@@ -48,7 +51,42 @@ export function Handler(event){
                 }
             )
         )
+        new App(model).render();
+        debugger
+        const $form = document.getElementById("input-form");
+        $form.addEventListener("submit",handlers.takeButton);
+    }
+    else if (value=="JOIN"){
+        model.length=0;
+        model.push(
+            new FormBlock({
+                id:"LobbyForm",
+                onsubmit:"event.preventDefault();",
+                role:"search"
+            },
+            [
+                new InputBlock(
+                    "",
+                    {
+                        id:"search_lobby",
+                        type:"search",
+                        placeholder:"Write lobby link..."
+                    }
+                ),
+                new ButtonBlock(
+                    "Go",
+                    {
+                        id:"go_lobby",
+                        type:"submit",
+                        class:"check-lobby__btn"
+                    }
+                )
+            ])
+        )
+        new App(model).render();
+        const $form = document.getElementById("LobbyForm");
+        $form.addEventListener("submit",handlers.takeButton);
+        debugger
     }
 
-    new App(model).render();
 }

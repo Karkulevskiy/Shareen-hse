@@ -1,10 +1,11 @@
 import { model } from './model.js'
 import { App } from './classes/app.js'
-import {Handler} from './choicehandler.js'
+import {choiceHandler} from './choicehandler.js'
+import * as handlers from "./clickhandler.js";
 
 
 new App(model).render();
 
 const $buttons = document.querySelector("#start-choice");
 
-$buttons.addEventListener("click",Handler,{once:"True"});
+$buttons.addEventListener("click",choiceHandler);

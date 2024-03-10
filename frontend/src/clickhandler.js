@@ -22,14 +22,33 @@ function sendRequest(method, URL, data = null){
     });
 }
 
-function takeButton(){
-    const input = document.getElementById('input-form');
-    const link = input.value;
-    const MaxURL='http://localhost:5233/api/VideoPlayer/CreateLinkToVideo?url='
-    let template = MaxURL + link;
-    sendRequest('POST',template,link)
-    .then(data => insertVideo(data))
-    .catch(err => console.log(err))
+export function takeButton(event){
+    debugger
+    const id = event.target.id;
+    if (id =="input-form"){
+        const input = document.getElementById('input-form');
+        const link = input.value;
+        const MaxURL='http://localhost:5233/api/VideoPlayer/CreateLinkToVideo?url='
+        let template = MaxURL + link;
+
+        sendRequest('POST',template,link)
+        .then(data => insertVideo(data))
+        .catch(err => console.log(err))
+    }
+    else if (id =="LobbyForm"){
+        console.log("pdfpaw")
+        const link = document.getElementById("search_lobby").value;
+        const MaxURL='http://localhost:5233/api/UserController/AddUserToLobby?url=';
+        const template = MaxURL+link;
+
+        sendRequest('POST',template)
+        .then(data => insertVideo(data))
+        .catch(err => console.log(err))
+    }
+}
+
+function loadLobby(answer){
+
 }
 
 function insertVideo(EmbedHTML){

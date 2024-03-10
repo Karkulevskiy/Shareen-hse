@@ -6,7 +6,6 @@ export function div(content,options){
     `
 }
 
-
 export function css(styles = {}){
     if (typeof styles ==='string') {
         return styles
@@ -17,6 +16,10 @@ export function css(styles = {}){
 }
 
 
-export function scripttag(source){
-    return `<script src="${source}"></script>`
+export function addScript(source){
+        const tag = document.createElement('script');
+        tag.setAttribute('src',source);
+        
+        const $app = document.querySelector('#app');
+        $app.append(tag);
 }

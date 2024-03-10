@@ -5,10 +5,9 @@ export class App {
     }
 
     render(){
-        
-        this.$app.innerHTML=''
+        this.$app.textContent = ''
         this.model.forEach(block =>{
-            this.$app.insertAdjacentHTML('beforeend',block.ToHTML())
+            this.$app.appendChild(block.ToObj())
         })
     }
 }

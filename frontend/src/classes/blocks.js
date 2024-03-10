@@ -1,4 +1,3 @@
-import { scripttag,div } from "../utils.js";
 
 class Block{
     constructor(value,options){
@@ -6,22 +5,68 @@ class Block{
         this.options = options;
     }
 
-    ToHTML(){
-        throw new Error("Метод ToHTML не реализован в этом классе")
+    ToObj(){
+        throw new Error("Метод ToObj не реализован в этом классе");
+    }
+}
+
+export class ScriptBlock extends Block{
+    constructor(options={},inside=[]){
+        super(inside,options);
+    }
+
+    ToObj(){
+        const tag = document.createElement('script');
+        const SetAttr = (key) => {
+            tag.setAttribute(key,this.options[key]);
+        };
+        Object.keys(this.options).map(SetAttr);
+
+        return tag;
+    }
+}
+
+export class FormBlock extends Block{
+    constructor(options={},inside=[]){
+        super(inside,options);
+    }
+
+    ToObj(){
+        var form = document.createElement("form");
+        
+        const SetAttr = (key) => {
+            form.setAttribute(key,this.options[key]);
+        };
+        Object.keys(this.options).map(SetAttr)
+        
+        this.value.forEach(Block =>{
+            form.appendChild(Block.ToObj());
+        })
+
+        return form;
+
     }
 }
 
 export class DivBlock extends Block{
     constructor(options={},inside=[]){
-        super(inside,options)
+        super(inside,options);
     }
 
-    ToHTML(){
-        let content = ``; 
-        this.value.forEach(Block => {
-            content+=Block.ToHTML();
-        });
-        return div(content,this.options);
+    ToObj(){
+        var div = document.createElement("div");
+
+        this.value.forEach(Block =>{
+            div.appendChild(Block.ToObj());
+        })
+
+        const SetAttr = (key) => {
+            div.setAttribute(key,this.options[key]);
+        };
+        Object.keys(this.options).map(SetAttr)
+
+        return div;
+        
     }
 }
 
@@ -30,49 +75,56 @@ export class TextBlock extends Block{
         super(value,options)
     }
 
-    ToHTML(){
-        const {} = this.options
-        return div(`<p>${this.value}</p>`)
+    ToObj(){
+        var paragraph = document.createElement("p");
+        
+        const SetAttr = (key) => {
+            paragraph.setAttribute(key,this.options[key]);
+        };
+        Object.keys(this.options).map(SetAttr);
+
+        paragraph.textContent(this.value)
     }
 }
 
 export class InputBlock extends Block{
-    constructor(value,options){
+    constructor(value="",options={}){
         super(value,options)
     }
 
-    ToHTML(){
-        const ToString = key => `${key}="${this.options[key]}"`;
-        const Params = Object.keys(this.options).map(ToString).join(" ")
-        return `<input ${Params} placeholder="${this.value}">`;
+    ToObj(){
+        var input = document.createElement("input")
+
+        const SetAttr = (key) => {
+            input.setAttribute(key,this.options[key]);
+        };
+        Object.keys(this.options).map(SetAttr);
+
+        return input
     }
 }
 
 export class ButtonBlock extends Block{
-    constructor(value,options,inside=[]){
+    constructor(value="",options={},inside=[]){
         super(value,options);
         this.inside=inside;
     }
 
-    ToHTML(){
-        const ToString = key => `${key}="${this.options[key]}"`;
-        const Params = Object.keys(this.options).map(ToString).join(" ");
-        let HTML = `<button ${Params}>${this.value}`;
-        if (this.inside.length!=0){
-            this.inside.forEach(block => {
-                HTML+=block.ToHTML();
-            });
-        }   
-        const {script=''} = this.options;
-        if (script!=''){
-            const tag = document.createElement('script');
-            tag.setAttribute('src','clickhandler.js');
-            const $app = document.querySelector('#app');
-            $app.append(tag);
-        }
+    ToObj(){
+        var but = document.createElement("button")
 
-        HTML+=`</button>`;
-        return HTML;
+        const SetAttr = (key) => {
+            but.setAttribute(key,this.options[key]);
+        };
+        Object.keys(this.options).map(SetAttr);
+
+        but.innerText = this.value;
+
+        this.inside.forEach(Block =>{
+            but.appendChild(Block.ToObj());
+        })
+
+        return but;
     }
 }
 
@@ -81,10 +133,16 @@ export class ImageBlock extends Block{
         super(value,options)
     }
 
-    ToHTML(){
-        const ToString = key => `${key}="${this.options[key]}"`;
-        const Params = Object.keys(this.options).map(ToString).join(" ");
-        return `<img src="${this.value}" ${Params}>`
+    ToObj(){
+        var img = document.createElement("img")
+        
+        img.setAttribute("src",this.value);
+        const SetAttr = (key) => {
+            img.setAttribute(key,this.options[key]);
+        };
+        Object.keys(this.options).map(SetAttr);
+
+        return img;
     }
 }
 
