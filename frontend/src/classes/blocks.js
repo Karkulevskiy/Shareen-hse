@@ -64,8 +64,12 @@ export class ButtonBlock extends Block{
             });
         }   
         const {script=''} = this.options;
-        if (script!='')
-            HTML+=scripttag(script);
+        if (script!=''){
+            const tag = document.createElement('script');
+            tag.setAttribute('src','clickhandler.js');
+            const $app = document.querySelector('#app');
+            $app.append(tag);
+        }
 
         HTML+=`</button>`;
         return HTML;
