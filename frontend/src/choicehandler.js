@@ -15,7 +15,8 @@ export function choiceHandler(event){
             new FormBlock(
                 {
                     role:"search",
-                    id:"search-form"
+                    id:"search-form",
+                    type:"submit"
                 },
                 [
                     new InputBlock(
@@ -29,7 +30,6 @@ export function choiceHandler(event){
                     new ButtonBlock(
                         "",
                         {
-                            type:"submit",
                             class:"search-form__btn"
                         },
                         [

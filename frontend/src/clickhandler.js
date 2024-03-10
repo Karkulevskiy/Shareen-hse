@@ -26,6 +26,7 @@ function sendRequest(method, URL, data = null){
 export function takeButton(event){
     debugger
     const id = event.target.id;
+    event.preventDefault();
     if (id =="search-form"){
         const form = event.target.elements;
         const link = form[0].value;
@@ -53,9 +54,8 @@ function loadLobby(answer){
 }
 
 function insertVideo(EmbedHTML){
-    debugger
     var player=document.getElementById('player');
-
+    debugger
     player.innerHTML=EmbedHTML;
     console.log("EZ")
 }
