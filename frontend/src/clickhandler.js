@@ -1,4 +1,5 @@
 function sendRequest(method, URL, data = null){
+    debugger
     return new Promise((resolve,reject) => {
         const xhr = new XMLHttpRequest();
 
@@ -25,9 +26,9 @@ function sendRequest(method, URL, data = null){
 export function takeButton(event){
     debugger
     const id = event.target.id;
-    if (id =="input-form"){
-        const input = document.getElementById('input-form');
-        const link = input.value;
+    if (id =="search-form"){
+        const form = event.target.elements;
+        const link = form[0].value;
         const MaxURL='http://localhost:5233/api/VideoPlayer/CreateLinkToVideo?url='
         let template = MaxURL + link;
 
@@ -35,14 +36,14 @@ export function takeButton(event){
         .then(data => insertVideo(data))
         .catch(err => console.log(err))
     }
-    else if (id =="LobbyForm"){
+    else if (id =="lobby-form"){
         console.log("pdfpaw")
         const link = document.getElementById("search_lobby").value;
         const MaxURL='http://localhost:5233/api/UserController/AddUserToLobby?url=';
         const template = MaxURL+link;
 
         sendRequest('POST',template)
-        .then(data => insertVideo(data))
+        .then((status,) => insertVideo(data))
         .catch(err => console.log(err))
     }
 }
@@ -52,7 +53,9 @@ function loadLobby(answer){
 }
 
 function insertVideo(EmbedHTML){
+    debugger
     var player=document.getElementById('player');
 
-    player.innerHTML=EmbedHTML
+    player.innerHTML=EmbedHTML;
+    console.log("EZ")
 }

@@ -36,7 +36,7 @@
   color:#000000
 }
 
-.search-form{
+#search-form{
     position: absolute;
     border: 1px solid rgb(0, 0, 0);
     display: inline-flex;
@@ -52,7 +52,7 @@
 
 }
 
-.search-form:hover > .search-form__txt{
+#search-form:hover > .search-form__txt{
     width: 250px;
     padding: 0 6px;
 }
@@ -94,7 +94,7 @@
     transform: translate(-50%,-50%);
 }
 
-#LobbyForm{
+#lobby-form{
     position: relative;
     width: 30rem;
     background: #57bd84;

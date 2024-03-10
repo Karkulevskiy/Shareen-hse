@@ -12,10 +12,10 @@ export function choiceHandler(event){
     if (value==="CREATE"){
         model.length=0;
         model.push(
-            new DivBlock(
+            new FormBlock(
                 {
-                    class:"search-form",
-                    id:"search"
+                    role:"search",
+                    id:"search-form"
                 },
                 [
                     new InputBlock(
@@ -23,8 +23,7 @@ export function choiceHandler(event){
                         {
                             placeholder:"Enter the link...",
                             class:"search-form__txt",
-                            type:"text",
-                            id:"input-form"
+                            type:"search",
                         }
                     ), 
                     new ButtonBlock(
@@ -52,15 +51,15 @@ export function choiceHandler(event){
             )
         )
         new App(model).render();
-        debugger
-        const $form = document.getElementById("input-form");
+
+        const $form = document.getElementById("search-form");
         $form.addEventListener("submit",handlers.takeButton);
     }
     else if (value=="JOIN"){
         model.length=0;
         model.push(
             new FormBlock({
-                id:"LobbyForm",
+                id:"lobby-form",
                 onsubmit:"event.preventDefault();",
                 role:"search"
             },
@@ -84,9 +83,8 @@ export function choiceHandler(event){
             ])
         )
         new App(model).render();
-        const $form = document.getElementById("LobbyForm");
+        const $form = document.getElementById("lobby-form");
         $form.addEventListener("submit",handlers.takeButton);
-        debugger
     }
 
 }
