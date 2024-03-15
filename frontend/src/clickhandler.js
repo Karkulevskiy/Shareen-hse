@@ -1,5 +1,4 @@
 function sendRequest(method, URL, data = null){
-    debugger
     return new Promise((resolve,reject) => {
         const xhr = new XMLHttpRequest();
 
@@ -24,14 +23,12 @@ function sendRequest(method, URL, data = null){
 }
 
 export function takeButton(event){
-    debugger
     const id = event.target.id;
     if (id =="search-form"){
         const form = event.target.elements;
         const link = form[0].value;
         const MaxURL='http://localhost:5233/api/VideoPlayer/CreateLinkToVideo?url='
         let template = MaxURL + link;
-
         sendRequest('POST',template,link)
         .then(data => insertVideo(data))
         .catch(err => console.log(err))
@@ -53,9 +50,6 @@ function loadLobby(answer){
 }
 
 function insertVideo(EmbedHTML){
-    debugger
     var player=document.getElementById('player');
-
-    player.innerHTML=EmbedHTML;
-    console.log("EZ")
+    player.innerHTML = EmbedHTML;
 }
