@@ -8,49 +8,51 @@ export function choiceHandler(event){
     if (event.target.tagName=="DIV"){
         return;
     }
+    debugger
     const value = event.target.innerText;
     if (value==="CREATE"){
-        model.length=0;
-        model.push(
-            new FormBlock(
-                {
-                    role:"search",
-                    id:"search-form",
-                    type:"submit"
-                },
-                [
-                    new InputBlock(
-                        "",
-                        {
-                            placeholder:"Enter the link...",
-                            class:"search-form__txt",
-                            type:"search",
-                        }
-                    ), 
-                    new ButtonBlock(
-                        "",
-                        {
-                            class:"search-form__btn"
-                        },
-                        [
-                            new ImageBlock(
-                                "./assets/search.svg",
-                                {
-                                alt:"image",
-                                class:"search-form__img"
-                            })
-                        ]
-                    )
-                ]
-            ),
-            new DivBlock(
-                {
-                id:"player",
-                class:"content"
-                }
-            )
-        )
-        new App(model).render();
+        window.location.href = "./lobby.html";
+        // model.length=0;
+        // model.push(
+        //     new FormBlock(
+        //         {
+        //             role:"search",
+        //             id:"search-form",
+        //             type:"submit"
+        //         },
+        //         [
+        //             new InputBlock(
+        //                 "",
+        //                 {
+        //                     placeholder:"Enter the link...",
+        //                     class:"search-form__txt",
+        //                     type:"search",
+        //                 }
+        //             ), 
+        //             new ButtonBlock(
+        //                 "",
+        //                 {
+        //                     class:"search-form__btn"
+        //                 },
+        //                 [
+        //                     new ImageBlock(
+        //                         "./assets/search.svg",
+        //                         {
+        //                         alt:"image",
+        //                         class:"search-form__img"
+        //                     })
+        //                 ]
+        //             )
+        //         ]
+        //     ),
+        //     new DivBlock(
+        //         {
+        //         id:"player",
+        //         class:"content"
+        //         }
+        //     )
+        // )
+        // new App(model).render();
 
         const $form = document.getElementById("search-form");
         $form.addEventListener("submit",handlers.takeButton);

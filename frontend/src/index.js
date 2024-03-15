@@ -7,5 +7,4 @@ import * as handlers from "./clickhandler.js";
 new App(model).render();
 
 const $buttons = document.querySelector("#start-choice");
-
 $buttons.addEventListener("click",choiceHandler);
