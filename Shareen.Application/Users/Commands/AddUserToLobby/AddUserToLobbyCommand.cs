@@ -1,8 +1,9 @@
 
 using MediatR;
+using Shareen.Application.Lobbies.Queries;
 
-public class AddUserToLobbyCommand : IRequest<Unit>
+public class AddUserToLobbyCommand : IRequest<LobbyDto>
 {
-    public Guid UserId { get; set; }
+    public string UserName { get; set; }
     public string LobbyLink { get; set; }
 }

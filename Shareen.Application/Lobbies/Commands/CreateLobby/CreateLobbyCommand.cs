@@ -2,7 +2,7 @@
 
 namespace Shareen.Application.Lobbies.Commands.CreateLobby;
 
-public class CreateLobbyCommand : IRequest<Guid>
+public class CreateLobbyCommand : IRequest<CreateLobbyDto>
 {
     public string Name { get; set; }    
 }

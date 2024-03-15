@@ -18,7 +18,10 @@ builder.Services.AddApplication();
 builder.Services.AddControllers();
 builder.Services.AddSwaggerGen();
 builder.Services.AddCors();
-
+builder.Services.AddControllers()
+    .AddNewtonsoftJson(opt =>
+     opt.SerializerSettings.ReferenceLoopHandling 
+        = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
 
 var app = builder.Build();
 
@@ -37,6 +40,7 @@ using (var scope = app.Services.CreateScope())
 }
 
 app.UseCors(cfg => cfg.AllowAnyOrigin()); // потому нужно настроить cors
+
 app.UseSwagger();
 app.UseSwaggerUI();
 app.UseRouting();

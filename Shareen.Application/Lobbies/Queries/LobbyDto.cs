@@ -7,7 +7,7 @@ public class LobbyDto : IMapWith<Lobby>
 {
     public string Name { get; set; }
     public DateTime TimeCreated { get; set; }
-    public List<User> Users { get; set; }
+    public List<UserInLobbyDto> Users { get; set; }
     public string LobbyLink { get; set; }
 
     public void Mapping(Profile profile)

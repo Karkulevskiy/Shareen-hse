@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using AutoMapper;
 using MediatR;
 using Shareen.Application.Interfaces;
 using Shareen.Application.Users.Commands.CreateUser;
@@ -6,10 +7,11 @@ using Shareen.Domain;
 
 namespace Shareen.Application.Lobbies.Commands.CreateLobby;
 
-public class CreateLobbyCommandHandler(IAppDbContext _dbContext)
-    : IRequestHandler<CreateLobbyCommand, Guid>
+public class CreateLobbyCommandHandler(IAppDbContext _dbContext, IMapper _mapper)
+    : IRequestHandler<CreateLobbyCommand, CreateLobbyDto>
 {
-    public async Task<Guid> Handle(CreateLobbyCommand request,
+    private static string domain = "http://127.0.0.1:5501/";
+    public async Task<CreateLobbyDto> Handle(CreateLobbyCommand request,
         CancellationToken cancellationToken)
     {
         var lobbyId = Guid.NewGuid();
@@ -19,7 +21,7 @@ public class CreateLobbyCommandHandler(IAppDbContext _dbContext)
             Name = request.Name,
             TimeCreated = DateTime.Now,
             Users = new(),
-            UniqueLink = GenerateUniqueUrl("www.shareen.ru", lobbyId.ToString())
+            UniqueLink = domain + lobbyId.ToString()
         };
 
         var chat = new Chat
@@ -37,9 +39,6 @@ public class CreateLobbyCommandHandler(IAppDbContext _dbContext)
         await _dbContext.Chats.AddAsync(chat, cancellationToken);
         await _dbContext.SaveChangesAsync(cancellationToken);
 
-        return lobby.Id;
+        return _mapper.Map<CreateLobbyDto>(lobby);
     }
-
-    private string GenerateUniqueUrl(string domain, string guid)
-        => domain + guid;
 }

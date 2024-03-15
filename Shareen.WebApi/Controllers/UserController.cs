@@ -46,8 +46,8 @@ public class UserController(IMapper mapper) : BaseController
     public async Task<IActionResult> AddUserToLobby([FromBody] AddUserToLobbyDto userToLobbyDto)
     {
         var command = _mapper.Map<AddUserToLobbyCommand>(userToLobbyDto);
-        await Mediator.Send(command);
-        return NoContent();
+        var lobbyDto = await Mediator.Send(command);
+        return Ok(lobbyDto);
     }
     //реализовать потом получение пользователей
 }
