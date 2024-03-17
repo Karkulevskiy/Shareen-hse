@@ -1,3 +1,5 @@
+import { parseHTMLFile,loadLobby } from "./utils.js";
+
 function sendRequest(method, URL, data = null){
     return new Promise((resolve,reject) => {
         const xhr = new XMLHttpRequest();
@@ -22,7 +24,8 @@ function sendRequest(method, URL, data = null){
     });
 }
 
-export function takeButton(event){
+export function takeButton(event){  
+    debugger
     const id = event.target.id;
     event.preventDefault();
     if (id =="search-form"){
@@ -36,26 +39,20 @@ export function takeButton(event){
         .catch(err => console.log(err))
     }
     else if (id =="lobby-form"){
-        console.log("pdfpaw")
+        console.log("pdfpaw");
+        debugger;
         const lobbyLink = document.getElementById("search_lobby").value;
         const MaxURL='http://localhost:5233/api/Lobby/GetLobbyById?link=';
         const template = MaxURL+lobbyLink;
 
-        sendRequest('POST',template)
-        .then((answer) => loadLobby(answer))
+        sendRequest('GET',template,lobbyLink)
+        .then((answer) => loadLobby())
         .catch(err => console.log(err))
     }
 }
 
-function loadLobby(answer){
-
-}
 
 function insertVideo(EmbedHTML){
     var player=document.getElementById('player');
     player.innerHTML=EmbedHTML;
-}
-
-function goHome(){
-
 }

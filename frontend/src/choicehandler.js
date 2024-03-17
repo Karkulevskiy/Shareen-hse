@@ -1,61 +1,40 @@
 import { App } from "./classes/app.js";
-import * as handlers from "./clickhandler.js";
 import { DivBlock,InputBlock,ButtonBlock,ImageBlock,FormBlock, ScriptBlock } from "./classes/blocks.js";
 import { model } from "./model.js";
+import * as handlers from "./clickhandler.js";
+import { parseHTMLFile,loadLobby } from "./utils.js";
 
 
 export function choiceHandler(event){
     if (event.target.tagName=="DIV"){
         return;
     }
-    debugger
     const value = event.target.innerText;
     if (value==="CREATE"){
-        window.location.href = "./lobby.html";
-        // model.length=0;
-        // model.push(
-        //     new FormBlock(
-        //         {
-        //             role:"search",
-        //             id:"search-form",
-        //             type:"submit"
-        //         },
-        //         [
-        //             new InputBlock(
-        //                 "",
-        //                 {
-        //                     placeholder:"Enter the link...",
-        //                     class:"search-form__txt",
-        //                     type:"search",
-        //                 }
-        //             ), 
-        //             new ButtonBlock(
-        //                 "",
-        //                 {
-        //                     class:"search-form__btn"
-        //                 },
-        //                 [
-        //                     new ImageBlock(
-        //                         "./assets/search.svg",
-        //                         {
-        //                         alt:"image",
-        //                         class:"search-form__img"
-        //                     })
-        //                 ]
-        //             )
-        //         ]
-        //     ),
-        //     new DivBlock(
-        //         {
-        //         id:"player",
-        //         class:"content"
-        //         }
-        //     )
-        // )
-        // new App(model).render();
+        loadLobby()
+        // const $form = document.getElementById("search-form");
+        // debugger
+        // $form.addEventListener("submit",handlers.takeButton);
+        // let xhr = new XMLHttpRequest();
+        // xhr.open('GET', './lobby.html',true);
+        // xhr.responseType="text"
 
-        const $form = document.getElementById("search-form");
-        $form.addEventListener("submit",handlers.takeButton);
+        // xhr.onreadystatechange = function () {
+        //     if (xhr.readyState === 4 && xhr.status === 200) {
+        //         let htmlContent = xhr.response;
+
+        //         let a = htmlContent.search(/<body>/g)
+        //         let b = htmlContent.search(/<!-- Code/g)
+        //         htmlContent = htmlContent.slice(a,b);
+        //         htmlContent +=`</body>`
+
+        //         document.body.innerHTML=htmlContent;
+        //         const $form = document.getElementById("search-form");
+        //         $form.addEventListener("submit",handlers.takeButton);
+        //     }
+        // }
+
+        // xhr.send();
     }
     else if (value=="JOIN"){
         model.length=0;
