@@ -26,23 +26,58 @@ export function addScript(source){
         $app.append(tag);
 }
 
-export function loadLobby(){
-    let xhr = new XMLHttpRequest();
+export function loadLobby(lobbyLink = null){
+    debugger
+    var xhr
+    if (window.ActiveXObject)
+    {
+     xhr = new ActiveXObject("Microsoft.XMLHTTP");
+    }
+    else if (window.XMLHttpRequest)
+    {
+     xhr = new XMLHttpRequest();
+    } 
         xhr.open('GET', './lobby.html',true);
         xhr.responseType="text"
 
-        xhr.onreadystatechange = function () {
-            if (xhr.readyState === 4 && xhr.status === 200) {
-                let htmlContent = xhr.response;
+        xhr.onload = function () {
+            debugger
+        
+            let htmlContent = xhr.responseText;
 
-                const content = parseHTMLFile(htmlContent);
+            const content = parseHTMLFile(htmlContent);
 
-                document.body.innerHTML=content;
-                const $form = document.getElementById("search-form");
-                $form.addEventListener("submit",handlers.takeButton);
-            }
+            document.body.innerHTML=content;
+            const $form = document.getElementById("search-form");
+            $form.addEventListener("submit",handlers.takeButton);
         }
-        xhr.send()
+        xhr.send();
+        console.log(xhr.responseText)
+}
+
+export function sendRequest(method,URL,data=null){
+    var xhr
+    if (window.ActiveXObject)
+    {
+     xhr = new ActiveXObject("Microsoft.XMLHTTP");
+    }
+    else if (window.XMLHttpRequest)
+    {
+     xhr = new XMLHttpRequest();
+    } 
+    xhr.open(method,URL);
+    xhr.onreadystatechange = () => {
+        if (xhr.status==200 && xhr.readyState==4){
+            console.log("Success")
+            return false;
+        }
+    }
+
+    xhr.onerror = () => {
+        console.log(xhr.response)
+    }
+
+    xhr.send(data);
 }
 
 export function parseHTMLFile(content){

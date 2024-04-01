@@ -18,7 +18,8 @@ export const model = [
                 "CREATE",
                 {
                     type:"button",
-                    class:"choice__btn"
+                    class:"choice__btn",
+                    onclick:"event.preventDefault();"
                 },
             )
         ]
