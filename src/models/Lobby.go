@@ -1,9 +1,9 @@
 package models
 
-import "github.com/google/uuid"
-
 type Lobby struct {
-	ID       uuid.UUID
-	LobbyURL string
-	VideoURL string
+	ID        string  `json:"id"`
+	LobbyURL  string  `json:"lobby_url"`
+	VideoURL  string  `json:"video_url"`
+	CreatedAt string  `json:"created_at"`
+	UserList  []*User `json:"user_list"`
 }
