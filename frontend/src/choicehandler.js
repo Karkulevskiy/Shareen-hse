@@ -1,8 +1,9 @@
 import { App } from "./classes/app.js";
 import { DivBlock,InputBlock,ButtonBlock,ImageBlock,FormBlock, ScriptBlock } from "./classes/blocks.js";
 import { model } from "./model.js";
+import { loadLobby } from "./lobbyloader.js";
 import * as handlers from "./clickhandler.js";
-import { parseHTMLFile,loadLobby,sendRequest } from "./utils.js";
+import { parseHTMLFile,sendRequest } from "./utils.js";
 
 async function createLobby(){
     let MaxURL = 'http://localhost:5233/api/Lobby/CreateLobby?lobbyName=MaxHuy'
@@ -30,7 +31,7 @@ async function createLobby(){
     .post(MaxURL)
     .then((data) => console.log(data));
     
-
+    debugger
     loadLobby();
     console.log("done")
 }

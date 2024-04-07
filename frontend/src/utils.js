@@ -1,5 +1,3 @@
-import * as handlers from "./clickhandler.js";
-
 export function div(content,options){
     const ToString = key => `${key}="${options[key]}"`;
     const Params = Object.keys(options).map(ToString).join(" ");
@@ -27,32 +25,39 @@ export function addScript(source){
 }
 
 export function loadLobby(lobbyLink = null){
-    debugger
-    var xhr
-    if (window.ActiveXObject)
-    {
-     xhr = new ActiveXObject("Microsoft.XMLHTTP");
-    }
-    else if (window.XMLHttpRequest)
-    {
-     xhr = new XMLHttpRequest();
-    } 
-        xhr.open('GET', './lobby.html',true);
-        xhr.responseType="text"
+    let app = document.querySelector("#app");
+    axios.get("lobby.html")
+    .then(response => app.innerHTML=response);
+    // fetch("../frontend/src/lobby.html")
+    // .then(response => response.text())
+    // .then(text => app.innerHTML=text);
+    // axios.get("http://localhost:5001/frontend/src/lobby.html")
+    // .then((response)=>console.log(response.data));
 
-        xhr.onload = function () {
-            debugger
+    // var xhr
+    // if (window.ActiveXObject)
+    // {
+    //  xhr = new ActiveXObject("Microsoft.XMLHTTP");
+    // }
+    // else if (window.XMLHttpRequest)
+    // {
+    //  xhr = new XMLHttpRequest();
+    // } 
+    //     xhr.open('GET', './lobby.html',true);
+    //     xhr.responseType="text"
+
+    //     xhr.onload = function () {
         
-            let htmlContent = xhr.responseText;
+    //         let htmlContent = xhr.responseText;
 
-            const content = parseHTMLFile(htmlContent);
+    //         const content = parseHTMLFile(htmlContent);
 
-            document.body.innerHTML=content;
-            const $form = document.getElementById("search-form");
-            $form.addEventListener("submit",handlers.takeButton);
-        }
-        xhr.send();
-        console.log(xhr.responseText)
+    //         document.body.innerHTML=content;
+    //         const $form = document.getElementById("search-form");
+    //         $form.addEventListener("submit",handlers.takeButton);
+    //     }
+    //     xhr.send();
+    //     console.log(xhr.responseText)
 }
 
 export function sendRequest(method,URL,data=null){
@@ -86,4 +91,26 @@ export function parseHTMLFile(content){
     content = content.slice(BodyStart,BodyEnd);
     content +=`</body>`
     return content 
+}
+
+export function addMessage(person="",content,time=""){
+    let userclass = ""
+    if (person == ""){
+        userclass="me";
+    }
+    if (time==""){
+        let curDate = new Date();
+        time+=curDate.getHours() +":" + curDate.getMinutes();
+    }
+    let tag = `<li class="`+userclass+`">
+    <div class="name">
+        <span class="">`+person+`</span>
+    </div>
+    <div class="message">
+        <p>` + content + `</p>
+        <span class="msg-time">` + time + `</span>
+    </div>
+    </li>`
+    const $chatlist = document.querySelector("#chat-list");
+    $chatlist.innerHTML += tag;
 }

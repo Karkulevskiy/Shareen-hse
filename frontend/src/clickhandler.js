@@ -1,4 +1,5 @@
-import { parseHTMLFile,loadLobby } from "./utils.js";
+import { addMessage, parseHTMLFile } from "./utils.js";
+import { loadLobby } from "./lobbyloader.js";
 
 function sendRequest(method, URL, data = null){
     return new Promise((resolve,reject) => {
@@ -25,7 +26,7 @@ function sendRequest(method, URL, data = null){
 }
 
 export function takeButton(event){  
-    debugger
+    debugger;
     const id = event.target.id;
     event.preventDefault();
     if (id =="search-form"){
@@ -46,8 +47,16 @@ export function takeButton(event){
         const template = MaxURL+lobbyLink;
 
         sendRequest('GET',template,lobbyLink)
-        .then((answer) => loadLobby())
+        .then((answer) => {
+            console.log(answer);
+            loadLobby();
+        })
         .catch(err => console.log(err))
+    }
+    else if (id=="send-chat"){
+        const $input = document.querySelector(".input-wrapper");
+        let text = $input.getElementsByTagName("input")[0].value;
+        addMessage("",text,"");
     }
 }
 
