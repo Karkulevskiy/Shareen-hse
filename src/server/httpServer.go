@@ -2,6 +2,7 @@ package server
 
 import (
 	"database/sql"
+	"log"
 	"shareen/src/controllers"
 	"shareen/src/repositories"
 	"shareen/src/services"
@@ -13,6 +14,8 @@ import (
 type HttpServer struct {
 	router *gin.Engine
 	config *viper.Viper
+	usersController *controllers.UsersController
+	lobbiesController *controllers.LobbiesController
 }
 
 func InitHttpServer(config *viper.Viper, dbHandler *sql.DB) HttpServer{
@@ -25,4 +28,21 @@ func InitHttpServer(config *viper.Viper, dbHandler *sql.DB) HttpServer{
 	router := gin.Default()
 	router.POST("/lobby", lobbiesController.CreateLobby)
 	router.GET("/user/:id", usersController.GetUser) // ??
+
+
+	/// etc
+
+	return HttpServer{
+		config: config,
+		router: router,
+		usersController: usersController,
+		lobbiesController: lobbiesController,
+	}
+}
+
+func (hs HttpServer) Start(){
+	err := hs.router.Run(hs.config.GetString("http.server_address"))
+	if err != nil{
+		log.Fatal("error occured while starting server\n", err)
+	}
 }
