@@ -2,9 +2,9 @@ package server
 
 import (
 	"database/sql"
-	"log"
-
+	_ "github.com/lib/pq"
 	"github.com/spf13/viper"
+	"log"
 )
 
 func InitDatabase(config *viper.Viper) *sql.DB {

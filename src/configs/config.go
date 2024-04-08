@@ -6,13 +6,12 @@ import (
 	"github.com/spf13/viper"
 )
 
-func InitConfig(filename string) *viper.Viper{
+func InitConfig(filename string) *viper.Viper {
 	config := viper.New()
 	config.SetConfigName(filename)
-	config.AddConfigPath(".")
-	config.AddConfigPath("$HOME")
+	config.AddConfigPath(".\\configs\\")
 	err := config.ReadInConfig()
-	if err != nil{
+	if err != nil {
 		log.Fatal("error while parsing configuraion file\n", err)
 	}
 	return config

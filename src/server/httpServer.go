@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"log"
 	"shareen/src/controllers"
+	_ "shareen/src/docs"
 	"shareen/src/repositories"
 	"shareen/src/services"
 
@@ -12,37 +13,35 @@ import (
 )
 
 type HttpServer struct {
-	router *gin.Engine
-	config *viper.Viper
-	usersController *controllers.UsersController
-	lobbiesController *controllers.LobbiesController
+	Router            *gin.Engine
+	config            *viper.Viper
+	usersController   *controllers.UsersController
+	LobbiesController *controllers.LobbiesController
 }
 
-func InitHttpServer(config *viper.Viper, dbHandler *sql.DB) HttpServer{
+func InitHttpServer(config *viper.Viper, dbHandler *sql.DB, router *gin.Engine) *HttpServer {
 	usersRepository := repositories.NewUsersRepository(dbHandler)
 	lobbiesRepository := repositories.NewLobbiesRepository(dbHandler)
 	usersService := services.NewUsersService(usersRepository, lobbiesRepository)
 	lobbiesService := services.NewLobbiesService(usersRepository, lobbiesRepository)
 	usersController := controllers.NewUsersController(usersService)
 	lobbiesController := controllers.NewLobbiesController(lobbiesService)
-	router := gin.Default()
-	router.POST("/lobby", lobbiesController.CreateLobby)
-	router.GET("/user/:id", usersController.GetUser) // ??
 
+	//router.GET("/user/:id", usersController.GetUser) // ??
 
 	/// etc
 
-	return HttpServer{
-		config: config,
-		router: router,
-		usersController: usersController,
-		lobbiesController: lobbiesController,
+	return &HttpServer{
+		config:            config,
+		Router:            router,
+		usersController:   usersController,
+		LobbiesController: lobbiesController,
 	}
 }
 
-func (hs HttpServer) Start(){
-	err := hs.router.Run(hs.config.GetString("http.server_address"))
-	if err != nil{
+func (hs *HttpServer) Start() {
+	err := hs.Router.Run(hs.config.GetString("http.server_address"))
+	if err != nil {
 		log.Fatal("error occured while starting server\n", err)
 	}
 }

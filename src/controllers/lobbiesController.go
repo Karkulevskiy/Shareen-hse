@@ -19,6 +19,13 @@ func NewLobbiesController(lobbiesService *services.LobbiesService) *LobbiesContr
 	}
 }
 
+// @Summary Creating lobby
+// @Accept json
+// @Produce json
+// @Param
+// @Success 200 {object} models.Lobby
+// @Router /lobby/create [post]
+
 func (lc *LobbiesController) CreateLobby(ctx *gin.Context) {
 	response, err := lc.lobbiesService.CreateLobby()
 	if err != nil {

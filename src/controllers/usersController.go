@@ -1,8 +1,6 @@
 package controllers
 
 import (
-	"io"
-	"log"
 	"net/http"
 	"shareen/src/services"
 
@@ -22,7 +20,7 @@ func NewUsersController(usersService *services.UsersService) *UsersController {
 func (uc *UsersController) GetUser(ctx *gin.Context) {
 	userId := ctx.Param("id")
 	response, err := uc.usersService.GetUser(userId)
-	if err != nil{
+	if err != nil {
 		ctx.AbortWithError(http.StatusInternalServerError, err)
 	}
 	ctx.JSON(http.StatusOK, response)
