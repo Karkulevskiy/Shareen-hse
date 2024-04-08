@@ -5,7 +5,7 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp" WITH SCHEMA pg_catalog;
 CREATE TABLE lobbies(
     id uuid NOT NULL DEFAULT uuid_generate_v1mc(),
     lobby_url varchar(255) NOT NULL,
-    video_url varchar(255) NOT NULL ,
+    video_url varchar(255),
     created_at varchar(255) NOT NULL ,
     PRIMARY KEY (id)
 );
