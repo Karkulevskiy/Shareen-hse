@@ -3,6 +3,8 @@
 - github.com/google/uuid
 - github.com/gin-gonic/gin
 - github.com/swaggo/swag/cmd/swag
+- github.com/swaggo/gin-swagger
+- github.com/swaggo/files
 Также: go install github.com/swaggo/swag/cmd/swag@latest
 В папке dbSchema находится SQL файл с запросами на создание БД.   
 
