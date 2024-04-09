@@ -5,6 +5,8 @@ import (
 	"shareen/src/models"
 	"shareen/src/repositories"
 	"shareen/src/utils"
+
+	"github.com/google/uuid"
 )
 
 type UsersService struct {
@@ -20,12 +22,16 @@ func NewUsersService(userRepository *repositories.UsersRepository,
 	}
 }
 
-func (us *UsersService) CreateUser(userName *models.User) (*models.User, *models.ResponseError) {
-	if user.Name == "" {
+func (us *UsersService) CreateUser(userName string) (*models.User, *models.ResponseError) {
+	if userName == "" {
 		return nil, &models.ResponseError{
 			Message: "user name can't be empty",
 			Status:  http.StatusBadRequest,
 		}
+	} // ПР
+	user := &models.User{
+		Name:    userName,
+		LobbyID: uuid.NullUUID.,
 	}
 	return us.usersRepository.CreateUser(user)
 }

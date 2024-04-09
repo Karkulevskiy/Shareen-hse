@@ -37,18 +37,22 @@ func InitHttpServer(config *viper.Viper, dbHandler *sql.DB) HttpServer {
 
 	lobbyGroup := router.Group("/lobby")
 	{
-		lobbyGroup.GET("/:id", lobbiesController.GetLobby)
-		lobbyGroup.GET("/all", lobbiesController.GetAllLobbies)
-		lobbyGroup.GET("/lobbyusers", lobbiesController.GetLobbyUsers)
-		lobbyGroup.POST("/create", lobbiesController.CreateLobby)
-		lobbyGroup.POST("/delete", lobbiesController.DeleteLobby)
-		lobbyGroup.POST("/deleteall", lobbiesController.DeleteAllLobbies)
-		lobbyGroup.PATCH("/update", lobbiesController.UpdateLobby)
+		lobbyGroup.GET(":id", lobbiesController.GetLobby)
+		lobbyGroup.GET("all", lobbiesController.GetAllLobbies)
+		lobbyGroup.GET("lobbyusers/:id", lobbiesController.GetLobbyUsers)
+		lobbyGroup.POST("create", lobbiesController.CreateLobby)
+		lobbyGroup.DELETE("delete/:id", lobbiesController.DeleteLobby)
+		lobbyGroup.DELETE("deleteall", lobbiesController.DeleteAllLobbies)
+		lobbyGroup.PATCH("update", lobbiesController.UpdateLobby)
 	}
 
 	userGroup := router.Group("/user")
 	{
-		userGroup.GET()
+		userGroup.GET(":id", usersController.GetUser)
+		userGroup.GET("allusers", usersController.GetAllUsers)
+		userGroup.POST("create/:name", usersController.CreateUser)
+		userGroup.PATCH("update", usersController.UpdateUser)
+		userGroup.DELETE(":id", usersController.DeleteUser)
 	}
 
 	return HttpServer{

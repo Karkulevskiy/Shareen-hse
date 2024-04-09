@@ -37,8 +37,8 @@ func (lc *LobbiesController) CreateLobby(ctx *gin.Context) {
 // @Accept json
 // @Produce json
 // @Success 200 {object} models.Lobby
-// @Param lobbyid query string false "Id of lobby"
-// @Router /lobby/:id [get]
+// @Param id path string true "Id of lobby"
+// @Router /lobby/{id} [get]
 func (lc *LobbiesController) GetLobby(ctx *gin.Context) {
 	lobbyId := ctx.Param("id")
 	lobby, responseErr := lc.lobbiesService.GetLobby(lobbyId)
@@ -65,7 +65,8 @@ func (lc *LobbiesController) GetAllLobbies(ctx *gin.Context) {
 // @Accept json
 // @Success 204
 // @Failure 500
-// @Router /lobby/delete [delete]
+// @Param id path string true "id for deleting"
+// @Router /lobby/delete/{id} [delete]
 func (lc *LobbiesController) DeleteLobby(ctx *gin.Context) {
 	lobbyId := ctx.Param("id")
 	responseErr := lc.lobbiesService.DeleteLobby(lobbyId)
@@ -93,7 +94,7 @@ func (lc *LobbiesController) DeleteAllLobbies(ctx *gin.Context) {
 // @Success 204
 // @Failure 500
 // @Router /lobby/update [patch]
-// @Param lobby query string false
+// @Param lobby body models.Lobby false "update lobby"
 func (lc *LobbiesController) UpdateLobby(ctx *gin.Context) {
 	body, err := io.ReadAll(ctx.Request.Body)
 	if err != nil {
@@ -117,8 +118,8 @@ func (lc *LobbiesController) UpdateLobby(ctx *gin.Context) {
 // @Accept json
 // @Success 200
 // @Failure 500
-// @Router /lobby/lobbyusers [PATCH]
-// @Param lobby query string false
+// @Param id path string true "lobby id to get all users there"
+// @Router /lobby/lobbyusers/{id} [get]
 func (lc *LobbiesController) GetLobbyUsers(ctx *gin.Context) {
 	lobbyId := ctx.Param("id")
 	users, responseErr := lc.lobbiesService.GetLobbyUsers(lobbyId)

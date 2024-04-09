@@ -17,7 +17,7 @@ func ValidateId(id string) *models.ResponseError {
 	err := uuid.Validate(id)
 	if err != nil {
 		return &models.ResponseError{
-			Message: "invalid format id, check -> uuid format",
+			Message: err.Error(),
 			Status:  http.StatusBadRequest,
 		}
 	}

@@ -38,11 +38,11 @@ func (uc *UsersController) GetUser(ctx *gin.Context) {
 // @Accept json
 // @Produce json
 // @Success 200 {object} models.Lobby
-// @Param name query string false "name of user"
-// @Router /user/create [post]
+// @Param name path string true "name of user"
+// @Router /user/create/{name} [post]
 func (uc *UsersController) CreateUser(ctx *gin.Context) {
 	userName := ctx.Param("name")
-	user, responseErr := uc.usersService.CreateUser(&models.User{Name: userName})
+	user, responseErr := uc.usersService.CreateUser(userName)
 	if responseErr != nil {
 		ctx.AbortWithStatusJSON(responseErr.Status, responseErr)
 		return
@@ -82,7 +82,7 @@ func (uc *UsersController) DeleteUser(ctx *gin.Context) {
 // @Produce json
 // @Success 204
 // @Param user query string false "Id of user"
-// @Router /user/query [patch]
+// @Router /user/update [patch]
 func (uc *UsersController) UpdateUser(ctx *gin.Context) {
 	body, err := io.ReadAll(ctx.Request.Body)
 	if err != nil {

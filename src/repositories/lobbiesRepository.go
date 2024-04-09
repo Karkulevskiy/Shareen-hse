@@ -21,7 +21,7 @@ func NewLobbiesRepository(dbHandler *sql.DB) *LobbiesRepository {
 }
 
 func (lr *LobbiesRepository) GetLobby(lobbyID string) (*models.Lobby, *models.ResponseError) {
-	query := "SELECT * FROM lobbies, users WHERE lobbies.id = $1 AND lobbies.id = users.lobby_id"
+	query := "SELECT * FROM lobbies L LEFT JOIN users U on (L.id = U.lobby_id or L.id = $1)"
 	rows, err := lr.dbHandler.Query(query, lobbyID)
 	if err != nil {
 		log.Println("error occured while getting lobby by id: ", err.Error())
@@ -31,10 +31,11 @@ func (lr *LobbiesRepository) GetLobby(lobbyID string) (*models.Lobby, *models.Re
 		}
 	}
 	defer rows.Close()
-	var lobbyId, lobbyUrl, videoUrl, createdAt, userId, userLobbyId, userName string
+	var lobbyId, lobbyUrl, createdAt string
+	var videoURL, changedAt, userLobbyId, userId, userName sql.NullString
 	userList := make([]*models.User, 0)
 	for rows.Next() {
-		err = rows.Scan(&lobbyId, &lobbyUrl, &videoUrl, &createdAt, &userId, &userLobbyId, &userName)
+		err = rows.Scan(&lobbyId, &lobbyUrl, &videoURL, &createdAt, &changedAt, &userId, &userLobbyId, &userName)
 		if err != nil {
 			log.Println("error occured while getting (scanning) lobby by id: ", err.Error())
 			return nil, &models.ResponseError{
@@ -42,12 +43,14 @@ func (lr *LobbiesRepository) GetLobby(lobbyID string) (*models.Lobby, *models.Re
 				Status:  http.StatusInternalServerError,
 			}
 		}
-		user := &models.User{
-			ID:      userId,
-			LobbyID: userLobbyId,
-			Name:    userName,
+		if userId.String != "" {
+			user := &models.User{
+				ID:      userId.String,
+				LobbyID: userLobbyId.String,
+				Name:    userName.String,
+			}
+			userList = append(userList, user)
 		}
-		userList = append(userList, user)
 	}
 	if rows.Err() != nil {
 		log.Println("any error occured while getting lobby by id: ", err.Error())
@@ -62,11 +65,15 @@ func (lr *LobbiesRepository) GetLobby(lobbyID string) (*models.Lobby, *models.Re
 			Status:  http.StatusNotFound,
 		}
 	}
+	if len(userList) == 0 {
+		userList = nil
+	}
 	return &models.Lobby{
 		ID:        lobbyId,
 		LobbyURL:  lobbyUrl,
-		VideoURL:  videoUrl,
+		VideoURL:  videoURL.String,
 		CreatedAt: createdAt,
+		ChangedAt: changedAt.String,
 		UserList:  userList,
 	}, nil
 }
@@ -102,7 +109,7 @@ func (lr *LobbiesRepository) CreateLobby(lobby *models.Lobby) (*models.Lobby, *m
 		LobbyURL:  lobby.LobbyURL,
 		VideoURL:  lobby.VideoURL,
 		CreatedAt: lobby.CreatedAt,
-		UserList:  lobby.UserList,
+		UserList:  nil,
 	}, nil
 }
 
@@ -142,10 +149,10 @@ func (lr *LobbiesRepository) GetAllLobbies() ([]*models.Lobby, *models.ResponseE
 	}
 	defer rows.Close()
 	var lobbyId, lobbyURL, videoURL, createdAt string
-	var userID, userName, userLobbyID sql.NullString
+	var changedAt, userID, userName, userLobbyID sql.NullString
 	lobbies_users := map[*models.Lobby][]*models.User{}
 	for rows.Next() {
-		err = rows.Scan(&lobbyId, &lobbyURL, &videoURL, &createdAt, &userID, &userName, &userLobbyID)
+		err = rows.Scan(&lobbyId, &lobbyURL, &videoURL, &createdAt, &changedAt, &userID, &userName, &userLobbyID)
 		if err != nil {
 			return nil, &models.ResponseError{
 				Message: err.Error(),
@@ -157,13 +164,18 @@ func (lr *LobbiesRepository) GetAllLobbies() ([]*models.Lobby, *models.ResponseE
 			LobbyURL:  lobbyURL,
 			VideoURL:  videoURL,
 			CreatedAt: createdAt,
+			ChangedAt: createdAt,
 		}
 		user := &models.User{
 			ID:      userID.String,
 			LobbyID: userLobbyID.String,
 			Name:    userName.String,
 		}
-		lobbies_users[lobby] = append(lobbies_users[lobby], user)
+		if lobbies_users[lobby] == nil {
+			lobbies_users[lobby] = nil
+		} else {
+			lobbies_users[lobby] = append(lobbies_users[lobby], user)
+		}
 	}
 
 	// Посмотреть что за null в сваггере, лоигку добавления в массив
@@ -175,7 +187,7 @@ func (lr *LobbiesRepository) GetAllLobbies() ([]*models.Lobby, *models.ResponseE
 			Status:  http.StatusInternalServerError,
 		}
 	}
-	lobbies := make([]*models.Lobby, len(lobbies_users))
+	lobbies := make([]*models.Lobby, 0)
 	for lKey, uVal := range lobbies_users {
 		lKey.UserList = uVal
 		lobbies = append(lobbies, lKey)
@@ -184,7 +196,7 @@ func (lr *LobbiesRepository) GetAllLobbies() ([]*models.Lobby, *models.ResponseE
 }
 
 func (lr *LobbiesRepository) DeleteAllLobbies() *models.ResponseError {
-	query := "DELETE * FROM lobbies"
+	query := "TRUNCATE TABLE lobbies"
 	row := lr.dbHandler.QueryRow(query)
 	if row.Err() != nil {
 		return &models.ResponseError{
@@ -229,7 +241,7 @@ func (lr *LobbiesRepository) UpdateLobby(lobby *models.Lobby) *models.ResponseEr
 }
 
 func (lr *LobbiesRepository) GetLobbyUsers(lobbyId string) ([]*models.User, *models.ResponseError) {
-	query := "SELECT * FROM users WHERE lobbyId = $1"
+	query := "SELECT * FROM users WHERE lobby_id = $1"
 	rows, err := lr.dbHandler.Query(query, lobbyId)
 	if err != nil {
 		return nil, &models.ResponseError{
