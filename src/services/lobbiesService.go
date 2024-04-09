@@ -1,9 +1,9 @@
 package services
 
 import (
-	"fmt"
 	"shareen/src/models"
 	"shareen/src/repositories"
+	"shareen/src/utils"
 	"slices"
 	"strings"
 	"time"
@@ -25,7 +25,7 @@ func NewLobbiesService(usersRepository *repositories.UsersRepository,
 	}
 }
 
-func (ls *LobbiesService) CreateLobby() (*models.Lobby, error) {
+func (ls *LobbiesService) CreateLobby() (*models.Lobby, *models.ResponseError) {
 	lobbyId := uuid.New().ID()
 	lobby := &models.Lobby{
 		LobbyURL:  createUniqueLobbyURL(lobbyId),
@@ -34,15 +34,44 @@ func (ls *LobbiesService) CreateLobby() (*models.Lobby, error) {
 	return ls.lobbiesRepository.CreateLobby(lobby)
 }
 
-func (ls *LobbiesService) GetLobby(lobbyId string) (*models.Lobby, error) {
-	if lobbyId == "" {
-		return nil, fmt.Errorf("lobby id can't be null")
+func (ls *LobbiesService) GetLobby(lobbyId string) (*models.Lobby, *models.ResponseError) {
+	err := utils.ValidateId(lobbyId)
+	if err != nil {
+		return nil, err
 	}
-	return ls.GetLobby(lobbyId)
+	return ls.lobbiesRepository.GetLobby(lobbyId)
 }
 
-func (ls *LobbiesService) GetAllLobbies() ([]*models.Lobby, error) {
+func (ls *LobbiesService) GetAllLobbies() ([]*models.Lobby, *models.ResponseError) {
 	return ls.lobbiesRepository.GetAllLobbies()
+}
+
+func (ls *LobbiesService) DeleteLobby(lobbyId string) *models.ResponseError {
+	err := utils.ValidateId(lobbyId)
+	if err != nil {
+		return err
+	}
+	return ls.lobbiesRepository.DeleteLobby(lobbyId)
+}
+
+func (ls *LobbiesService) DeleteAllLobbies() *models.ResponseError {
+	return ls.lobbiesRepository.DeleteAllLobbies()
+}
+
+func (ls *LobbiesService) UpdateLobby(lobby *models.Lobby) *models.ResponseError {
+	err := utils.ValidateId(lobby.ID)
+	if err != nil {
+		return err
+	}
+	return ls.lobbiesRepository.UpdateLobby(lobby)
+}
+
+func (ls *LobbiesService) GetLobbyUsers(lobbyId string) ([]*models.User, *models.ResponseError) {
+	err := utils.ValidateId(lobbyId)
+	if err != nil {
+		return nil, err
+	}
+	return ls.lobbiesRepository.GetLobbyUsers(lobbyId)
 }
 
 func createUniqueLobbyURL(id uint32) string {

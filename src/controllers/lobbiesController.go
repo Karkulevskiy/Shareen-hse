@@ -1,9 +1,11 @@
 package controllers
 
 import (
-	"log"
+	"encoding/json"
+	"io"
 	"net/http"
 
+	"shareen/src/models"
 	"shareen/src/services"
 
 	"github.com/gin-gonic/gin"
@@ -24,10 +26,9 @@ func NewLobbiesController(lobbiesService *services.LobbiesService) *LobbiesContr
 // @Success 200 {object} models.Lobby
 // @Router /lobby/create [post]
 func (lc *LobbiesController) CreateLobby(ctx *gin.Context) {
-	response, err := lc.lobbiesService.CreateLobby()
-	if err != nil {
-		log.Println("error occured while creating lobby", err.Error())
-		ctx.AbortWithError(http.StatusInternalServerError, err)
+	response, responseErr := lc.lobbiesService.CreateLobby()
+	if responseErr != nil {
+		ctx.AbortWithStatusJSON(responseErr.Status, responseErr)
 		return
 	}
 	ctx.JSON(http.StatusOK, response)
@@ -40,10 +41,9 @@ func (lc *LobbiesController) CreateLobby(ctx *gin.Context) {
 // @Router /lobby/:id [get]
 func (lc *LobbiesController) GetLobby(ctx *gin.Context) {
 	lobbyId := ctx.Param("id")
-	lobby, err := lc.lobbiesService.GetLobby(lobbyId)
-	if err != nil {
-		log.Println("error getting lobby")
-		ctx.AbortWithError(http.StatusInternalServerError, err)
+	lobby, responseErr := lc.lobbiesService.GetLobby(lobbyId)
+	if responseErr != nil {
+		ctx.AbortWithStatusJSON(responseErr.Status, responseErr)
 		return
 	}
 	ctx.JSON(http.StatusOK, lobby)
@@ -54,11 +54,71 @@ func (lc *LobbiesController) GetLobby(ctx *gin.Context) {
 // @Success 200 {array} models.Lobby
 // @Router /lobby/all [get]
 func (lc *LobbiesController) GetAllLobbies(ctx *gin.Context) {
-	lobbies, err := lc.lobbiesService.GetAllLobbies()
-	if err != nil {
-		log.Println(err.Error())
-		ctx.AbortWithError(http.StatusInternalServerError, err)
+	lobbies, responseErr := lc.lobbiesService.GetAllLobbies()
+	if responseErr != nil {
+		ctx.AbortWithStatusJSON(responseErr.Status, responseErr)
 		return
 	}
 	ctx.JSON(http.StatusOK, lobbies)
+}
+
+// @Accept json
+// @Success 204
+// @Failure 500
+// @Router /lobby/delete [delete]
+func (lc *LobbiesController) DeleteLobby(ctx *gin.Context) {
+	lobbyId := ctx.Param("id")
+	responseErr := lc.lobbiesService.DeleteLobby(lobbyId)
+	if responseErr != nil {
+		ctx.AbortWithStatusJSON(responseErr.Status, responseErr)
+		return
+	}
+	ctx.Status(http.StatusNoContent)
+}
+
+// @Accept json
+// @Success 204
+// @Failure 500
+// @Router /lobby/deleteall [delete]
+func (lc *LobbiesController) DeleteAllLobbies(ctx *gin.Context) {
+	responseErr := lc.lobbiesService.DeleteAllLobbies()
+	if responseErr != nil {
+		ctx.AbortWithStatusJSON(responseErr.Status, responseErr)
+		return
+	}
+	ctx.Status(http.StatusNoContent)
+}
+
+// @Accept json
+// @Success 204
+// @Failure 500
+// @Router /lobby/update [PATCH]
+// @Param lobby query string false
+func (lc *LobbiesController) UpdateLobby(ctx *gin.Context) {
+	body, err := io.ReadAll(ctx.Request.Body)
+	if err != nil {
+		ctx.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+	var lobby models.Lobby
+	err = json.Unmarshal(body, &lobby)
+	if err != nil {
+		ctx.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+	responseErr := lc.lobbiesService.UpdateLobby(&lobby)
+	if responseErr != nil {
+		ctx.AbortWithStatusJSON(responseErr.Status, responseErr)
+		return
+	}
+	ctx.Status(http.StatusNoContent)
+}
+
+// @Accept json
+// @Success 204
+// @Failure 500
+// @Router /lobby/update [PATCH]
+// @Param lobby query string false
+func (lc *LobbiesController) GetLobbyUsers(ctx *gin.Context) {
+
 }

@@ -8,6 +8,7 @@ import (
 	"shareen/src/repositories"
 	"shareen/src/services"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
 	swaggerfiles "github.com/swaggo/files"
@@ -30,17 +31,16 @@ func InitHttpServer(config *viper.Viper, dbHandler *sql.DB) HttpServer {
 	lobbiesController := controllers.NewLobbiesController(lobbiesService)
 
 	router := gin.Default()
-	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
+
+	router.Use(cors.Default())                                                //Allow all origing | Нужно будет потом настроить
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler)) // Using swagger
+
 	lobbyGroup := router.Group("/lobby")
 	{
 		lobbyGroup.GET("/:id", lobbiesController.GetLobby)
-		lobbyGroup.POST("/create", lobbiesController.CreateLobby)
 		lobbyGroup.GET("/all", lobbiesController.GetAllLobbies)
+		lobbyGroup.POST("/create", lobbiesController.CreateLobby)
 	}
-
-	//router.GET("/user/:id", usersController.GetUser) // ??
-
-	/// etc
 
 	return HttpServer{
 		config:            config,

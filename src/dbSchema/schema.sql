@@ -7,6 +7,7 @@ CREATE TABLE lobbies(
     lobby_url varchar(255) NOT NULL,
     video_url varchar(255),
     created_at varchar(255) NOT NULL ,
+    changed_at varchar(255) ,
     PRIMARY KEY (id)
 );
 
@@ -22,8 +23,8 @@ CREATE TABLE users(
 --creating lobby_user
 CREATE TABLE lobbies_users(
     id BIGSERIAL PRIMARY KEY,
-    users_id uuid REFERENCES users,
-    lobbies_id uuid REFERENCES lobbies 
+    users_id uuid REFERENCES users ON DELETE SET NULL, --Проверить поведение БД, при удалении пользователя и лобби
+    lobbies_id uuid REFERENCES lobbies ON DELETE CASCADE
 )
 
 --TODO Сделать таблицу для чата

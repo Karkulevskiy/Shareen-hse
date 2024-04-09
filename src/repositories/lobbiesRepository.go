@@ -1,31 +1,10 @@
 package repositories
 
-// @title           Swagger Example API
-// @version         1.0
-// @description     This is a sample server celler server.
-// @termsOfService  http://swagger.io/terms/
-
-// @contact.name   API Support
-// @contact.url    http://www.swagger.io/support
-// @contact.email  support@swagger.io
-
-// @license.name  Apache 2.0
-// @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
-
-// @host      localhost:8080
-// @BasePath  /api/v1
-
-// @securityDefinitions.basic  BasicAuth
-
-// @externalDocs.description  OpenAPI
-// @externalDocs.url          https://swagger.io/resources/open-api/
-
-// TODO Посмотреть документацию gin, swagger_gint
-
 import (
 	"database/sql"
 	"fmt"
 	"log"
+	"net/http"
 	"shareen/src/models"
 )
 
@@ -34,57 +13,89 @@ type LobbiesRepository struct {
 	transaction *sql.Tx
 }
 
+// Constructor for creating repository layer
 func NewLobbiesRepository(dbHandler *sql.DB) *LobbiesRepository {
 	return &LobbiesRepository{
 		dbHandler: dbHandler,
 	}
 }
 
-func (lr *LobbiesRepository) GetLobby(lobbyID string) (*models.Lobby, error) {
-	query := "SELECT * FROM lobbies WHERE id = $1"
+func (lr *LobbiesRepository) GetLobby(lobbyID string) (*models.Lobby, *models.ResponseError) {
+	query := "SELECT * FROM lobbies, users WHERE lobbies.id = $1 AND lobbies.id = users.lobby_id"
 	rows, err := lr.dbHandler.Query(query, lobbyID)
 	if err != nil {
-		return nil, fmt.Errorf("error occured selecting lobby by id: %s", err.Error())
-	}
-	defer rows.Close()
-	var id, lobbyUrl, videoUrl, createdAt string
-	userList := make([]*models.User, 0)
-	for rows.Next() {
-		err = rows.Scan(&id, &lobbyUrl, &videoUrl, &createdAt, &userList)
-		//TODO Check if we can scan entire slice without cycle in order to append
-		if err != nil {
-			return nil, fmt.Errorf("error occured selecting lobby by id: %s", err.Error())
+		log.Println("error occured while getting lobby by id: ", err.Error())
+		return nil, &models.ResponseError{
+			Message: err.Error(),
+			Status:  http.StatusInternalServerError,
 		}
 	}
-	if rows.Err() != nil {
-		return nil, fmt.Errorf("any error occure during selecting by id: %s", err.Error())
+	defer rows.Close()
+	var lobbyId, lobbyUrl, videoUrl, createdAt, userId, userLobbyId, userName string
+	userList := make([]*models.User, 0)
+	for rows.Next() {
+		err = rows.Scan(&lobbyId, &lobbyUrl, &videoUrl, &createdAt, &userId, &userLobbyId, &userName)
+		if err != nil {
+			log.Println("error occured while getting (scanning) lobby by id: ", err.Error())
+			return nil, &models.ResponseError{
+				Message: err.Error(),
+				Status:  http.StatusInternalServerError,
+			}
+		}
+		user := &models.User{
+			ID:      userId,
+			LobbyID: userLobbyId,
+			Name:    userName,
+		}
+		userList = append(userList, user)
 	}
-	fmt.Println(userList)
+	if rows.Err() != nil {
+		log.Println("any error occured while getting lobby by id: ", err.Error())
+		return nil, &models.ResponseError{
+			Message: rows.Err().Error(),
+			Status:  http.StatusInternalServerError,
+		}
+	}
+	if lobbyId == "" {
+		return nil, &models.ResponseError{
+			Message: fmt.Sprintf("lobby not found with id : {%s}", lobbyID),
+			Status:  http.StatusNotFound,
+		}
+	}
 	return &models.Lobby{
-		ID:        id,
-		LobbyURL:  lobbyID,
+		ID:        lobbyId,
+		LobbyURL:  lobbyUrl,
 		VideoURL:  videoUrl,
 		CreatedAt: createdAt,
 		UserList:  userList,
 	}, nil
 }
 
-func (lr *LobbiesRepository) CreateLobby(lobby *models.Lobby) (*models.Lobby, error) {
+func (lr *LobbiesRepository) CreateLobby(lobby *models.Lobby) (*models.Lobby, *models.ResponseError) {
 	query := "INSERT INTO lobbies (lobby_url, video_url, created_at) VALUES ($1, $2, $3) RETURNING id"
 	rows, err := lr.dbHandler.Query(query, lobby.LobbyURL, lobby.VideoURL, lobby.CreatedAt)
 	if err != nil {
-		return nil, fmt.Errorf("error occured while inserting into lobby: %s", err.Error())
+		return nil, &models.ResponseError{
+			Message: err.Error(),
+			Status:  http.StatusInternalServerError,
+		}
 	}
 	defer rows.Close()
 	var lobbyId string
 	for rows.Next() {
 		err := rows.Scan(&lobbyId)
 		if err != nil {
-			return nil, fmt.Errorf("error occured while inserting into lobby: %s", err.Error())
+			return nil, &models.ResponseError{
+				Message: err.Error(),
+				Status:  http.StatusInternalServerError,
+			}
 		}
 	}
 	if rows.Err() != nil {
-		return nil, fmt.Errorf("any errors occured while inserting into lobby: %s", rows.Err())
+		return nil, &models.ResponseError{
+			Message: rows.Err().Error(),
+			Status:  http.StatusInternalServerError,
+		}
 	}
 	return &models.Lobby{
 		ID:        lobbyId,
@@ -95,27 +106,39 @@ func (lr *LobbiesRepository) CreateLobby(lobby *models.Lobby) (*models.Lobby, er
 	}, nil
 }
 
-func (lr *LobbiesRepository) DeleteLobby(lobbyID string) error {
+func (lr *LobbiesRepository) DeleteLobby(lobbyID string) *models.ResponseError {
 	query := "DELETE FROM lobbies WHERE id = $1"
 	res, err := lr.dbHandler.Exec(query, lobbyID)
 	if err != nil {
-		return fmt.Errorf("error occured while deleting lobby: %s", err.Error())
+		return &models.ResponseError{
+			Message: err.Error(),
+			Status:  http.StatusInternalServerError,
+		}
 	}
 	rowsAffected, err := res.RowsAffected()
 	if err != nil {
-		return fmt.Errorf("error occured while deleting lobby: %s", err.Error())
+		return &models.ResponseError{
+			Message: err.Error(),
+			Status:  http.StatusInternalServerError,
+		}
 	}
 	if rowsAffected == 0 {
-		return fmt.Errorf("lobby with id: %s. NOT FOUND", lobbyID)
+		return &models.ResponseError{
+			Message: fmt.Sprintf("Not found lobby with id: {%s}", lobbyID),
+			Status:  http.StatusInternalServerError,
+		}
 	}
 	return nil
 }
 
-func (lr *LobbiesRepository) GetAllLobbies() ([]*models.Lobby, error) {
+func (lr *LobbiesRepository) GetAllLobbies() ([]*models.Lobby, *models.ResponseError) {
 	query := "SELECT * FROM lobbies l LEFT JOIN users u on l.id = u.lobby_id"
 	rows, err := lr.dbHandler.Query(query)
 	if err != nil {
-		return nil, fmt.Errorf("error occured while getting all lobbies: %s", err.Error())
+		return nil, &models.ResponseError{
+			Message: err.Error(),
+			Status:  http.StatusInternalServerError,
+		}
 	}
 	defer rows.Close()
 	var lobbyId, lobbyURL, videoURL, createdAt string
@@ -124,8 +147,10 @@ func (lr *LobbiesRepository) GetAllLobbies() ([]*models.Lobby, error) {
 	for rows.Next() {
 		err = rows.Scan(&lobbyId, &lobbyURL, &videoURL, &createdAt, &userID, &userName, &userLobbyID)
 		if err != nil {
-			log.Println(err.Error())
-			return nil, fmt.Errorf("error occured while scanning lobbies")
+			return nil, &models.ResponseError{
+				Message: err.Error(),
+				Status:  http.StatusInternalServerError,
+			}
 		}
 		lobby := &models.Lobby{
 			ID:        lobbyId,
@@ -140,8 +165,15 @@ func (lr *LobbiesRepository) GetAllLobbies() ([]*models.Lobby, error) {
 		}
 		lobbies_users[lobby] = append(lobbies_users[lobby], user)
 	}
+
+	// Посмотреть что за null в сваггере, лоигку добавления в массив
+	// Странно отображается время
+
 	if rows.Err() != nil {
-		return nil, fmt.Errorf("any error occured while scannig lobbies")
+		return nil, &models.ResponseError{
+			Message: rows.Err().Error(),
+			Status:  http.StatusInternalServerError,
+		}
 	}
 	lobbies := make([]*models.Lobby, len(lobbies_users))
 	for lKey, uVal := range lobbies_users {
@@ -151,6 +183,83 @@ func (lr *LobbiesRepository) GetAllLobbies() ([]*models.Lobby, error) {
 	return lobbies, nil
 }
 
-func (lr *LobbiesRepository) UpdateLobby() {
+func (lr *LobbiesRepository) DeleteAllLobbies() *models.ResponseError {
+	query := "DELETE * FROM lobbies"
+	row := lr.dbHandler.QueryRow(query)
+	if row.Err() != nil {
+		return &models.ResponseError{
+			Message: row.Err().Error(),
+			Status:  http.StatusInternalServerError,
+		}
+	}
+	return nil
+}
 
+func (lr *LobbiesRepository) UpdateLobby(lobby *models.Lobby) *models.ResponseError {
+	query := `
+		UPDATE lobbies
+		SET
+		lobby_url = $1,
+		video_url = $2,
+		created_at = $3,
+		changed_at = $4
+		WHERE id = $5
+	`
+	res, err := lr.dbHandler.Exec(query, lobby.LobbyURL, lobby.VideoURL, lobby.CreatedAt, lobby.ChangedAt, lobby.ID)
+	if err != nil {
+		return &models.ResponseError{
+			Message: err.Error(),
+			Status:  http.StatusInternalServerError,
+		}
+	}
+	rowsAffected, err := res.RowsAffected()
+	if err != nil {
+		return &models.ResponseError{
+			Message: err.Error(),
+			Status:  http.StatusInternalServerError,
+		}
+	}
+	if rowsAffected == 0 {
+		return &models.ResponseError{
+			Message: fmt.Sprintf("lobby for updating with id: {%s} not found", lobby.ID),
+			Status:  http.StatusNotFound,
+		}
+	}
+	return nil
+}
+
+func (lr *LobbiesRepository) GetLobbyUsers(lobbyId string) ([]*models.User, *models.ResponseError) {
+	query := "SELECT * FROM users WHERE lobbyId = $1"
+	rows, err := lr.dbHandler.Query(query, lobbyId)
+	if err != nil {
+		return nil, &models.ResponseError{
+			Message: err.Error(),
+			Status:  http.StatusInternalServerError,
+		}
+	}
+	defer rows.Close()
+	users := make([]*models.User, 0)
+	var userId, lobbyUserId, name string
+	for rows.Next() {
+		err = rows.Scan(&userId, &lobbyUserId, &name)
+		if err != nil {
+			return nil, &models.ResponseError{
+				Message: err.Error(),
+				Status:  http.StatusInternalServerError,
+			}
+		}
+		user := &models.User{
+			ID:      userId,
+			LobbyID: lobbyUserId,
+			Name:    name,
+		}
+		users = append(users, user)
+	}
+	if rows.Err() != nil {
+		return nil, &models.ResponseError{
+			Message: rows.Err().Error(),
+			Status:  http.StatusInternalServerError,
+		}
+	}
+	return users, nil
 }
