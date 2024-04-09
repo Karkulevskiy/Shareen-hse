@@ -1,15 +1,12 @@
 package main
 
 import (
+	_ "github.com/swaggo/files"       // swagger embed files
+	_ "github.com/swaggo/gin-swagger" // gin-swagger middleware
 	"log"
 	"shareen/src/configs"
 	_ "shareen/src/docs"
 	"shareen/src/server"
-
-	//"github.com/gin-gonic/gin"
-	"github.com/gin-gonic/gin"
-	swaggerfiles "github.com/swaggo/files"
-	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 // @title           Swagger Example API
@@ -38,10 +35,6 @@ func main() {
 	log.Print("Initializing configuration")
 	config := configs.InitConfig("shareen")
 	dbHandler := server.InitDatabase(config)
-	router := gin.Default()
-	httpServer := server.InitHttpServer(config, dbHandler, router)
-	httpServer.Router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
-	httpServer.Router.POST("/lobby/create", httpServer.LobbiesController.CreateLobby)
+	httpServer := server.InitHttpServer(config, dbHandler)
 	httpServer.Start()
-
 }

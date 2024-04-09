@@ -6,4 +6,4 @@ connection_max_lifetime = "60s"
 driver_name = "postgres"
 
 [http]
-served_address = ":8080"
+server_address = ":8080"

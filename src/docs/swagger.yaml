@@ -1,4 +1,29 @@
 basePath: /
+definitions:
+  models.Lobby:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: string
+      lobby_url:
+        type: string
+      user_list:
+        items:
+          $ref: '#/definitions/models.User'
+        type: array
+      video_url:
+        type: string
+    type: object
+  models.User:
+    properties:
+      id:
+        type: string
+      lobby_id:
+        type: string
+      name:
+        type: string
+    type: object
 externalDocs:
   description: OpenAPI
   url: https://swagger.io/resources/open-api/
@@ -15,7 +40,47 @@ info:
   termsOfService: http://swagger.io/terms/
   title: Swagger Example API
   version: "1.0"
-paths: {}
+paths:
+  /lobby/:id:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: Id of lobby
+        in: query
+        name: lobbyid
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Lobby'
+  /lobby/all:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Lobby'
+            type: array
+  /lobby/create:
+    post:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Lobby'
 securityDefinitions:
   BasicAuth:
     type: basic

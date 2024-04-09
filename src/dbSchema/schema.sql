@@ -11,10 +11,19 @@ CREATE TABLE lobbies(
 );
 
 --creating table user
-
 CREATE TABLE users(
     id uuid NOT NULL DEFAULT uuid_generate_v1mc(),
     lobby_id uuid,
     name VARCHAR(20) NOT NULL,
-    FOREIGN KEY (lobby_id) REFERENCES lobbies (id)
+    FOREIGN KEY (lobby_id) REFERENCES lobbies (id),
+    PRIMARY KEY(id)
 );
+
+--creating lobby_user
+CREATE TABLE lobbies_users(
+    id BIGSERIAL PRIMARY KEY,
+    users_id uuid REFERENCES users,
+    lobbies_id uuid REFERENCES lobbies 
+)
+
+--TODO Сделать таблицу для чата

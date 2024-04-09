@@ -10,16 +10,18 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
+	swaggerfiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 type HttpServer struct {
-	Router            *gin.Engine
+	router            *gin.Engine
 	config            *viper.Viper
 	usersController   *controllers.UsersController
-	LobbiesController *controllers.LobbiesController
+	lobbiesController *controllers.LobbiesController
 }
 
-func InitHttpServer(config *viper.Viper, dbHandler *sql.DB, router *gin.Engine) *HttpServer {
+func InitHttpServer(config *viper.Viper, dbHandler *sql.DB) HttpServer {
 	usersRepository := repositories.NewUsersRepository(dbHandler)
 	lobbiesRepository := repositories.NewLobbiesRepository(dbHandler)
 	usersService := services.NewUsersService(usersRepository, lobbiesRepository)
@@ -27,20 +29,29 @@ func InitHttpServer(config *viper.Viper, dbHandler *sql.DB, router *gin.Engine) 
 	usersController := controllers.NewUsersController(usersService)
 	lobbiesController := controllers.NewLobbiesController(lobbiesService)
 
+	router := gin.Default()
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
+	lobbyGroup := router.Group("/lobby")
+	{
+		lobbyGroup.GET("/:id", lobbiesController.GetLobby)
+		lobbyGroup.POST("/create", lobbiesController.CreateLobby)
+		lobbyGroup.GET("/all", lobbiesController.GetAllLobbies)
+	}
+
 	//router.GET("/user/:id", usersController.GetUser) // ??
 
 	/// etc
 
-	return &HttpServer{
+	return HttpServer{
 		config:            config,
-		Router:            router,
+		router:            router,
 		usersController:   usersController,
-		LobbiesController: lobbiesController,
+		lobbiesController: lobbiesController,
 	}
 }
 
-func (hs *HttpServer) Start() {
-	err := hs.Router.Run(hs.config.GetString("http.server_address"))
+func (hs HttpServer) Start() {
+	err := hs.router.Run(hs.config.GetString("http.server_address"))
 	if err != nil {
 		log.Fatal("error occured while starting server\n", err)
 	}

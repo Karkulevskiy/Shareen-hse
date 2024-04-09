@@ -25,6 +25,7 @@ package repositories
 import (
 	"database/sql"
 	"fmt"
+	"log"
 	"shareen/src/models"
 )
 
@@ -69,8 +70,8 @@ func (lr *LobbiesRepository) GetLobby(lobbyID string) (*models.Lobby, error) {
 }
 
 func (lr *LobbiesRepository) CreateLobby(lobby *models.Lobby) (*models.Lobby, error) {
-	query := "INSERT INTO lobbies (lobby_url, video_url, created_at, user_list) VALUES ($1, $2, $3, $4) RETURNING id"
-	rows, err := lr.dbHandler.Query(query, lobby.LobbyURL, lobby.VideoURL, lobby.CreatedAt, lobby.UserList)
+	query := "INSERT INTO lobbies (lobby_url, video_url, created_at) VALUES ($1, $2, $3) RETURNING id"
+	rows, err := lr.dbHandler.Query(query, lobby.LobbyURL, lobby.VideoURL, lobby.CreatedAt)
 	if err != nil {
 		return nil, fmt.Errorf("error occured while inserting into lobby: %s", err.Error())
 	}
@@ -110,21 +111,45 @@ func (lr *LobbiesRepository) DeleteLobby(lobbyID string) error {
 	return nil
 }
 
-// func (lr *LobbiesRepository) GetAllLobbies() ([]*models.Lobby, error) {
-// 	query := "SELECT * FROM LOBBIES"
-// 	rows, err := lr.dbHandler.Query(query)
-// 	defer rows.Close()
-// 	if err != nil {
-// 		return nil, fmt.Errorf("Error occured while getting all lobbies: %w", err.Error())
-// 	}
-// 	//TODO Проверить, что при сканировании всех лобби будут подтягиваться User'ы
-// 	// Наверное надо посмотреть сложные запросы в постгресе
-// 	lobbies := make([]*models.Lobby, 0)
-// 	var id, lobbyUrl, videoUrl, createdAt string
-// 	for rows.Next() {
-// 		err = rows.Scan()
-// 	}
-// }
+func (lr *LobbiesRepository) GetAllLobbies() ([]*models.Lobby, error) {
+	query := "SELECT * FROM lobbies l LEFT JOIN users u on l.id = u.lobby_id"
+	rows, err := lr.dbHandler.Query(query)
+	if err != nil {
+		return nil, fmt.Errorf("error occured while getting all lobbies: %s", err.Error())
+	}
+	defer rows.Close()
+	var lobbyId, lobbyURL, videoURL, createdAt string
+	var userID, userName, userLobbyID sql.NullString
+	lobbies_users := map[*models.Lobby][]*models.User{}
+	for rows.Next() {
+		err = rows.Scan(&lobbyId, &lobbyURL, &videoURL, &createdAt, &userID, &userName, &userLobbyID)
+		if err != nil {
+			log.Println(err.Error())
+			return nil, fmt.Errorf("error occured while scanning lobbies")
+		}
+		lobby := &models.Lobby{
+			ID:        lobbyId,
+			LobbyURL:  lobbyURL,
+			VideoURL:  videoURL,
+			CreatedAt: createdAt,
+		}
+		user := &models.User{
+			ID:      userID.String,
+			LobbyID: userLobbyID.String,
+			Name:    userName.String,
+		}
+		lobbies_users[lobby] = append(lobbies_users[lobby], user)
+	}
+	if rows.Err() != nil {
+		return nil, fmt.Errorf("any error occured while scannig lobbies")
+	}
+	lobbies := make([]*models.Lobby, len(lobbies_users))
+	for lKey, uVal := range lobbies_users {
+		lKey.UserList = uVal
+		lobbies = append(lobbies, lKey)
+	}
+	return lobbies, nil
+}
 
 func (lr *LobbiesRepository) UpdateLobby() {
 

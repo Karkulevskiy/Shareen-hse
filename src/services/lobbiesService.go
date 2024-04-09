@@ -1,6 +1,7 @@
 package services
 
 import (
+	"fmt"
 	"shareen/src/models"
 	"shareen/src/repositories"
 	"slices"
@@ -31,6 +32,17 @@ func (ls *LobbiesService) CreateLobby() (*models.Lobby, error) {
 		CreatedAt: time.Now().GoString(),
 	}
 	return ls.lobbiesRepository.CreateLobby(lobby)
+}
+
+func (ls *LobbiesService) GetLobby(lobbyId string) (*models.Lobby, error) {
+	if lobbyId == "" {
+		return nil, fmt.Errorf("lobby id can't be null")
+	}
+	return ls.GetLobby(lobbyId)
+}
+
+func (ls *LobbiesService) GetAllLobbies() ([]*models.Lobby, error) {
+	return ls.lobbiesRepository.GetAllLobbies()
 }
 
 func createUniqueLobbyURL(id uint32) string {
