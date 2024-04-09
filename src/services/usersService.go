@@ -20,7 +20,7 @@ func NewUsersService(userRepository *repositories.UsersRepository,
 	}
 }
 
-func (us *UsersService) CreateUser(user *models.User) (*models.User, *models.ResponseError) {
+func (us *UsersService) CreateUser(userName *models.User) (*models.User, *models.ResponseError) {
 	if user.Name == "" {
 		return nil, &models.ResponseError{
 			Message: "user name can't be empty",

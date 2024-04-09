@@ -92,7 +92,7 @@ func (lc *LobbiesController) DeleteAllLobbies(ctx *gin.Context) {
 // @Accept json
 // @Success 204
 // @Failure 500
-// @Router /lobby/update [PATCH]
+// @Router /lobby/update [patch]
 // @Param lobby query string false
 func (lc *LobbiesController) UpdateLobby(ctx *gin.Context) {
 	body, err := io.ReadAll(ctx.Request.Body)
@@ -115,10 +115,16 @@ func (lc *LobbiesController) UpdateLobby(ctx *gin.Context) {
 }
 
 // @Accept json
-// @Success 204
+// @Success 200
 // @Failure 500
-// @Router /lobby/update [PATCH]
+// @Router /lobby/lobbyusers [PATCH]
 // @Param lobby query string false
 func (lc *LobbiesController) GetLobbyUsers(ctx *gin.Context) {
-
+	lobbyId := ctx.Param("id")
+	users, responseErr := lc.lobbiesService.GetLobbyUsers(lobbyId)
+	if responseErr != nil {
+		ctx.AbortWithStatusJSON(responseErr.Status, responseErr)
+		return
+	}
+	ctx.JSON(http.StatusOK, users)
 }

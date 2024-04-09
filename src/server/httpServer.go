@@ -39,7 +39,16 @@ func InitHttpServer(config *viper.Viper, dbHandler *sql.DB) HttpServer {
 	{
 		lobbyGroup.GET("/:id", lobbiesController.GetLobby)
 		lobbyGroup.GET("/all", lobbiesController.GetAllLobbies)
+		lobbyGroup.GET("/lobbyusers", lobbiesController.GetLobbyUsers)
 		lobbyGroup.POST("/create", lobbiesController.CreateLobby)
+		lobbyGroup.POST("/delete", lobbiesController.DeleteLobby)
+		lobbyGroup.POST("/deleteall", lobbiesController.DeleteAllLobbies)
+		lobbyGroup.PATCH("/update", lobbiesController.UpdateLobby)
+	}
+
+	userGroup := router.Group("/user")
+	{
+		userGroup.GET()
 	}
 
 	return HttpServer{
