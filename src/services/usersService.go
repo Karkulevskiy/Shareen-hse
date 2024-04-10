@@ -31,7 +31,7 @@ func (us *UsersService) CreateUser(userName string) (*models.User, *models.Respo
 	} // ПР
 	user := &models.User{
 		Name:    userName,
-		LobbyID: uuid.NullUUID.,
+		LobbyID: uuid.Nil.String(),
 	}
 	return us.usersRepository.CreateUser(user)
 }
