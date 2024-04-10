@@ -37,7 +37,7 @@ func (uc *UsersController) GetUser(ctx *gin.Context) {
 
 // @Accept json
 // @Produce json
-// @Success 200 {object} models.Lobby
+// @Success 200 {object} models.User
 // @Param name path string true "name of user"
 // @Router /user/create/{name} [post]
 func (uc *UsersController) CreateUser(ctx *gin.Context) {

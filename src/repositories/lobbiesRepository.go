@@ -21,7 +21,7 @@ func NewLobbiesRepository(dbHandler *sql.DB) *LobbiesRepository {
 }
 
 func (lr *LobbiesRepository) GetLobby(lobbyID string) (*models.Lobby, *models.ResponseError) {
-	query := "SELECT * FROM lobbies L LEFT JOIN users U on (L.id = U.lobby_id or L.id = $1)"
+	query := "SELECT * FROM lobbies WHERE id = $1"
 	rows, err := lr.dbHandler.Query(query, lobbyID)
 	if err != nil {
 		log.Println("error occured while getting lobby by id: ", err.Error())
@@ -139,7 +139,7 @@ func (lr *LobbiesRepository) DeleteLobby(lobbyID string) *models.ResponseError {
 }
 
 func (lr *LobbiesRepository) GetAllLobbies() ([]*models.Lobby, *models.ResponseError) {
-	query := "SELECT * FROM lobbies l LEFT JOIN users u on l.id = u.lobby_id"
+	query := "SELECT * FROM lobbies" //тут написать сложный запрос
 	rows, err := lr.dbHandler.Query(query)
 	if err != nil {
 		return nil, &models.ResponseError{

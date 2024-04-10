@@ -262,7 +262,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.Lobby"
+                            "$ref": "#/definitions/models.User"
                         }
                     }
                 }

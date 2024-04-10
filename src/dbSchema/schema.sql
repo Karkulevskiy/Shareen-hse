@@ -14,17 +14,16 @@ CREATE TABLE lobbies(
 --creating table user
 CREATE TABLE users(
     id uuid NOT NULL DEFAULT gen_random_uuid(),
-    lobby_id uuid,
     name VARCHAR(20) NOT NULL,
-    FOREIGN KEY (lobby_id) REFERENCES lobbies (id) ON DELETE SET NULL,
     PRIMARY KEY(id)
 );
 
 --creating lobby_user
 CREATE TABLE lobbies_users(
-    id BIGSERIAL PRIMARY KEY,
+    id uuid NOT NULL DEFAULT gen_random_uuid(),
     users_id uuid REFERENCES users ON DELETE SET NULL, --Проверить поведение БД, при удалении пользователя и лобби
-    lobbies_id uuid REFERENCES lobbies ON DELETE CASCADE
+    lobbies_id uuid REFERENCES lobbies ON DELETE CASCADE,
+	PRIMARY KEY(id)
 )
 
 --TODO Сделать таблицу для чата

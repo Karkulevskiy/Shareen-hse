@@ -53,7 +53,7 @@ func (ur *UsersRepository) GetUser(userId string) (*models.User, *models.Respons
 }
 
 func (ur *UsersRepository) CreateUser(user *models.User) (*models.User, *models.ResponseError) {
-	query := "INSERT INTO users (lobby_id, name) VALUES ($1, $2) RETURNING id"
+	query := "INSERT INTO users (id, lobby_id, name) VALUES ($1, $2) RETURNING id"
 	rows, err := ur.dbHandler.Query(query, user.LobbyID, user.Name)
 	if err != nil {
 		return nil, &models.ResponseError{
