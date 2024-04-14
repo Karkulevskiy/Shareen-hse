@@ -9,7 +9,7 @@ import (
 func InitConfig(filename string) *viper.Viper {
 	config := viper.New()
 	config.SetConfigName(filename)
-	config.AddConfigPath(".\\..\\internal\\configs\\")
+	config.AddConfigPath(".\\internal\\configs\\")
 	err := config.ReadInConfig()
 	if err != nil {
 		log.Fatal("error while parsing configuraion file\n", err)

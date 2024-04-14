@@ -79,8 +79,9 @@ func (lr *LobbiesRepository) GetLobby(lobbyID string) (*models.Lobby, *models.Re
 }
 
 func (lr *LobbiesRepository) CreateLobby(lobby *models.Lobby) (*models.Lobby, *models.ResponseError) {
-	query := "INSERT INTO lobbies (lobby_url, video_url, created_at) VALUES ($1, $2, $3) RETURNING id"
-	rows, err := lr.dbHandler.Query(query, lobby.LobbyURL, lobby.VideoURL, lobby.CreatedAt)
+	queryFirst := "INSERT INTO lobbies (lobby_url, video_url, created_at) VALUES ($1, $2, $3) RETURNING id"
+	querySecond := "INSERT INTO lobbies_users (lobby_id) VALUES ($1)"
+	rows, err := lr.dbHandler.Query(queryFirst, lobby.LobbyURL, lobby.VideoURL, lobby.CreatedAt)
 	if err != nil {
 		return nil, &models.ResponseError{
 			Message: err.Error(),
@@ -101,6 +102,27 @@ func (lr *LobbiesRepository) CreateLobby(lobby *models.Lobby) (*models.Lobby, *m
 	if rows.Err() != nil {
 		return nil, &models.ResponseError{
 			Message: rows.Err().Error(),
+			Status:  http.StatusInternalServerError,
+		}
+	}
+	// Добавление данных в промежуточную таблицу
+	res, err := lr.dbHandler.Exec(querySecond, lobbyId)
+	if err != nil {
+		return nil, &models.ResponseError{
+			Message: err.Error(),
+			Status:  http.StatusInternalServerError,
+		}
+	}
+	rowsAffected, err := res.RowsAffected()
+	if err != nil {
+		return nil, &models.ResponseError{
+			Message: err.Error(),
+			Status:  http.StatusInternalServerError,
+		}
+	}
+	if rowsAffected == 0 {
+		return nil, &models.ResponseError{
+			Message: "no any rows were affected",
 			Status:  http.StatusInternalServerError,
 		}
 	}

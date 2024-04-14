@@ -12,6 +12,9 @@
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "lobbies"
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -33,6 +36,9 @@
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "lobbies"
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -47,6 +53,9 @@
             "delete": {
                 "consumes": [
                     "application/json"
+                ],
+                "tags": [
+                    "lobbies"
                 ],
                 "parameters": [
                     {
@@ -72,6 +81,9 @@
                 "consumes": [
                     "application/json"
                 ],
+                "tags": [
+                    "lobbies"
+                ],
                 "responses": {
                     "204": {
                         "description": "No Content"
@@ -86,6 +98,9 @@
             "get": {
                 "consumes": [
                     "application/json"
+                ],
+                "tags": [
+                    "lobbies"
                 ],
                 "parameters": [
                     {
@@ -110,6 +125,9 @@
             "patch": {
                 "consumes": [
                     "application/json"
+                ],
+                "tags": [
+                    "lobbies"
                 ],
                 "parameters": [
                     {
@@ -139,6 +157,9 @@
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "lobbies"
+                ],
                 "parameters": [
                     {
                         "type": "string",
@@ -166,6 +187,9 @@
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "users"
+                ],
                 "parameters": [
                     {
                         "type": "string",
@@ -190,6 +214,9 @@
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "users"
+                ],
                 "parameters": [
                     {
                         "type": "string",
@@ -213,6 +240,9 @@
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "users"
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -233,6 +263,9 @@
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "users"
                 ],
                 "parameters": [
                     {
@@ -260,6 +293,9 @@
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "users"
                 ],
                 "parameters": [
                     {

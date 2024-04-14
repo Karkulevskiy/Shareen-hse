@@ -23,6 +23,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "lobbies"
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -44,6 +47,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "lobbies"
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -58,6 +64,9 @@ const docTemplate = `{
             "delete": {
                 "consumes": [
                     "application/json"
+                ],
+                "tags": [
+                    "lobbies"
                 ],
                 "parameters": [
                     {
@@ -83,6 +92,9 @@ const docTemplate = `{
                 "consumes": [
                     "application/json"
                 ],
+                "tags": [
+                    "lobbies"
+                ],
                 "responses": {
                     "204": {
                         "description": "No Content"
@@ -97,6 +109,9 @@ const docTemplate = `{
             "get": {
                 "consumes": [
                     "application/json"
+                ],
+                "tags": [
+                    "lobbies"
                 ],
                 "parameters": [
                     {
@@ -121,6 +136,9 @@ const docTemplate = `{
             "patch": {
                 "consumes": [
                     "application/json"
+                ],
+                "tags": [
+                    "lobbies"
                 ],
                 "parameters": [
                     {
@@ -150,6 +168,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "lobbies"
+                ],
                 "parameters": [
                     {
                         "type": "string",
@@ -177,6 +198,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "users"
+                ],
                 "parameters": [
                     {
                         "type": "string",
@@ -201,6 +225,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "users"
+                ],
                 "parameters": [
                     {
                         "type": "string",
@@ -224,6 +251,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "users"
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -244,6 +274,9 @@ const docTemplate = `{
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "users"
                 ],
                 "parameters": [
                     {
@@ -271,6 +304,9 @@ const docTemplate = `{
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "users"
                 ],
                 "parameters": [
                     {

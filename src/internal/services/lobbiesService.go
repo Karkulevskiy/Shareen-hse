@@ -31,7 +31,23 @@ func (ls *LobbiesService) CreateLobby() (*models.Lobby, *models.ResponseError) {
 		LobbyURL:  createUniqueLobbyURL(lobbyId),
 		CreatedAt: time.Now().GoString(),
 	}
-	return ls.lobbiesRepository.CreateLobby(lobby)
+	err := repositories.BeginTransaction(ls.lobbiesRepository, ls.usersRepository)
+	if err != nil {
+		return nil, err
+	}
+	response, responseErr := ls.lobbiesRepository.CreateLobby(lobby)
+	if responseErr != nil {
+		err := repositories.RollbackTransaction(ls.lobbiesRepository, ls.usersRepository)
+		if err != nil {
+			return nil, err
+		}
+		return nil, responseErr
+	}
+	err = repositories.CommitTransaction(ls.lobbiesRepository, ls.usersRepository)
+	if err != nil {
+		return nil, err
+	}
+	return response, nil
 }
 
 func (ls *LobbiesService) GetLobby(lobbyId string) (*models.Lobby, *models.ResponseError) {
@@ -51,11 +67,43 @@ func (ls *LobbiesService) DeleteLobby(lobbyId string) *models.ResponseError {
 	if err != nil {
 		return err
 	}
-	return ls.lobbiesRepository.DeleteLobby(lobbyId)
+	transactionErr := repositories.BeginTransaction(ls.lobbiesRepository, ls.usersRepository)
+	if transactionErr != nil {
+		return transactionErr
+	}
+	responseErr := ls.lobbiesRepository.DeleteLobby(lobbyId)
+	if responseErr != nil {
+		err = repositories.RollbackTransaction(ls.lobbiesRepository, ls.usersRepository)
+		if err != nil {
+			return err
+		}
+		return responseErr
+	}
+	err = repositories.CommitTransaction(ls.lobbiesRepository, ls.usersRepository)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (ls *LobbiesService) DeleteAllLobbies() *models.ResponseError {
-	return ls.lobbiesRepository.DeleteAllLobbies()
+	transactionErr := repositories.BeginTransaction(ls.lobbiesRepository, ls.usersRepository)
+	if transactionErr != nil {
+		return transactionErr
+	}
+	responseErr := ls.lobbiesRepository.DeleteAllLobbies()
+	if responseErr != nil {
+		transactionErr := repositories.RollbackTransaction(ls.lobbiesRepository, ls.usersRepository)
+		if transactionErr != nil {
+			return transactionErr
+		}
+		return responseErr
+	}
+	transactionErr = repositories.CommitTransaction(ls.lobbiesRepository, ls.usersRepository)
+	if transactionErr != nil {
+		return transactionErr
+	}
+	return nil
 }
 
 func (ls *LobbiesService) UpdateLobby(lobby *models.Lobby) *models.ResponseError {

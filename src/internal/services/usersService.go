@@ -28,7 +28,7 @@ func (us *UsersService) CreateUser(userName string) (*models.User, *models.Respo
 			Message: "user name can't be empty",
 			Status:  http.StatusBadRequest,
 		}
-	} // ПР
+	} // ПР что я тут имел ввиду - хз
 	user := &models.User{
 		Name:    userName,
 		LobbyID: uuid.Nil.String(),
@@ -53,7 +53,23 @@ func (us *UsersService) DeleteUser(userId string) *models.ResponseError {
 	if err != nil {
 		return err
 	}
-	return us.usersRepository.DeleteUser(userId)
+	transactionErr := repositories.BeginTransaction(us.lobbiesRepository, us.usersRepository)
+	if transactionErr != nil {
+		return transactionErr
+	}
+	responserErr := us.usersRepository.DeleteUser(userId)
+	if responserErr != nil {
+		transactionErr = repositories.RollbackTransaction(us.lobbiesRepository, us.usersRepository)
+		if transactionErr != nil {
+			return transactionErr
+		}
+		return responserErr
+	}
+	transactionErr = repositories.CommitTransaction(us.lobbiesRepository, us.usersRepository)
+	if transactionErr != nil {
+		return transactionErr
+	}
+	return nil
 }
 
 func (us *UsersService) UpdateUser(user *models.User) *models.ResponseError {

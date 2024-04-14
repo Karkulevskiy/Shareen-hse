@@ -22,6 +22,7 @@ func NewUsersController(usersService *services.UsersService) *UsersController {
 
 // @Accept json
 // @Produce json
+// @Tags users
 // @Success 200 {object} models.Lobby
 // @Param userid query string false "Id of user"
 // @Router /user/:id [get]
@@ -37,6 +38,7 @@ func (uc *UsersController) GetUser(ctx *gin.Context) {
 
 // @Accept json
 // @Produce json
+// @Tags users
 // @Success 200 {object} models.User
 // @Param name path string true "name of user"
 // @Router /user/create/{name} [post]
@@ -52,6 +54,7 @@ func (uc *UsersController) CreateUser(ctx *gin.Context) {
 
 // @Accept json
 // @Produce json
+// @Tags users
 // @Success 200 {array} models.Lobby
 // @Router /user/allusers [get]
 func (uc *UsersController) GetAllUsers(ctx *gin.Context) {
@@ -65,6 +68,7 @@ func (uc *UsersController) GetAllUsers(ctx *gin.Context) {
 
 // @Accept json
 // @Produce json
+// @Tags users
 // @Success 204
 // @Param userid query string false "Id of user"
 // @Router /user/:id [delete]
@@ -79,6 +83,7 @@ func (uc *UsersController) DeleteUser(ctx *gin.Context) {
 }
 
 // @Accept json
+// @Tags users
 // @Produce json
 // @Success 204
 // @Param user query string false "Id of user"
