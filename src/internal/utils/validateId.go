@@ -2,7 +2,7 @@ package utils
 
 import (
 	"net/http"
-	"shareen/src/models"
+	"shareen/src/internal/models"
 
 	"github.com/google/uuid"
 )

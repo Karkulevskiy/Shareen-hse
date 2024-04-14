@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"shareen/src/models"
+	"shareen/src/internal/models"
 )
 
 type LobbiesRepository struct {

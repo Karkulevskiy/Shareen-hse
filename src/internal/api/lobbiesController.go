@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
-
-	"shareen/src/models"
-	"shareen/src/services"
+	_ "shareen/src/internal/docs"
+	"shareen/src/internal/models"
+	"shareen/src/internal/services"
 
 	"github.com/gin-gonic/gin"
 )

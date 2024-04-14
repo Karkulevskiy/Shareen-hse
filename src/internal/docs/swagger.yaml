@@ -1,4 +1,3 @@
-basePath: /
 definitions:
   models.Lobby:
     properties:
@@ -26,16 +25,8 @@ definitions:
       name:
         type: string
     type: object
-externalDocs:
-  description: OpenAPI
-host: localhost:8080
 info:
   contact: {}
-  license:
-    name: Apache 2.0
-    url: http://www.apache.org/licenses/LICENSE-2.0.html
-  title: Swagger Shareen
-  version: "1.0"
 paths:
   /lobby/{id}:
     get:
@@ -205,7 +196,4 @@ paths:
       responses:
         "204":
           description: No Content
-securityDefinitions:
-  BasicAuth:
-    type: basic
 swagger: "2.0"

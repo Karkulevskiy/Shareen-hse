@@ -5,7 +5,7 @@ import (
 	"log"
 	"net/http"
 	"regexp"
-	"shareen/src/models"
+	"shareen/src/internal/models"
 	"strings"
 )
 

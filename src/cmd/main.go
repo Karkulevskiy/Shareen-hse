@@ -1,13 +1,12 @@
 package main
 
 import (
-	"log"
-	"shareen/src/configs"
-	_ "shareen/src/docs"
-	"shareen/src/server"
-
 	_ "github.com/swaggo/files"       // swagger embed files
 	_ "github.com/swaggo/gin-swagger" // gin-swagger middleware
+	"log"
+	"shareen/src/internal/configs"
+	_ "shareen/src/internal/docs"
+	"shareen/src/internal/server"
 )
 
 // @title           Swagger Shareen

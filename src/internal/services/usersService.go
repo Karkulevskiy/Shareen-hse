@@ -2,9 +2,9 @@ package services
 
 import (
 	"net/http"
-	"shareen/src/models"
-	"shareen/src/repositories"
-	"shareen/src/utils"
+	"shareen/src/internal/models"
+	"shareen/src/internal/repositories"
+	"shareen/src/internal/utils"
 
 	"github.com/google/uuid"
 )

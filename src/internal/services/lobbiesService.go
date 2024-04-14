@@ -1,9 +1,9 @@
 package services
 
 import (
-	"shareen/src/models"
-	"shareen/src/repositories"
-	"shareen/src/utils"
+	"shareen/src/internal/models"
+	"shareen/src/internal/repositories"
+	"shareen/src/internal/utils"
 	"slices"
 	"strings"
 	"time"

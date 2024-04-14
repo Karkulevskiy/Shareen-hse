@@ -2,17 +2,16 @@ package server
 
 import (
 	"database/sql"
-	"log"
-	"shareen/src/controllers"
-	_ "shareen/src/docs"
-	"shareen/src/repositories"
-	"shareen/src/services"
-
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
 	swaggerfiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
+	"log"
+	controllers "shareen/src/internal/api"
+	_ "shareen/src/internal/docs"
+	"shareen/src/internal/repositories"
+	"shareen/src/internal/services"
 )
 
 type HttpServer struct {

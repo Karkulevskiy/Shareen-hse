@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"net/http"
-	"shareen/src/models"
+	"shareen/src/internal/models"
 )
 
 type UsersRepository struct {

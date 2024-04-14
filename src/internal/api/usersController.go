@@ -2,12 +2,12 @@ package controllers
 
 import (
 	"encoding/json"
+	"github.com/gin-gonic/gin"
 	"io"
 	"net/http"
-	"shareen/src/models"
-	"shareen/src/services"
-
-	"github.com/gin-gonic/gin"
+	_ "shareen/src/internal/docs"
+	"shareen/src/internal/models"
+	"shareen/src/internal/services"
 )
 
 type UsersController struct {
