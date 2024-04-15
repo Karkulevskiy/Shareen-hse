@@ -29,9 +29,9 @@ func (ur *UsersRepository) GetUser(userId string) (*models.User, *models.Respons
 	}
 	defer rows.Close()
 	//TODO Проверить, что будет если lobbyid == nil
-	var id, lobbyid, name string
+	var id, name string
 	for rows.Next() {
-		err = rows.Scan(&id, &lobbyid, &name)
+		err = rows.Scan(&id, &name)
 		if err != nil {
 			return nil, &models.ResponseError{
 				Message: err.Error(),
@@ -46,15 +46,14 @@ func (ur *UsersRepository) GetUser(userId string) (*models.User, *models.Respons
 		}
 	}
 	return &models.User{
-		ID:      id,
-		LobbyID: lobbyid,
-		Name:    name,
+		ID:   id,
+		Name: name,
 	}, nil
 }
 
 func (ur *UsersRepository) CreateUser(user *models.User) (*models.User, *models.ResponseError) {
-	query := "INSERT INTO users (id, lobby_id, name) VALUES ($1, $2) RETURNING id"
-	rows, err := ur.dbHandler.Query(query, user.LobbyID, user.Name)
+	query := "INSERT INTO users (name) VALUES ($1) RETURNING id"
+	rows, err := ur.dbHandler.Query(query, user.Name)
 	if err != nil {
 		return nil, &models.ResponseError{
 			Message: err.Error(),
@@ -79,9 +78,8 @@ func (ur *UsersRepository) CreateUser(user *models.User) (*models.User, *models.
 		}
 	}
 	return &models.User{
-		ID:      userId,
-		LobbyID: user.LobbyID,
-		Name:    user.Name,
+		ID:   userId,
+		Name: user.Name,
 	}, nil
 }
 
@@ -96,9 +94,9 @@ func (ur *UsersRepository) GetAllUsers() ([]*models.User, *models.ResponseError)
 	}
 	defer rows.Close()
 	users := make([]*models.User, 0)
-	var id, lobbyId, name string
+	var id, name string
 	for rows.Next() {
-		err = rows.Scan(&id, &lobbyId, &name)
+		err = rows.Scan(&id, &name)
 		if err != nil {
 			return nil, &models.ResponseError{
 				Message: err.Error(),
@@ -106,9 +104,8 @@ func (ur *UsersRepository) GetAllUsers() ([]*models.User, *models.ResponseError)
 			}
 		}
 		users = append(users, &models.User{
-			ID:      id,
-			LobbyID: lobbyId,
-			Name:    name,
+			ID:   id,
+			Name: name,
 		})
 	}
 	if rows.Err() != nil {
@@ -147,10 +144,9 @@ func (ur *UsersRepository) DeleteUser(userId string) *models.ResponseError {
 func (ur *UsersRepository) UpdateUser(user *models.User) *models.ResponseError {
 	query := `UPDATE users
 	SET
-	name = $1,
-	lobby_id = $2
-	WHERE id = $3`
-	res, err := ur.dbHandler.Exec(query, user.LobbyID, user.Name, user.ID)
+	name = $1
+	WHERE id = $2`
+	res, err := ur.dbHandler.Exec(query, user.Name, user.ID)
 	if err != nil {
 		return &models.ResponseError{
 			Message: err.Error(),

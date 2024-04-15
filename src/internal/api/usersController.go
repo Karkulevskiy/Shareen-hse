@@ -2,12 +2,13 @@ package controllers
 
 import (
 	"encoding/json"
-	"github.com/gin-gonic/gin"
 	"io"
 	"net/http"
 	_ "shareen/src/internal/docs"
 	"shareen/src/internal/models"
 	"shareen/src/internal/services"
+
+	"github.com/gin-gonic/gin"
 )
 
 type UsersController struct {
@@ -23,9 +24,9 @@ func NewUsersController(usersService *services.UsersService) *UsersController {
 // @Accept json
 // @Produce json
 // @Tags users
-// @Success 200 {object} models.Lobby
-// @Param userid query string false "Id of user"
-// @Router /user/:id [get]
+// @Success 200 {object} models.User
+// @Param id path string false "Id of user"
+// @Router /user/{id} [get]
 func (uc *UsersController) GetUser(ctx *gin.Context) {
 	userId := ctx.Param("id")
 	user, responseErr := uc.usersService.GetUser(userId)
@@ -55,7 +56,7 @@ func (uc *UsersController) CreateUser(ctx *gin.Context) {
 // @Accept json
 // @Produce json
 // @Tags users
-// @Success 200 {array} models.Lobby
+// @Success 200 {array} models.User
 // @Router /user/allusers [get]
 func (uc *UsersController) GetAllUsers(ctx *gin.Context) {
 	users, responseErr := uc.usersService.GetAllUsers()
@@ -70,8 +71,8 @@ func (uc *UsersController) GetAllUsers(ctx *gin.Context) {
 // @Produce json
 // @Tags users
 // @Success 204
-// @Param userid query string false "Id of user"
-// @Router /user/:id [delete]
+// @Param id path string false "Id of user"
+// @Router /user/{id} [delete]
 func (uc *UsersController) DeleteUser(ctx *gin.Context) {
 	userId := ctx.Param("id")
 	responseErr := uc.usersService.DeleteUser(userId)
@@ -86,7 +87,7 @@ func (uc *UsersController) DeleteUser(ctx *gin.Context) {
 // @Tags users
 // @Produce json
 // @Success 204
-// @Param user query string false "Id of user"
+// @Param user body models.User false "Id of user"
 // @Router /user/update [patch]
 func (uc *UsersController) UpdateUser(ctx *gin.Context) {
 	body, err := io.ReadAll(ctx.Request.Body)

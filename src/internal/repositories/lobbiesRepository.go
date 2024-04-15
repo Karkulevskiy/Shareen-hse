@@ -45,9 +45,8 @@ func (lr *LobbiesRepository) GetLobby(lobbyID string) (*models.Lobby, *models.Re
 		}
 		if userId.String != "" {
 			user := &models.User{
-				ID:      userId.String,
-				LobbyID: userLobbyId.String,
-				Name:    userName.String,
+				ID:   userId.String,
+				Name: userName.String,
 			}
 			userList = append(userList, user)
 		}
@@ -189,9 +188,8 @@ func (lr *LobbiesRepository) GetAllLobbies() ([]*models.Lobby, *models.ResponseE
 			ChangedAt: createdAt,
 		}
 		user := &models.User{
-			ID:      userID.String,
-			LobbyID: userLobbyID.String,
-			Name:    userName.String,
+			ID:   userID.String,
+			Name: userName.String,
 		}
 		if lobbies_users[lobby] == nil {
 			lobbies_users[lobby] = nil
@@ -283,9 +281,8 @@ func (lr *LobbiesRepository) GetLobbyUsers(lobbyId string) ([]*models.User, *mod
 			}
 		}
 		user := &models.User{
-			ID:      userId,
-			LobbyID: lobbyUserId,
-			Name:    name,
+			ID:   userId,
+			Name: name,
 		}
 		users = append(users, user)
 	}

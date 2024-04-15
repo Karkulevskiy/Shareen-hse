@@ -190,59 +190,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/user/:id": {
-            "get": {
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "users"
-                ],
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Id of user",
-                        "name": "userid",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.Lobby"
-                        }
-                    }
-                }
-            },
-            "delete": {
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "users"
-                ],
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Id of user",
-                        "name": "userid",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "204": {
-                        "description": "No Content"
-                    }
-                }
-            }
-        },
         "/user/allusers": {
             "get": {
                 "consumes": [
@@ -260,7 +207,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.Lobby"
+                                "$ref": "#/definitions/models.User"
                             }
                         }
                     }
@@ -310,10 +257,65 @@ const docTemplate = `{
                 ],
                 "parameters": [
                     {
-                        "type": "string",
                         "description": "Id of user",
                         "name": "user",
-                        "in": "query"
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/models.User"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    }
+                }
+            }
+        },
+        "/user/{id}": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Id of user",
+                        "name": "id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.User"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Id of user",
+                        "name": "id",
+                        "in": "path"
                     }
                 ],
                 "responses": {
@@ -355,9 +357,6 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "id": {
-                    "type": "string"
-                },
-                "lobby_id": {
                     "type": "string"
                 },
                 "name": {

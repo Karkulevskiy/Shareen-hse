@@ -5,8 +5,6 @@ import (
 	"shareen/src/internal/models"
 	"shareen/src/internal/repositories"
 	"shareen/src/internal/utils"
-
-	"github.com/google/uuid"
 )
 
 type UsersService struct {
@@ -30,8 +28,7 @@ func (us *UsersService) CreateUser(userName string) (*models.User, *models.Respo
 		}
 	} // ПР что я тут имел ввиду - хз
 	user := &models.User{
-		Name:    userName,
-		LobbyID: uuid.Nil.String(),
+		Name: userName,
 	}
 	return us.usersRepository.CreateUser(user)
 }

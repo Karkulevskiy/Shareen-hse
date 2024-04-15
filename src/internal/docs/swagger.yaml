@@ -20,8 +20,6 @@ definitions:
     properties:
       id:
         type: string
-      lobby_id:
-        type: string
       name:
         type: string
     type: object
@@ -137,14 +135,14 @@ paths:
           description: Internal Server Error
       tags:
       - lobbies
-  /user/:id:
+  /user/{id}:
     delete:
       consumes:
       - application/json
       parameters:
       - description: Id of user
-        in: query
-        name: userid
+        in: path
+        name: id
         type: string
       produces:
       - application/json
@@ -158,8 +156,8 @@ paths:
       - application/json
       parameters:
       - description: Id of user
-        in: query
-        name: userid
+        in: path
+        name: id
         type: string
       produces:
       - application/json
@@ -167,7 +165,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.Lobby'
+            $ref: '#/definitions/models.User'
       tags:
       - users
   /user/allusers:
@@ -181,7 +179,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/models.Lobby'
+              $ref: '#/definitions/models.User'
             type: array
       tags:
       - users
@@ -210,9 +208,10 @@ paths:
       - application/json
       parameters:
       - description: Id of user
-        in: query
+        in: body
         name: user
-        type: string
+        schema:
+          $ref: '#/definitions/models.User'
       produces:
       - application/json
       responses:
