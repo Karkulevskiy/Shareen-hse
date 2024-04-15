@@ -21,7 +21,11 @@ func NewLobbiesRepository(dbHandler *sql.DB) *LobbiesRepository {
 }
 
 func (lr *LobbiesRepository) GetLobby(lobbyID string) (*models.Lobby, *models.ResponseError) {
-	query := "SELECT * FROM lobbies WHERE id = $1"
+	query := `SELECT lobbies.id, lobby_url, video_url, created_at, changed_at, users.id, name
+				FROM lobbies
+				LEFT JOIN lobbies_users ON lobbies.id = lobbies_users.lobby_id
+				LEFT JOIN users ON users.id = lobbies_users.user_id
+				WHERE lobbies.id = $1`
 	rows, err := lr.dbHandler.Query(query, lobbyID)
 	if err != nil {
 		log.Println("error occured while getting lobby by id: ", err.Error())
@@ -32,10 +36,10 @@ func (lr *LobbiesRepository) GetLobby(lobbyID string) (*models.Lobby, *models.Re
 	}
 	defer rows.Close()
 	var lobbyId, lobbyUrl, createdAt string
-	var videoURL, changedAt, userLobbyId, userId, userName sql.NullString
-	userList := make([]*models.User, 0)
+	var videoURL, changedAt, userId, userName sql.NullString
+	var lobbyUsers []*models.User
 	for rows.Next() {
-		err = rows.Scan(&lobbyId, &lobbyUrl, &videoURL, &createdAt, &changedAt, &userId, &userLobbyId, &userName)
+		err = rows.Scan(&lobbyId, &lobbyUrl, &videoURL, &createdAt, &changedAt, &userId, &userName)
 		if err != nil {
 			log.Println("error occured while getting (scanning) lobby by id: ", err.Error())
 			return nil, &models.ResponseError{
@@ -44,11 +48,10 @@ func (lr *LobbiesRepository) GetLobby(lobbyID string) (*models.Lobby, *models.Re
 			}
 		}
 		if userId.String != "" {
-			user := &models.User{
+			lobbyUsers = append(lobbyUsers, &models.User{
 				ID:   userId.String,
 				Name: userName.String,
-			}
-			userList = append(userList, user)
+			})
 		}
 	}
 	if rows.Err() != nil {
@@ -58,14 +61,8 @@ func (lr *LobbiesRepository) GetLobby(lobbyID string) (*models.Lobby, *models.Re
 			Status:  http.StatusInternalServerError,
 		}
 	}
-	if lobbyId == "" {
-		return nil, &models.ResponseError{
-			Message: fmt.Sprintf("lobby not found with id : {%s}", lobbyID),
-			Status:  http.StatusNotFound,
-		}
-	}
-	if len(userList) == 0 {
-		userList = nil
+	if len(lobbyUsers) == 0 {
+		lobbyUsers = nil
 	}
 	return &models.Lobby{
 		ID:        lobbyId,
@@ -73,8 +70,44 @@ func (lr *LobbiesRepository) GetLobby(lobbyID string) (*models.Lobby, *models.Re
 		VideoURL:  videoURL.String,
 		CreatedAt: createdAt,
 		ChangedAt: changedAt.String,
-		UserList:  userList,
+		UserList:  lobbyUsers,
 	}, nil
+}
+
+func (lr *LobbiesRepository) GetLobbyUsers(lobbyId string) ([]*models.User, *models.ResponseError) {
+	query := `SELECT FROM lobbies_users, users 
+			  WHERE users.id = lobbies_users.user_id
+			  AND lobbies_users.lobby_id = $1`
+	rows, err := lr.dbHandler.Query(query, lobbyId)
+	if err != nil {
+		return nil, &models.ResponseError{
+			Message: err.Error(),
+			Status:  http.StatusInternalServerError,
+		}
+	}
+	defer rows.Close()
+	var userId, userName string
+	var usersList []*models.User
+	for rows.Next() {
+		err := rows.Scan(&userId, &userName)
+		if err != nil {
+			return nil, &models.ResponseError{
+				Message: err.Error(),
+				Status:  http.StatusInternalServerError,
+			}
+		}
+		usersList = append(usersList, &models.User{
+			ID:   userId,
+			Name: userName,
+		})
+	}
+	if rows.Err() != nil {
+		return nil, &models.ResponseError{
+			Message: err.Error(),
+			Status:  http.StatusInternalServerError,
+		}
+	}
+	return usersList, nil
 }
 
 func (lr *LobbiesRepository) CreateLobby(lobby *models.Lobby) (*models.Lobby, *models.ResponseError) {
@@ -160,7 +193,12 @@ func (lr *LobbiesRepository) DeleteLobby(lobbyID string) *models.ResponseError {
 }
 
 func (lr *LobbiesRepository) GetAllLobbies() ([]*models.Lobby, *models.ResponseError) {
-	query := "SELECT * FROM lobbies" //тут написать сложный запрос
+	query := `SELECT lobbies.id as lobby_id, lobbies.lobby_url,
+			 lobbies.video_url, lobbies.created_at, lobbies.changed_at,
+    		users.id as user_id, users.name
+			FROM lobbies
+			LEFT JOIN lobbies_users ON lobbies.id = lobbies_users.lobby_id
+			LEFT JOIN users ON lobbies_users.user_id = users.id;` //тут написать сложный запрос
 	rows, err := lr.dbHandler.Query(query)
 	if err != nil {
 		return nil, &models.ResponseError{
@@ -170,10 +208,10 @@ func (lr *LobbiesRepository) GetAllLobbies() ([]*models.Lobby, *models.ResponseE
 	}
 	defer rows.Close()
 	var lobbyId, lobbyURL, videoURL, createdAt string
-	var changedAt, userID, userName, userLobbyID sql.NullString
-	lobbies_users := map[*models.Lobby][]*models.User{}
+	var changedAt, userID, userName sql.NullString
+	lobbiesUsers := map[*models.Lobby][]*models.User{}
 	for rows.Next() {
-		err = rows.Scan(&lobbyId, &lobbyURL, &videoURL, &createdAt, &changedAt, &userID, &userName, &userLobbyID)
+		err = rows.Scan(&lobbyId, &lobbyURL, &videoURL, &createdAt, &changedAt, &userID, &userName)
 		if err != nil {
 			return nil, &models.ResponseError{
 				Message: err.Error(),
@@ -187,15 +225,17 @@ func (lr *LobbiesRepository) GetAllLobbies() ([]*models.Lobby, *models.ResponseE
 			CreatedAt: createdAt,
 			ChangedAt: createdAt,
 		}
+		if userID.String == "" {
+			if len(lobbiesUsers[lobby]) == 0 {
+				lobbiesUsers[lobby] = nil
+			}
+			continue
+		}
 		user := &models.User{
 			ID:   userID.String,
 			Name: userName.String,
 		}
-		if lobbies_users[lobby] == nil {
-			lobbies_users[lobby] = nil
-		} else {
-			lobbies_users[lobby] = append(lobbies_users[lobby], user)
-		}
+		lobbiesUsers[lobby] = append(lobbiesUsers[lobby], user)
 	}
 
 	// Посмотреть что за null в сваггере, лоигку добавления в массив
@@ -208,9 +248,9 @@ func (lr *LobbiesRepository) GetAllLobbies() ([]*models.Lobby, *models.ResponseE
 		}
 	}
 	lobbies := make([]*models.Lobby, 0)
-	for lKey, uVal := range lobbies_users {
-		lKey.UserList = uVal
-		lobbies = append(lobbies, lKey)
+	for lobby, users := range lobbiesUsers {
+		lobby.UserList = users
+		lobbies = append(lobbies, lobby)
 	}
 	return lobbies, nil
 }
@@ -258,39 +298,4 @@ func (lr *LobbiesRepository) UpdateLobby(lobby *models.Lobby) *models.ResponseEr
 		}
 	}
 	return nil
-}
-
-func (lr *LobbiesRepository) GetLobbyUsers(lobbyId string) ([]*models.User, *models.ResponseError) {
-	query := "SELECT * FROM users WHERE lobby_id = $1"
-	rows, err := lr.dbHandler.Query(query, lobbyId)
-	if err != nil {
-		return nil, &models.ResponseError{
-			Message: err.Error(),
-			Status:  http.StatusInternalServerError,
-		}
-	}
-	defer rows.Close()
-	users := make([]*models.User, 0)
-	var userId, lobbyUserId, name string
-	for rows.Next() {
-		err = rows.Scan(&userId, &lobbyUserId, &name)
-		if err != nil {
-			return nil, &models.ResponseError{
-				Message: err.Error(),
-				Status:  http.StatusInternalServerError,
-			}
-		}
-		user := &models.User{
-			ID:   userId,
-			Name: name,
-		}
-		users = append(users, user)
-	}
-	if rows.Err() != nil {
-		return nil, &models.ResponseError{
-			Message: rows.Err().Error(),
-			Status:  http.StatusInternalServerError,
-		}
-	}
-	return users, nil
 }

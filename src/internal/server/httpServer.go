@@ -2,16 +2,17 @@ package server
 
 import (
 	"database/sql"
-	"github.com/gin-contrib/cors"
-	"github.com/gin-gonic/gin"
-	"github.com/spf13/viper"
-	swaggerfiles "github.com/swaggo/files"
-	ginSwagger "github.com/swaggo/gin-swagger"
 	"log"
 	controllers "shareen/src/internal/api"
 	_ "shareen/src/internal/docs"
 	"shareen/src/internal/repositories"
 	"shareen/src/internal/services"
+
+	"github.com/gin-contrib/cors"
+	"github.com/gin-gonic/gin"
+	"github.com/spf13/viper"
+	swaggerfiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 type HttpServer struct {
@@ -41,7 +42,6 @@ func InitHttpServer(config *viper.Viper, dbHandler *sql.DB) HttpServer {
 		lobbyGroup.GET("lobbyusers/:id", lobbiesController.GetLobbyUsers)
 		lobbyGroup.POST("create", lobbiesController.CreateLobby)
 		lobbyGroup.DELETE("delete/:id", lobbiesController.DeleteLobby)
-		lobbyGroup.DELETE("deleteall", lobbiesController.DeleteAllLobbies)
 		lobbyGroup.PATCH("update", lobbiesController.UpdateLobby)
 	}
 
@@ -50,6 +50,7 @@ func InitHttpServer(config *viper.Viper, dbHandler *sql.DB) HttpServer {
 		userGroup.GET(":id", usersController.GetUser)
 		userGroup.GET("allusers", usersController.GetAllUsers)
 		userGroup.POST("create/:name", usersController.CreateUser)
+		userGroup.POST("join", usersController.JoinUserInLobby)
 		userGroup.PATCH("update", usersController.UpdateUser)
 		userGroup.DELETE(":id", usersController.DeleteUser)
 	}

@@ -16,6 +16,13 @@ definitions:
       video_url:
         type: string
     type: object
+  models.LobbyUser:
+    properties:
+      lobby_id:
+        type: string
+      user_id:
+        type: string
+    type: object
   models.User:
     properties:
       id:
@@ -83,17 +90,6 @@ paths:
         name: id
         required: true
         type: string
-      responses:
-        "204":
-          description: No Content
-        "500":
-          description: Internal Server Error
-      tags:
-      - lobbies
-  /lobby/deleteall:
-    delete:
-      consumes:
-      - application/json
       responses:
         "204":
           description: No Content
@@ -200,6 +196,23 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/models.User'
+      tags:
+      - users
+  /user/join:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Id of lobby and user
+        in: body
+        name: user
+        schema:
+          $ref: '#/definitions/models.LobbyUser'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
       tags:
       - users
   /user/update:

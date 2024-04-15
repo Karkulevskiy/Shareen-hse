@@ -168,3 +168,28 @@ func (ur *UsersRepository) UpdateUser(user *models.User) *models.ResponseError {
 	}
 	return nil
 }
+
+func (ur *UsersRepository) JoinUserInLobby(userID, lobbyID string) *models.ResponseError {
+	query := `UPDATE lobbies_users SET user_id = $1 WHERE lobby_id = $2`
+	rows, err := ur.dbHandler.Exec(query, userID, lobbyID)
+	if err != nil {
+		return &models.ResponseError{
+			Message: err.Error(),
+			Status:  http.StatusInternalServerError,
+		}
+	}
+	rowsAffected, err := rows.RowsAffected()
+	if err != nil {
+		return &models.ResponseError{
+			Message: err.Error(),
+			Status:  http.StatusInternalServerError,
+		}
+	}
+	if rowsAffected == 0 {
+		return &models.ResponseError{
+			Message: fmt.Sprintf("lobby with id: {%s} not found", lobbyID),
+			Status:  http.StatusBadRequest,
+		}
+	}
+	return nil
+}

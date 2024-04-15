@@ -76,3 +76,15 @@ func (us *UsersService) UpdateUser(user *models.User) *models.ResponseError {
 	}
 	return us.usersRepository.UpdateUser(user)
 }
+
+func (us *UsersService) JoinUserInLobby(userID, lobbyID string) *models.ResponseError {
+	err := utils.ValidateId(userID)
+	if err != nil {
+		return err
+	}
+	err = utils.ValidateId(lobbyID)
+	if err != nil {
+		return err
+	}
+	return us.usersRepository.JoinUserInLobby(userID, lobbyID)
+}

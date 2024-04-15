@@ -108,3 +108,29 @@ func (uc *UsersController) UpdateUser(ctx *gin.Context) {
 	}
 	ctx.Status(http.StatusNoContent)
 }
+
+// @Accept json
+// @Tags users
+// @Produce json
+// @Success 200
+// @Param user body models.LobbyUser false "Id of lobby and user"
+// @Router /user/join [post]
+func (uc *UsersController) JoinUserInLobby(ctx *gin.Context) {
+	body, err := io.ReadAll(ctx.Request.Body)
+	if err != nil {
+		ctx.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+	var lobbyUser models.LobbyUser
+	err = json.Unmarshal(body, &lobbyUser)
+	if err != nil {
+		ctx.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+	responseErr := uc.usersService.JoinUserInLobby(lobbyUser.UserID, lobbyUser.LobbyID)
+	if responseErr != nil {
+		ctx.AbortWithStatusJSON(responseErr.Status, responseErr)
+		return
+	}
+	ctx.Status(http.StatusOK)
+}

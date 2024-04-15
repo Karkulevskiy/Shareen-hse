@@ -85,20 +85,6 @@ func (lc *LobbiesController) DeleteLobby(ctx *gin.Context) {
 // @Success 204
 // @Tags lobbies
 // @Failure 500
-// @Router /lobby/deleteall [delete]
-func (lc *LobbiesController) DeleteAllLobbies(ctx *gin.Context) {
-	responseErr := lc.lobbiesService.DeleteAllLobbies()
-	if responseErr != nil {
-		ctx.AbortWithStatusJSON(responseErr.Status, responseErr)
-		return
-	}
-	ctx.Status(http.StatusNoContent)
-}
-
-// @Accept json
-// @Success 204
-// @Tags lobbies
-// @Failure 500
 // @Router /lobby/update [patch]
 // @Param lobby body models.Lobby false "update lobby"
 func (lc *LobbiesController) UpdateLobby(ctx *gin.Context) {

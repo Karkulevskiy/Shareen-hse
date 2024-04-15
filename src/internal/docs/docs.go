@@ -87,24 +87,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/lobby/deleteall": {
-            "delete": {
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "lobbies"
-                ],
-                "responses": {
-                    "204": {
-                        "description": "No Content"
-                    },
-                    "500": {
-                        "description": "Internal Server Error"
-                    }
-                }
-            }
-        },
         "/lobby/lobbyusers/{id}": {
             "get": {
                 "consumes": [
@@ -244,6 +226,34 @@ const docTemplate = `{
                 }
             }
         },
+        "/user/join": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "parameters": [
+                    {
+                        "description": "Id of lobby and user",
+                        "name": "user",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/models.LobbyUser"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
         "/user/update": {
             "patch": {
                 "consumes": [
@@ -349,6 +359,17 @@ const docTemplate = `{
                     }
                 },
                 "video_url": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.LobbyUser": {
+            "type": "object",
+            "properties": {
+                "lobby_id": {
+                    "type": "string"
+                },
+                "user_id": {
                     "type": "string"
                 }
             }
