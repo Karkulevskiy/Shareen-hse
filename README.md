@@ -5,7 +5,14 @@
 - github.com/swaggo/swag/cmd/swag
 - github.com/swaggo/gin-swagger
 - github.com/swaggo/files
+- github.com/lib/pq
 Также: go install github.com/swaggo/swag/cmd/swag@latest
-В папке dbSchema находится SQL файл с запросами на создание БД.   
+В папке dbSchema находится SQL файл с запросами на создание БД. Нужно ручками в постгресе создать бд, скопировав код из конфига. Позже добавлю автомиграции. 
 
-Запуск бека -> go run main.go 
+Swagger генерируется автоматически по документации к api, поэтому стоит перед тестированием контроллеров прописать:
+swag init -g .\internal\server\httpServer.go -o .\internal\docs 
+
+Для запуска проекта:
+go run ./cmd/main.go
+
+Потом добавлю Makefile, чтобы ничего такого не прописывать
