@@ -30,6 +30,13 @@ definitions:
       name:
         type: string
     type: object
+  models.VideoLobby:
+    properties:
+      lobby_id:
+        type: string
+      video_url:
+        type: string
+    type: object
 info:
   contact: {}
 paths:
@@ -112,6 +119,24 @@ paths:
           description: OK
         "500":
           description: Internal Server Error
+      tags:
+      - lobbies
+  /lobby/seturl:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: videoUrl and lobbyId to set videoUrl in lobby
+        in: body
+        name: videoUrlLobbyId
+        required: true
+        schema:
+          $ref: '#/definitions/models.VideoLobby'
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
       tags:
       - lobbies
   /lobby/update:

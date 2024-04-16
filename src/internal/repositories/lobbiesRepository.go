@@ -103,7 +103,7 @@ func (lr *LobbiesRepository) GetLobbyUsers(lobbyId string) ([]*models.User, *mod
 	}
 	if rows.Err() != nil {
 		return nil, &models.ResponseError{
-			Message: err.Error(),
+			Message: rows.Err().Error(),
 			Status:  http.StatusInternalServerError,
 		}
 	}
@@ -274,6 +274,33 @@ func (lr *LobbiesRepository) UpdateLobby(lobby *models.Lobby) *models.ResponseEr
 		return &models.ResponseError{
 			Message: fmt.Sprintf("lobby for updating with id: {%s} not found", lobby.ID),
 			Status:  http.StatusNotFound,
+		}
+	}
+	return nil
+}
+
+func (lr *LobbiesRepository) SetVideoURL(videoUrl, lobbyID string) *models.ResponseError {
+	query := `UPDATE lobbies
+			  SET video_url = $1
+			  WHERE id = $2`
+	rows, err := lr.dbHandler.Exec(query, videoUrl, lobbyID)
+	if err != nil {
+		return &models.ResponseError{
+			Message: err.Error(),
+			Status:  http.StatusInternalServerError,
+		}
+	}
+	rowsAffected, err := rows.RowsAffected()
+	if err != nil {
+		return &models.ResponseError{
+			Message: err.Error(),
+			Status:  http.StatusInternalServerError,
+		}
+	}
+	if rowsAffected == 0 {
+		return &models.ResponseError{
+			Message: fmt.Sprintf("lobby with id:{%s} not found", lobbyID),
+			Status:  http.StatusBadRequest,
 		}
 	}
 	return nil

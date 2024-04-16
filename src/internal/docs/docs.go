@@ -114,6 +114,35 @@ const docTemplate = `{
                 }
             }
         },
+        "/lobby/seturl": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "lobbies"
+                ],
+                "parameters": [
+                    {
+                        "description": "videoUrl and lobbyId to set videoUrl in lobby",
+                        "name": "videoUrlLobbyId",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.VideoLobby"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    }
+                }
+            }
+        },
         "/lobby/update": {
             "patch": {
                 "consumes": [
@@ -381,6 +410,17 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.VideoLobby": {
+            "type": "object",
+            "properties": {
+                "lobby_id": {
+                    "type": "string"
+                },
+                "video_url": {
                     "type": "string"
                 }
             }

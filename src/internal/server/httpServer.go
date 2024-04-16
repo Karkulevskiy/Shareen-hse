@@ -41,6 +41,7 @@ func InitHttpServer(config *viper.Viper, dbHandler *sql.DB) HttpServer {
 		lobbyGroup.GET("all", lobbiesController.GetAllLobbies)
 		lobbyGroup.GET("lobbyusers/:id", lobbiesController.GetLobbyUsers)
 		lobbyGroup.POST("create", lobbiesController.CreateLobby)
+		lobbyGroup.POST("seturl", lobbiesController.SetVideoURL)
 		lobbyGroup.DELETE("delete/:id", lobbiesController.DeleteLobby)
 		lobbyGroup.PATCH("update", lobbiesController.UpdateLobby)
 	}

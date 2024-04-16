@@ -2,6 +2,8 @@ package services
 
 import (
 	"fmt"
+	"net/http"
+	"net/url"
 	"shareen/src/internal/models"
 	"shareen/src/internal/repositories"
 	"shareen/src/internal/utils"
@@ -123,6 +125,21 @@ func (ls *LobbiesService) GetLobbyUsers(lobbyId string) ([]*models.User, *models
 		return nil, err
 	}
 	return ls.lobbiesRepository.GetLobbyUsers(lobbyId)
+}
+
+func (ls *LobbiesService) SetVideoURL(videoUrl, lobbyID string) *models.ResponseError {
+	_, err := url.ParseRequestURI(videoUrl)
+	if err != nil {
+		return &models.ResponseError{
+			Message: err.Error(),
+			Status:  http.StatusBadRequest,
+		}
+	}
+	validateErr := utils.ValidateId(lobbyID)
+	if validateErr != nil {
+		return validateErr
+	}
+	return ls.lobbiesRepository.SetVideoURL(videoUrl, lobbyID)
 }
 
 func createUniqueLobbyURL(id uint32) string {

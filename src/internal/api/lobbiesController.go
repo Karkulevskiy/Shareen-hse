@@ -122,3 +122,29 @@ func (lc *LobbiesController) GetLobbyUsers(ctx *gin.Context) {
 	}
 	ctx.JSON(http.StatusOK, users)
 }
+
+// @Accept json
+// @Success 200
+// @Tags lobbies
+// @Failure 400
+// @Param videoUrlLobbyId body models.VideoLobby true "videoUrl and lobbyId to set videoUrl in lobby"
+// @Router /lobby/seturl [post]
+func (lc *LobbiesController) SetVideoURL(ctx *gin.Context) {
+	body, err := io.ReadAll(ctx.Request.Body)
+	if err != nil {
+		ctx.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+	var videoUrlLobbyId models.VideoLobby
+	err = json.Unmarshal(body, &videoUrlLobbyId)
+	if err != nil {
+		ctx.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+	responseErr := lc.lobbiesService.SetVideoURL(videoUrlLobbyId.VideoURL, videoUrlLobbyId.LobbyID)
+	if responseErr != nil {
+		ctx.AbortWithStatusJSON(responseErr.Status, responseErr)
+		return
+	}
+	ctx.Status(http.StatusOK)
+}
