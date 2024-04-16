@@ -23,6 +23,7 @@ CREATE TABLE lobbies_users(
     id uuid NOT NULL DEFAULT gen_random_uuid(),
     user_id uuid REFERENCES users ON DELETE SET NULL, --Проверить поведение БД, при удалении пользователя и лобби
     lobby_id uuid REFERENCES lobbies ON DELETE CASCADE,
+    UNIQUE(user_id, lobby_id),
 	PRIMARY KEY(id)
 )
 

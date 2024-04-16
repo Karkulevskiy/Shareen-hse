@@ -1,6 +1,7 @@
 package services
 
 import (
+	"fmt"
 	"shareen/src/internal/models"
 	"shareen/src/internal/repositories"
 	"shareen/src/internal/utils"
@@ -27,6 +28,7 @@ func NewLobbiesService(usersRepository *repositories.UsersRepository,
 
 func (ls *LobbiesService) CreateLobby() (*models.Lobby, *models.ResponseError) {
 	lobbyId := uuid.New().ID()
+	fmt.Println(lobbyId)
 	lobby := &models.Lobby{
 		LobbyURL:  createUniqueLobbyURL(lobbyId),
 		CreatedAt: time.Now().GoString(),
@@ -111,6 +113,7 @@ func (ls *LobbiesService) UpdateLobby(lobby *models.Lobby) *models.ResponseError
 	if err != nil {
 		return err
 	}
+	lobby.ChangedAt = time.Now().String()
 	return ls.lobbiesRepository.UpdateLobby(lobby)
 }
 
@@ -134,9 +137,8 @@ func createUniqueLobbyURL(id uint32) string {
 		builder strings.Builder
 	)
 	for num > 0 {
-		nums = append(nums, num&alpabetLen)
+		nums = append(nums, num%alpabetLen)
 		num /= alpabetLen
-
 	}
 	slices.Reverse(nums)
 	for _, num := range nums {

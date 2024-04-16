@@ -112,7 +112,6 @@ func (lr *LobbiesRepository) GetLobbyUsers(lobbyId string) ([]*models.User, *mod
 
 func (lr *LobbiesRepository) CreateLobby(lobby *models.Lobby) (*models.Lobby, *models.ResponseError) {
 	queryFirst := "INSERT INTO lobbies (lobby_url, video_url, created_at) VALUES ($1, $2, $3) RETURNING id"
-	querySecond := "INSERT INTO lobbies_users (lobby_id) VALUES ($1)"
 	rows, err := lr.dbHandler.Query(queryFirst, lobby.LobbyURL, lobby.VideoURL, lobby.CreatedAt)
 	if err != nil {
 		return nil, &models.ResponseError{
@@ -134,27 +133,6 @@ func (lr *LobbiesRepository) CreateLobby(lobby *models.Lobby) (*models.Lobby, *m
 	if rows.Err() != nil {
 		return nil, &models.ResponseError{
 			Message: rows.Err().Error(),
-			Status:  http.StatusInternalServerError,
-		}
-	}
-	// Добавление данных в промежуточную таблицу
-	res, err := lr.dbHandler.Exec(querySecond, lobbyId)
-	if err != nil {
-		return nil, &models.ResponseError{
-			Message: err.Error(),
-			Status:  http.StatusInternalServerError,
-		}
-	}
-	rowsAffected, err := res.RowsAffected()
-	if err != nil {
-		return nil, &models.ResponseError{
-			Message: err.Error(),
-			Status:  http.StatusInternalServerError,
-		}
-	}
-	if rowsAffected == 0 {
-		return nil, &models.ResponseError{
-			Message: "no any rows were affected",
 			Status:  http.StatusInternalServerError,
 		}
 	}
@@ -209,7 +187,7 @@ func (lr *LobbiesRepository) GetAllLobbies() ([]*models.Lobby, *models.ResponseE
 	defer rows.Close()
 	var lobbyId, lobbyURL, videoURL, createdAt string
 	var changedAt, userID, userName sql.NullString
-	lobbiesUsers := map[*models.Lobby][]*models.User{}
+	lobbiesUsers := map[string]*models.Lobby{}
 	for rows.Next() {
 		err = rows.Scan(&lobbyId, &lobbyURL, &videoURL, &createdAt, &changedAt, &userID, &userName)
 		if err != nil {
@@ -223,11 +201,14 @@ func (lr *LobbiesRepository) GetAllLobbies() ([]*models.Lobby, *models.ResponseE
 			LobbyURL:  lobbyURL,
 			VideoURL:  videoURL,
 			CreatedAt: createdAt,
-			ChangedAt: createdAt,
+			ChangedAt: changedAt.String,
+		}
+		if _, ok := lobbiesUsers[lobby.ID]; !ok {
+			lobbiesUsers[lobby.ID] = lobby
 		}
 		if userID.String == "" {
-			if len(lobbiesUsers[lobby]) == 0 {
-				lobbiesUsers[lobby] = nil
+			if len(lobbiesUsers[lobby.ID].UserList) == 0 {
+				lobbiesUsers[lobby.ID].UserList = nil
 			}
 			continue
 		}
@@ -235,7 +216,7 @@ func (lr *LobbiesRepository) GetAllLobbies() ([]*models.Lobby, *models.ResponseE
 			ID:   userID.String,
 			Name: userName.String,
 		}
-		lobbiesUsers[lobby] = append(lobbiesUsers[lobby], user)
+		lobbiesUsers[lobby.ID].UserList = append(lobbiesUsers[lobby.ID].UserList, user)
 	}
 
 	// Посмотреть что за null в сваггере, лоигку добавления в массив
@@ -248,8 +229,7 @@ func (lr *LobbiesRepository) GetAllLobbies() ([]*models.Lobby, *models.ResponseE
 		}
 	}
 	lobbies := make([]*models.Lobby, 0)
-	for lobby, users := range lobbiesUsers {
-		lobby.UserList = users
+	for _, lobby := range lobbiesUsers {
 		lobbies = append(lobbies, lobby)
 	}
 	return lobbies, nil
@@ -273,11 +253,10 @@ func (lr *LobbiesRepository) UpdateLobby(lobby *models.Lobby) *models.ResponseEr
 		SET
 		lobby_url = $1,
 		video_url = $2,
-		created_at = $3,
-		changed_at = $4
-		WHERE id = $5
+		changed_at = $3
+		WHERE id = $4
 	`
-	res, err := lr.dbHandler.Exec(query, lobby.LobbyURL, lobby.VideoURL, lobby.CreatedAt, lobby.ChangedAt, lobby.ID)
+	res, err := lr.dbHandler.Exec(query, lobby.LobbyURL, lobby.VideoURL, lobby.ChangedAt, lobby.ID)
 	if err != nil {
 		return &models.ResponseError{
 			Message: err.Error(),

@@ -170,8 +170,8 @@ func (ur *UsersRepository) UpdateUser(user *models.User) *models.ResponseError {
 }
 
 func (ur *UsersRepository) JoinUserInLobby(userID, lobbyID string) *models.ResponseError {
-	query := `UPDATE lobbies_users SET user_id = $1 WHERE lobby_id = $2`
-	rows, err := ur.dbHandler.Exec(query, userID, lobbyID)
+	query := `INSERT INTO lobbies_users (lobby_id, user_id) VALUES ($1, $2)`
+	rows, err := ur.dbHandler.Exec(query, lobbyID, userID)
 	if err != nil {
 		return &models.ResponseError{
 			Message: err.Error(),
