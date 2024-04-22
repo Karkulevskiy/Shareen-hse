@@ -1,6 +1,7 @@
 import { App } from "./classes/app.js";
 import { DivBlock,ButtonBlock } from "./classes/blocks.js";
 import { choiceHandler } from "./choicehandler.js";
+import {giveAccess} from "./index.js"
 
 const $logo = document.querySelector(".logoname");
 

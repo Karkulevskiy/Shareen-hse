@@ -1,5 +1,5 @@
 import { addMessage, parseHTMLFile } from "./utils.js";
-import { loadLobby } from "./lobbyloader.js";
+import { configureLobby, loadLobby } from "./lobbyloader.js";
 
 function sendRequest(method, URL, data = null){
     return new Promise((resolve,reject) => {
@@ -26,7 +26,6 @@ function sendRequest(method, URL, data = null){
 }
 
 export function takeButton(event){  
-    debugger;
     const id = event.target.id;
     event.preventDefault();
     if (id =="search-form"){
@@ -44,7 +43,7 @@ export function takeButton(event){
         debugger;
         const lobbyLink = document.getElementById("search_lobby").value;
         const MaxURL='http://localhost:5233/api/Lobby/GetLobbyById?link=';
-        const template = MaxURL+lobbyLink;
+        let template = MaxURL+lobbyLink;
 
         sendRequest('GET',template,lobbyLink)
         .then((answer) => {
@@ -52,6 +51,22 @@ export function takeButton(event){
             loadLobby();
         })
         .catch(err => console.log(err))
+        template = `http://localhost:5233/api/Lobby/GetLobbyList`
+        sendRequest('GET',template)
+        .then((answer)=>{
+            let info = JSON.parse(answer);
+            info.lobbies.forEach(lobby =>{
+                if (lobby.lobbyLink==lobbyLink){
+                    let users = [];
+                    lobby.users.forEach(user=>{
+                        users.push(user.name);
+                    })
+                    configureLobby(users);
+                }
+            })
+            debugger
+            console.log(answer)
+        })
     }
     else if (id=="send-chat"){
         const $input = document.querySelector(".input-wrapper");
