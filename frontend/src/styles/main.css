@@ -1,0 +1,449 @@
+#app{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+#up-panel{
+    box-shadow: 0 0.5em 0.5em -0.1em #000000;
+    background: linear-gradient(to right, #000000 300px, rgb(255, 130, 28) 1700px),
+    linear-gradient(0deg,#080607,#ffffff 90%);
+    height: 50px;
+}
+
+#start-choice{
+        margin: 0;
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+}
+
+.choice__btn{
+    color: #ffa260;
+    transition: 0.25s;
+    background: none;
+    border: 2px solid;
+    font: inherit;
+    line-height: 5;
+    width: 200px;
+    margin: 0.5em;
+    padding: 1em 2em;
+}
+
+.choice__btn:hover{
+  box-shadow: 0 0.5em 0.5em -0.4em #ff0202;
+  transform: translateY(-0.25em);
+  border-color: #ff0202;
+  color:#000000
+}
+
+#search-form{
+    position: absolute;
+    border: 1px solid rgb(0, 0, 0);
+    display: inline-flex;
+    padding: 10px;
+    align-items: center;
+    height: 50px;
+    border-radius: 5px;
+    overflow: hidden;
+    background-color: rgb(255, 130, 28);
+    top:5%;
+    left: 50%;
+    transform: translate(-50%);
+
+}
+
+#search-form:hover > .search-form__txt{
+    width: 250px;
+    padding: 0 6px;
+}
+
+.search-form__txt::placeholder{
+    color:#000000
+}
+.search-form__txt{
+    border: none;
+    width: 0px;
+    outline: none;
+    font-size: 20px;
+    padding-right: 10px;
+    color: black;
+    background-color: transparent;
+    transition: 0.4s;
+}
+
+.search-form__btn{
+    border: none;
+    width: 30px;
+    height: 40px;
+    background-color: transparent;
+}
+
+.search-form__img{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 25px;
+    height: 23px;
+    
+}
+
+.content{
+    position: fixed;
+    left:50%;
+    top:50%;
+    transform: translate(-50%,-50%);
+}
+
+#lobby-form{
+    position: relative;
+    width: 30rem;
+    background: #57bd84;
+    border-radius: .7rem;
+}
+
+label {
+    position: absolute;
+    clip: rect(1px, 1px, 1px, 1px);
+    padding: 0;
+    border: 0;
+    height: 1px;
+    width: 1px;
+    overflow: hidden;
+  }
+
+#go_lobby, #search_lobby {
+    height: 5rem;
+    font-family: 'Lato', sans-serif;
+    border: 0;
+    color: #2f2f2f;
+    font-size: 1.8rem;
+}
+
+#search_lobby[type="search"] {
+    width: 100%;
+    background: #fff;
+    padding: 0 1.6rem;
+    border-radius: .7rem;
+    appearance: none;
+    transition: all .3s cubic-bezier(0, 0, 0.43, 1.49);
+    transition-property: width, border-radius;
+    z-index: 1;
+    position: relative;
+  }
+
+#go_lobby {
+    display: none; 
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 6rem;
+    font-weight: bold;
+    background: #57bd84;
+    border-radius: 0 .7rem .7rem 0;
+  }
+
+#search_lobby:not(:placeholder-shown) {
+    border-radius: .7rem 0 0 .7rem;
+    width: calc(100% - 6rem);
+    + #go_lobby {
+      display: block;
+    }
+  }
+
+  
+
+
+  /* 
+  HTML implementation of a Hip Chat redesign based on Jan Dvořák Dribbble shot.
+  https://dribbble.com/shots/1529065-HipChat-Redesign
+*/
+
+/* HTML5 display-role reset for older browsers */
+
+
+blockquote:before, blockquote:after,
+q:before, q:after {
+	content: '';
+	content: none;
+}
+table {
+	border-collapse: collapse;
+	border-spacing: 0;
+}
+
+body{
+	background: #a9b89e;
+	font-family: 'Open Sans', Arial, sans-serif;
+	font-size: 12px;
+	color: #333f4d;
+}
+b{
+	font-weight: bold;
+}
+.window-wrapper{
+	background: #fff;
+	width: 480px;
+    top:100px;
+    right:10px;
+	margin: 30px auto;
+	border-radius: 6px;
+	box-shadow: 0 0 6px rgba(0,0,0,0.3);
+	overflow: hidden;
+	min-height: 730px;
+	position: absolute;
+}
+.window-title{
+	padding: 14px;
+	position: relative;
+    
+    > .title{
+        overflow: hidden;
+        text-align: center;
+      font-weight: bold;
+    }
+    
+    > .expand{
+        position: absolute;
+        right: 14px;
+        top: 12px;
+    }
+}
+
+.expand > i{
+	color: #cfd6e0;
+	font-size: 18px;
+	cursor: pointer;
+}
+.window-area{
+	position: absolute;
+	top: 40px;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	padding-left: 176px;
+}
+
+.chat-area{
+	border-top: 1px solid #cfdae1;
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0px;
+    right:0px;
+	box-shadow: inset 0 1px 3px rgba(207, 218, 225, 0.42);
+    
+    .title{
+        padding: 10px;
+        overflow: hidden;
+        line-height:15px;
+    }
+}
+.chat-area .chat-list{
+	border-top: 1px solid #cfdae1;
+	border-bottom: 1px solid #cfdae1;
+	position: absolute;
+	left: -32px;
+    overflow-x: hidden;
+	top: -1px;
+	right: 0;
+	bottom: 44px;
+	overflow-y: auto;
+	outline: none;
+    
+    & > div > .jspPane {
+        margin-left: 0 !important;
+    }
+}
+.chat-area ul{
+	margin-right: -4px;
+}
+.chat-area ul > li{
+	border-top: 1px solid #cfdae1;
+	overflow: hidden;
+	position: relative;
+}
+.chat-area ul > li.me{
+	background: #e4eaee;
+}
+.chat-area ul > li:first-child{
+	border-top: none;
+}
+.chat-area ul .name{
+	padding: 14px;
+	text-align: right;
+	width: 100px;
+	float: left;
+	color: #5d7185;
+	font-weight: bold;
+	line-height: 20px;
+}
+.chat-area ul .message{
+	padding: 14px;
+	border-left: 1px solid #cfdae1;
+	float: left;
+	color: #333f4d;
+	width: 214px;
+}
+.chat-area ul .message > p{
+	line-height: 20px;
+}
+.chat-area ul .message > p > .blue-label{
+	background: #6ea0ff;
+	color: #fff;
+	padding: 2px 5px;
+	border-radius: 3px;
+}
+.chat-area ul .message .msg-time{
+	position: absolute;
+	top:16px;
+	right: 15px;
+	color: #738ba3;
+	font-size: 9px;
+}
+.input-area{
+	background: #e4eaee;
+	padding: 6px;
+	overflow: hidden;
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	border-top: 1px solid #cfdae1;
+}
+.input-area .input-wrapper{
+	background: #fff;
+	border: 1px solid #cfdae1;
+	border-radius: 5px;
+	overflow: hidden;
+	float: left;
+}
+.input-area .input-wrapper input{
+	height: 30px;
+	line-height: 30px;
+	border: 0;
+	margin: 0;
+	padding: 0 10px;
+	outline: none;
+	color: #5D7185;
+	min-width: 271px;
+}
+.input-area .input-wrapper i{
+	font-size: 18px;
+	color: #a0b4c0;
+	margin-right: 10px;
+  margin-top:8px;
+	cursor: pointer;
+}
+.input-area > input{
+	background: #a0b4c0;
+	border: none;
+  letter-spacing:1px;
+	font-weight: bold;
+	color: #fff;
+	border-radius: 4px;
+	float:right;
+	height: 36px;
+	line-height: 30px;
+	cursor: pointer;
+	font-family: 'Open Sans', Arial, sans-serif;
+   outline: none;
+}
+.right-tabs{
+	position: absolute;
+	top: 20%;
+    bottom: 40%;
+	overflow: auto;
+	border: 1px solid #cfdae1;
+	width: 175px;
+}
+.right-tabs > ul.tabs{
+	overflow: hidden;
+}
+.right-tabs > ul.tabs > li{
+	float: left;
+	width: 33.3%;
+	text-align: center;
+	border-bottom: 1px solid #cfdae1;
+}
+.right-tabs > ul.tabs > li > a{
+	border-left: 1px solid #cfdae1;
+	color: #72a3ff;
+	display: block;
+	background: #eef2f8;
+	padding: 8px 0;
+  transition: background 0.2s linear;
+}
+
+.right-tabs > ul.tabs > li > a:hover{
+  background: #DDE5F1;  
+}
+
+.right-tabs > ul.tabs > li:first-child > a{
+	border-left: none;
+}
+.right-tabs > ul.tabs > li > a >i{
+	font-size: 18px
+}
+ul.tabs-container{
+	padding: 10px;
+	color: #6e7f91;
+}
+.right-tabs > .fa-cog{
+	position: absolute;
+	bottom: 14px;
+	right: 14px;
+	color: #a0b4c0;
+	font-size: 18px;
+	cursor: pointer;
+}
+.member-list > li{
+	padding: 5px 0;
+}
+.member-list > li .status{
+	margin: 0 10px 0 0;
+	font-size: 14px;
+}
+.member-list > li .status.online{
+	color: #82cf85;
+}
+.member-list > li .status.idle{
+	color: #ffac69;
+}
+.member-list > li .status.offline{
+	color: #f57e7d;
+}
+
+.jspDrag{
+	background: #A1AFC4;
+	border-radius: 10px;
+}
+.jspVerticalBar{
+	width: 7px;
+}
+.mui-form{
+	position: fixed;
+	top:40%;
+	left:30%;
+	text-align: center;
+	width: 600px;
+	height: 500px;
+	
+}
+
+.mui-form legend {
+    display: block;
+    width: 100%;
+    padding: 0;
+    margin-bottom: 10px;
+    font-size: 21px;
+    color: rgba(0,0,0,.87);
+    line-height: inherit;
+    border: 0;
+}
+
+#submit-btn{
+	background-color: rgb(255, 145, 35);
+	color:#000000
+}
