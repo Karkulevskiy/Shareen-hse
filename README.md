@@ -1,3 +1,4 @@
+ну и сам компилятор go
 Зависимости для запуска (go get [имя зависимости]):
 - github.com/spf13/viper
 - github.com/google/uuid
