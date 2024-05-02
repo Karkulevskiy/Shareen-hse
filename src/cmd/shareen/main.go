@@ -3,10 +3,13 @@ package main
 import (
 	"log/slog"
 	"os"
-	"shareen/src/internal/config"
 	_ "shareen/src/internal/docs"
-	"shareen/src/internal/server"
 
+	"github.com/shareen/src/internal/config"
+
+	"github.com/shareen/src/internal/storage/postgres"
+
+	"github.com/shareen/src/internal/server"
 	_ "github.com/swaggo/files"       // swagger embed files
 	_ "github.com/swaggo/gin-swagger" // gin-swagger middleware
 )
@@ -36,7 +39,9 @@ func main() {
 
 	log.Info("starting application", slog.String("env", cfg.Env))
 
-	storage, err := postgres.MustInitDB()
+	storage := postgres.MustInitDB(cfg.ConnectionString)
+
+	log.Info("initialized db")
 
 	httpServer := server.InitHttpServer(config, dbHandler)
 

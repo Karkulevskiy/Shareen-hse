@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"flag"
 	"fmt"
 
@@ -15,12 +14,14 @@ import (
 const (
 	connection_string  = "postgres://postgres:230704@localhost:5432/postgres?sslmode=disable"
 	path_to_migrations = "./migrations"
+	command            = `go run .\cmd\migrator\ -con-str="postgres://postgres:230704@localhost:5432/postgres?sslmode=disable" -path="./migrations" -op="up"`
 )
 
 // Config is a description for migrations
 type Config struct {
 	ConnectionString string
 	PathToMigrations string
+	Operation        string
 }
 
 // main Make migrations
@@ -36,14 +37,15 @@ func main() {
 		panic(err)
 	}
 
-	if err = m.Up(); err != nil {
-		if errors.Is(err, migrate.ErrNoChange) {
-			fmt.Println("no changes to apply")
-
-			return
+	switch cfg.Operation {
+	case "down":
+		if err = m.Down(); err != nil && err != migrate.ErrNoChange {
+			panic(err)
 		}
-
-		panic(err)
+	case "up":
+		if err = m.Up(); err != nil {
+			panic(err)
+		}
 	}
 
 	fmt.Println("migrations applied successfully")
@@ -53,9 +55,11 @@ func main() {
 func initDB() *Config {
 	var connectionString string
 	var pathToMigrations string
+	var op string
 
-	flag.StringVar(&connectionString, "c", "", "connection string")
-	flag.StringVar(&pathToMigrations, "m", "", "path to migrations")
+	flag.StringVar(&connectionString, "con-str", "", "connection string")
+	flag.StringVar(&pathToMigrations, "path", "", "path to migrations")
+	flag.StringVar(&op, "op", "", "operation")
 
 	flag.Parse()
 
@@ -67,8 +71,13 @@ func initDB() *Config {
 		panic("path to migrations is required")
 	}
 
+	if op == "" {
+		panic("operation is required")
+	}
+
 	return &Config{
 		ConnectionString: connectionString,
 		PathToMigrations: pathToMigrations,
+		Operation:        op,
 	}
 }
