@@ -1,11 +1,8 @@
-
---creating table lobby
 CREATE TABLE IF NOT EXISTS lobbies
 (
     id SERIAL PRIMARY KEY,
     lobby_url varchar(255) UNIQUE NOT NULL,
-    video_url varchar(255),
-    chat_id SERIAL REFERENCES chats ON DELETE CASCADE
+    video_url varchar(255)
 );
 
 --creating table user
@@ -24,6 +21,7 @@ CREATE TABLE IF NOT EXISTS lobbies_users
     UNIQUE(user_id, lobby_id)
 );
 
+--creating chats for lobbies
 CREATE TABLE IF NOT EXISTS chats 
 (
     id SERIAL PRIMARY KEY,

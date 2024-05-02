@@ -142,6 +142,10 @@ func (ls *LobbiesService) SetVideoURL(videoUrl, lobbyID string) *models.Response
 	return ls.lobbiesRepository.SetVideoURL(videoUrl, lobbyID)
 }
 
+func ChangeVideoData() {
+
+}
+
 func createUniqueLobbyURL(id uint32) string {
 
 	const alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"

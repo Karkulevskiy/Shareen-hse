@@ -1,9 +1,0 @@
-[database]
-connection_string = "host=localhost port=5432 user=postgres password=230704 dbname=postgres sslmode=disable"
-max_idle_connections = 5
-max_open_connections = 20
-connection_max_lifetime = "60s"
-driver_name = "postgres"
-
-[http]
-server_address = ":8080"
