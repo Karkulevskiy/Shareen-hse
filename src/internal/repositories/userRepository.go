@@ -24,7 +24,7 @@ func NewUserRepository(db *sql.DB) *UserRepository {
 // CreateUser creates user and returning userID
 func (u *UserRepository) CreateUser(name string) (int64, error) {
 	const op = "repositories.userRepository.CreateUser"
-	const query = "INSERT INTO users (name) VALUES ($1)"
+	const query = "INSERT INTO users (name) VALUES ($1) RETURNING id"
 
 	row := u.db.QueryRow(query, name)
 
@@ -77,6 +77,28 @@ func (u *UserRepository) DeleteUser(userID int64) error {
 
 	if rowsAffected == 0 {
 		return fmt.Errorf("%s: %w", op, storage.ErrUserNotFound)
+	}
+
+	return nil
+}
+
+func (u *UserRepository) JoinUserToLobby(lobbyURL string, userID string) error {
+	const op = "repositories.lobbyRepository.JoinUserToLobby"
+	const query = "INSERT INTO lobbies_users (lobby_url, user_id) VALUES ($1, $2)"
+
+	res, err := u.db.Exec(query, lobbyURL, userID)
+
+	if err != nil {
+		return fmt.Errorf("%s: %w", op, err)
+	}
+
+	rowsAffected, err := res.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("%s: %w", op, err)
+	}
+
+	if rowsAffected == 0 {
+		return fmt.Errorf("%s: %w", op, storage.ErrLobbyNotFound)
 	}
 
 	return nil

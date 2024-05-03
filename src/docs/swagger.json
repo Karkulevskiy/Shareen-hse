@@ -1,0 +1,308 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "This is a sample server celler server.",
+        "title": "Shareen API",
+        "contact": {},
+        "license": {
+            "name": "Apache 2.0"
+        },
+        "version": "1.0"
+    },
+    "host": "localhost:8080",
+    "basePath": "/",
+    "paths": {
+        "/lobby/": {
+            "post": {
+                "description": "Create lobby | ПОТОМ НУЖНО ПОЛУЧАТЬ ID ПОЛЬЗОВАТЕЛЯ, КОТОРЫЙ СОЗДАЕТ ЛОББИ",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Lobby"
+                ],
+                "summary": "Create lobby",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/lobby/{url}": {
+            "get": {
+                "description": "Get lobby by unique url",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Lobby"
+                ],
+                "summary": "Get lobby",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "lobby search by url",
+                        "name": "url",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Lobby"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete lobby by unique url",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Lobby"
+                ],
+                "summary": "Delete lobby",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "delete lobby by unique url",
+                        "name": "url",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/lobby/{url}-{video}": {
+            "patch": {
+                "description": "Update vieo URL in lobby",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Lobby"
+                ],
+                "summary": "Update vieo URL in lobby",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "update video URL in lobby by unique url",
+                        "name": "url",
+                        "in": "path"
+                    },
+                    {
+                        "type": "string",
+                        "description": "update video URL in lobby by unique url",
+                        "name": "video",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/user/{id}": {
+            "get": {
+                "description": "Get user by user id",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Get user",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "get user by id",
+                        "name": "id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.User"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete user by id",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Delete user",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Delete user by ID",
+                        "name": "id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/user/{name}": {
+            "post": {
+                "description": "Create user",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Create user",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Create user using his name",
+                        "name": "name",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/user/{url}-{id}": {
+            "patch": {
+                "description": "Join user in lobby by userID, lobbyID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Join user",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Join user in lobby by unique url",
+                        "name": "url",
+                        "in": "path"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Join user in lobby by unique url",
+                        "name": "id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "models.Lobby": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "lobbdyURL": {
+                    "type": "string"
+                },
+                "users": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.User"
+                    }
+                },
+                "videoURL": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.User": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        }
+    },
+    "securityDefinitions": {
+        "BasicAuth": {
+            "type": "basic"
+        }
+    }
+}

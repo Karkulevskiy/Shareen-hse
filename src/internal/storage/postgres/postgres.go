@@ -4,25 +4,28 @@ import (
 	"database/sql"
 	"fmt"
 
+	_ "github.com/lib/pq"
 	"github.com/shareen/src/internal/repositories"
 )
 
 type Storage struct {
-	db *sql.DB
-	repositories.LobbyRepository
+	LobbyRepository *repositories.LobbyRepository
+	UserRepository  *repositories.UserRepository
 }
 
 // MustInitDB - initializes DB
 func MustInitDB(connectionString string) *Storage {
 	db, err := sql.Open("postgres", connectionString)
-
 	if err != nil {
 		panic("failed to init db: " + err.Error())
 	}
 
 	prepareDB(db)
 
-	return &Storage{db: db}
+	return &Storage{
+		LobbyRepository: repositories.NewLobbyRepository(db),
+		UserRepository:  repositories.NewUserRepository(db),
+	}
 }
 
 // prepareDB - describes prepared statement for DB initializing
@@ -43,19 +46,19 @@ func prepareDB(db *sql.DB) {
 				name VARCHAR(20) NOT NULL
 			);`
 		lobbiesUsersStmt = `
-			CREATE TABLE IF NOT EXISTS lobbies_users
-			(
-				id SERIAL PRIMARY KEY,
-				user_id SERIAL REFERENCES users ON DELETE SET NULL,
-				lobby_id SERIAL REFERENCES lobbies ON DELETE CASCADE,
-				UNIQUE(user_id, lobby_id)
-			);`
+		CREATE TABLE IF NOT EXISTS lobbies_users
+(
+    id SERIAL PRIMARY KEY,
+    user_id SERIAL REFERENCES users ON DELETE CASCADE, --Проверить поведение БД, при удалении пользователя и лобби
+    lobby_url VARCHAR(255) REFERENCES lobbies (lobby_url) ON DELETE CASCADE,
+    UNIQUE(user_id, lobby_url)
+);`
 		chatsStmt = `
-			CREATE TABLE IF NOT EXISTS chats 
-			(
-				id SERIAL PRIMARY KEY,
-				lobby_id SERIAL REFERENCES lobbies ON DELETE CASCADE
-			);`
+		CREATE TABLE IF NOT EXISTS chats 
+		(
+			id SERIAL PRIMARY KEY,
+			lobby_url VARCHAR(255) REFERENCES lobbies (lobby_url) ON DELETE CASCADE
+		);`
 	)
 
 	for _, query := range []string{lobbiesStmt, index, usersStmt, lobbiesUsersStmt, chatsStmt} {
