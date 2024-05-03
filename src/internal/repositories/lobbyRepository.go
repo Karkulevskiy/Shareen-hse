@@ -111,7 +111,7 @@ func (l *LobbyRepository) DeleteLobby(lobbyURL string) error {
 	return nil
 }
 
-func (l *LobbyRepository) UpdateLobbyVideoURL(lobbyURL string, videoURL string) error {
+func (l *LobbyRepository) SetLobbyVideoURL(lobbyURL string, videoURL string) error {
 	const op = "repositories.lobbyRepository.UpdateLobbyVideoURL"
 	const query = "UPDATE lobbies SET video_url = $1 WHERE lobby_url = $2"
 

@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS lobbies
 (
     id SERIAL PRIMARY KEY,
     lobby_url varchar(255) UNIQUE NOT NULL,
-    video_url varchar(255)
+    video_url varchar(500)
 );
 --creating index for lobby_url
 CREATE INDEX IF NOT EXISTS lobby_url_idx ON lobbies (lobby_url);

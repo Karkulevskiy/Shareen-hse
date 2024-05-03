@@ -18,7 +18,7 @@ type Lobbier interface {
 	CreateLobby(lobbyURL string) (string, error)
 	GetLobby(lobbyURL string) (*models.Lobby, error)
 	DeleteLobby(lobbyURL string) error
-	UpdateLobbyVideoURL(lobbyID string, videoURL string) error
+	SetLobbyVideoURL(lobbyID string, videoURL string) error
 }
 
 // @Summary      Get lobby
@@ -174,7 +174,7 @@ func DeleteLobby(log *slog.Logger, l Lobbier) http.HandlerFunc {
 // @Failure      400
 // @Failure      500
 // @Router       /lobby/{url}-{video} [patch]
-func UpdateLobbyVideoURL(log *slog.Logger, l Lobbier) http.HandlerFunc {
+func SetLobbyVideoURL(log *slog.Logger, l Lobbier) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		const op = "http-server.handlers.UpdateLobbyVideoURL"
 
@@ -207,7 +207,19 @@ func UpdateLobbyVideoURL(log *slog.Logger, l Lobbier) http.HandlerFunc {
 			return
 		}
 
-		err := l.UpdateLobbyVideoURL(lobbyURL, videoURL)
+		iframe, err := utils.GetIframe(videoURL)
+		if err != nil {
+			log.Info("failed to get iframe", err)
+
+			render.JSON(w, r, models.Response{
+				Message: "failed to get iframe",
+				Status:  http.StatusBadRequest,
+			})
+
+			return
+		}
+
+		err = l.SetLobbyVideoURL(lobbyURL, iframe)
 		if err != nil {
 			log.Error("failed to update lobby video url", err)
 
@@ -219,6 +231,6 @@ func UpdateLobbyVideoURL(log *slog.Logger, l Lobbier) http.HandlerFunc {
 			return
 		}
 
-		render.JSON(w, r, http.StatusOK)
+		render.JSON(w, r, iframe)
 	}
 }

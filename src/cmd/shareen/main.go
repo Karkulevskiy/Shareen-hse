@@ -58,7 +58,7 @@ func main() {
 		r.Get("/{url}", handlers.GetLobby(log, storage.LobbyRepository))
 		r.Post("/", handlers.CreateLobby(log, storage.LobbyRepository))
 		r.Delete("/{url}", handlers.DeleteLobby(log, storage.LobbyRepository))
-		r.Patch("/{url}-{video}", handlers.UpdateLobbyVideoURL(log, storage.LobbyRepository))
+		r.Patch("/{url}-{video}", handlers.SetLobbyVideoURL(log, storage.LobbyRepository))
 	})
 
 	//TODO: как лучше передовать параметры? Строчкой или json???
