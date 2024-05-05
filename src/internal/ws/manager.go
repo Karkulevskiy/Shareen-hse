@@ -1,11 +1,13 @@
 package ws
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"log/slog"
 	"net/http"
 	"sync"
+	"time"
 
 	"github.com/go-chi/chi/middleware"
 	"github.com/gorilla/websocket"
@@ -24,14 +26,19 @@ type Manager struct {
 	log *slog.Logger
 	sync.RWMutex
 	handlers map[string]EventHandler
-	storage  *postgres.Storage
+	storage  *postgres.Postgres
+	otps     RetentionMap
+	clients  map[*Client]bool
+	//TODO: сделать ещё lobby map
 }
 
-func NewManager(storage *postgres.Storage, log *slog.Logger) *Manager {
+func NewManager(storage *postgres.Postgres, log *slog.Logger, ctx context.Context) *Manager {
 	m := &Manager{
 		handlers: make(map[string]EventHandler),
 		storage:  storage,
 		log:      log,
+		otps:     NewRetentionMap(ctx, 5*time.Second),
+		clients:  make(map[*Client]bool),
 	}
 
 	m.setupEventHandlers()
@@ -40,7 +47,7 @@ func NewManager(storage *postgres.Storage, log *slog.Logger) *Manager {
 }
 
 func (m *Manager) setupEventHandlers() {
-	m.handlers[EventCreateLobby] = handlers.CreateLobby
+	m.handlers[EventCreateLobby] = CreateLobbyHandler
 	//TODO:
 	// m.handlers[]
 }
@@ -49,16 +56,23 @@ func (m *Manager) routeEvent(event Event, c *Client) error {
 	if handler, ok := m.handlers[event.Type]; ok {
 		if err := handler(event, c); err != nil {
 			m.log.Error("failed to handle event", err)
+
 			return err
 		}
+
 		return nil
 	} else {
 		return errors.New("no such event type")
 	}
 }
 
-func (m *Manager) serveWS(w http.ResponseWriter, r *http.Request) {
+func (m *Manager) ServeWS(w http.ResponseWriter, r *http.Request) {
 	const op = "ws.manager.serveWS"
+
+	type Response struct {
+		Message string `json:"message"`
+		Status  int    `json:"status"`
+	}
 
 	log := m.log.With(
 		slog.String("op", op),
@@ -86,6 +100,43 @@ func (m *Manager) serveWS(w http.ResponseWriter, r *http.Request) {
 		w.Write(resp)
 	}
 
+	if !m.otps.VerifyOTP(otp) {
+		log.Info("user is not authorized")
+
+		w.WriteHeader(http.StatusUnauthorized)
+
+		return
+	}
+
 	log.Info("new connection")
 
+	conn, err := websocketUpgrader.Upgrade(w, r, nil)
+	if err != nil {
+		log.Error("failed to upgrade connection", err)
+
+		w.WriteHeader(http.StatusInternalServerError)
+
+		return
+	}
+
+	client := NewClient(conn, m)
+	m.addClient(client)
+
+	go client.readMessages()
+	go client.writeMessages()
+}
+
+func (m *Manager) addClient(c *Client) {
+	m.Lock()
+	defer m.Unlock()
+	m.clients[c] = true
+}
+
+func (m *Manager) removeClient(c *Client) {
+	m.Lock()
+	defer m.Unlock()
+	if _, ok := m.clients[c]; ok {
+		c.conn.Close()
+		delete(m.clients, c)
+	}
 }

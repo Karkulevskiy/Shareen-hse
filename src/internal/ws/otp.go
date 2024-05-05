@@ -29,8 +29,8 @@ func (rm RetentionMap) NewOTP() OTP {
 }
 
 // NewRetentionMap creates new retention map
-func NewRetentionMap(ctx context.Context, retention time.Duration) *RetentionMap {
-	rm := &RetentionMap{}
+func NewRetentionMap(ctx context.Context, retention time.Duration) RetentionMap {
+	rm := RetentionMap{}
 
 	go rm.Retention(ctx, retention)
 
@@ -38,7 +38,7 @@ func NewRetentionMap(ctx context.Context, retention time.Duration) *RetentionMap
 }
 
 // VerifyOTP verifies one time password
-func (rm RetentionMap) VerifyOTP(ctx context.Context, otp string) bool {
+func (rm RetentionMap) VerifyOTP(otp string) bool {
 	if _, ok := rm[otp]; !ok {
 		return false
 	}

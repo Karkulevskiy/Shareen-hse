@@ -2,15 +2,21 @@ package postgres
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 
+	"github.com/karkulevskiy/shareen/src/internal/domain"
+	"github.com/karkulevskiy/shareen/src/internal/storage"
+	"github.com/lib/pq"
 	_ "github.com/lib/pq"
 )
 
-type Storage struct{}
+type Postgres struct {
+	db *sql.DB
+}
 
 // MustInitDB - initializes DB
-func MustInitDB(connectionString string) *Storage {
+func MustInitDB(connectionString string) *Postgres {
 	db, err := sql.Open("postgres", connectionString)
 	if err != nil {
 		panic("failed to init db: " + err.Error())
@@ -18,7 +24,9 @@ func MustInitDB(connectionString string) *Storage {
 
 	prepareDB(db)
 
-	return &Storage{}
+	return &Postgres{
+		db: db,
+	}
 }
 
 // prepareDB - describes prepared statement for DB initializing
@@ -74,4 +82,66 @@ func execStmt(db *sql.DB, query string) {
 	if err != nil {
 		panic(fmt.Errorf("%s: %w", op, err))
 	}
+}
+
+func (p *Postgres) SaveUser(login string, passHash []byte) (int64, error) {
+	const op = "storage.postgres.SaveUser"
+
+	stmt, err := p.db.Prepare("INSERT INTO users_secrets (login, pass_hash) VALUES ($1, $2) RETURNING id")
+	if err != nil {
+		return 0, fmt.Errorf("%s: %w", op, err)
+	}
+
+	rows, err := stmt.Query(login, passHash)
+	if err != nil {
+		if postgresErr, ok := err.(*pq.Error); ok && postgresErr.Constraint != "" {
+			return 0, fmt.Errorf("%s: %w", op, storage.ErrUserAlreadyExists)
+		}
+
+		return 0, fmt.Errorf("%s: %w", op, err)
+	}
+
+	defer rows.Close()
+
+	var userID int64
+
+	for rows.Next() {
+		if err := rows.Scan(&userID); err != nil {
+			return 0, fmt.Errorf("%s: %w", op, err)
+		}
+	}
+
+	if rows.Err() != nil {
+		return 0, fmt.Errorf("%s: %w", op, rows.Err())
+	}
+
+	return userID, nil
+}
+
+func (p *Postgres) User(login string) (*domain.User, error) {
+	const op = "storage.Postgres.User"
+
+	stmt, err := p.db.Prepare("SELECT (id, login, pass_hash) FROM users_secrets WHERE login = $1")
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", op, err)
+	}
+
+	row := stmt.QueryRow(login)
+
+	var user domain.User
+
+	err = row.Scan(&user.ID, &user.Login, &user.PassHash)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, fmt.Errorf("%s: %w", op, storage.ErrUserNotFound)
+		}
+
+		return nil, fmt.Errorf("%s: %w", op, err)
+	}
+
+	return &domain.User{
+		ID:       user.ID,
+		Login:    user.Login,
+		PassHash: user.PassHash,
+	}, nil
 }

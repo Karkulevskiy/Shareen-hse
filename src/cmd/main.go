@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"log/slog"
 	"net/http"
 	"os"
@@ -9,6 +10,8 @@ import (
 	"github.com/karkulevskiy/shareen/src/internal/storage/postgres"
 	"github.com/karkulevskiy/shareen/src/internal/ws"
 )
+
+//TODO: Надо поделить все на папки (handlers), но сейчас есть цикличные зависимости
 
 const (
 	envLocal = "local"
@@ -28,6 +31,8 @@ func main() {
 
 	setupAPI(storage, log)
 
+	log.Info("started server", slog.String("address", cfg.HTTPServer.Address))
+
 	if err := http.ListenAndServe(cfg.HTTPServer.Address, nil); err != nil {
 		log.Error("failed to start server", err)
 	}
@@ -35,10 +40,12 @@ func main() {
 	//TODO: graceful shutdown
 }
 
-func setupAPI(storage *postgres.Storage, log *slog.Logger) {
-	manager := ws.NewManager(storage, log)
+func setupAPI(storage *postgres.Postgres, log *slog.Logger) {
+	m := ws.NewManager(storage, log, context.Background())
 
-	http.HandleFunc("/ws", manager.serveWS)
+	http.HandleFunc("/ws", m.ServeWS)
+	http.HandleFunc("/login", m.LoginHandler)
+	http.HandleFunc("/register", m.RegisterUser)
 }
 
 func setupLogger(env string) *slog.Logger {
