@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/karkulevskiy/shareen/src/internal/domain"
 	"github.com/karkulevskiy/shareen/src/internal/storage"
@@ -188,8 +189,101 @@ func (p *Postgres) User(login string) (*domain.User, error) {
 	}, nil
 }
 
-func (p *Postgres) CreateLobby(lobbyURL string) error {
-	return nil
+func (p *Postgres) CreateLobby(lobbyURL string) (string, error) {
+	const op = "postgres.CreateLobby"
+
+	stmt, err := p.db.Prepare("INSERT INTO lobbies (lobby_url) VALUES ($1)")
+	if err != nil {
+		return "", fmt.Errorf("%s: %w", op, err)
+	}
+
+	res, err := stmt.Exec(lobbyURL)
+	if err != nil {
+		if postgresErr, ok := err.(*pq.Error); ok && postgresErr.Constraint != "" {
+			return "", fmt.Errorf("%s: %w", op, storage.ErrURLExists)
+		}
+
+		return "", fmt.Errorf("%s: %w", op, err)
+	}
+
+	if totalRows, err := res.RowsAffected(); err != nil || totalRows == 0 {
+		return "", fmt.Errorf("%s: %w", op, err)
+	}
+
+	return lobbyURL, nil
 }
 
-func (p *Postgres) JoinLobby() {}
+func (p *Postgres) Lobby(lobbyURL string) (*domain.Lobby, error) {
+	const op = "postgres.Lobby"
+
+	stmt, err := p.db.Prepare("SELECT * FROM lobbies WHERE lobby_url = $1")
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", op, err)
+	}
+
+	rows := stmt.QueryRow(lobbyURL)
+
+	var lobbyID int64
+	var lobbyURL_ string
+	var videoURL sql.NullString
+	var pause bool
+	var timing sql.NullTime
+
+	err = rows.Scan(&lobbyID, &lobbyURL_, &videoURL, &pause, &timing)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, fmt.Errorf("%s: %w", op, storage.ErrLobbyNotFound)
+		}
+		return nil, fmt.Errorf("%s: %w", op, err)
+	}
+
+	lobby := &domain.Lobby{
+		LobbyURL: lobbyURL_,
+		VideoURL: videoURL.String,
+		Pause:    pause,
+		Timing:   timing.Time,
+	}
+
+	chat, err := p.Chat(lobbyID)
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", op, err)
+	}
+
+	lobby.Chat = chat
+
+	return lobby, nil
+}
+
+func (p *Postgres) Chat(lobbyID int64) ([]domain.Message, error) {
+	const op = "storage.postgres.Chat"
+
+	stmt, err := p.db.Prepare("SELECT (user_login, time, message) FROM chats WHERE lobby_id = $1")
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", op, err)
+	}
+
+	rows, err := stmt.Query(lobbyID)
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", op, err)
+	}
+	defer rows.Close()
+
+	var chat []domain.Message
+
+	var login, message string
+	var time time.Time
+
+	for rows.Next() {
+		err = rows.Scan(&login, &time, &message)
+		if err != nil {
+			return nil, fmt.Errorf("%s: %w", op, err)
+		}
+		chat = append(chat, domain.Message{
+			Login: login,
+			Text:  message,
+			Time:  time,
+		})
+	}
+
+	return chat, nil
+}

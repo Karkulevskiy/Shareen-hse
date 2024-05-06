@@ -65,9 +65,7 @@ func (c *Client) readMessages() {
 			break
 		}
 
-		if err = c.m.routeEvent(request, c); err != nil {
-			log.Error("failed to route event", err)
-		}
+		c.m.routeEvent(request, c)
 	}
 }
 

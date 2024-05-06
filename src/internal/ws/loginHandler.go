@@ -12,17 +12,6 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-type Request struct {
-	Login    string `json:"login"`
-	Password string `json:"password"`
-}
-
-type Response struct {
-	OTP     string `json:"otp,omitempty"`
-	Message string `json:"message,omitempty"`
-	Status  int    `json:"status,omitempty"`
-}
-
 func (m *Manager) LoginHandler(w http.ResponseWriter, r *http.Request) {
 	const op = "ws.manager.loginHandler"
 
@@ -31,14 +20,22 @@ func (m *Manager) LoginHandler(w http.ResponseWriter, r *http.Request) {
 		slog.String("request_id", middleware.GetReqID(r.Context())),
 	)
 
+	type Request struct {
+		Login    string `json:"login"`
+		Password string `json:"password"`
+	}
+
+	type ResponseOTP struct {
+		OTP string `json:"otp"`
+	}
+
 	var request Request
 
 	err := json.NewDecoder(r.Body).Decode(&request)
 	if err != nil {
 		log.Error("failed to decode login request", err)
 
-		http.Error(w, "invalid login request", http.StatusBadRequest)
-		w.Write(lib.Err("internal error", http.StatusInternalServerError))
+		lib.HTPPErr(w, EventLogin, http.StatusInternalServerError)
 
 		return
 	}
@@ -48,16 +45,14 @@ func (m *Manager) LoginHandler(w http.ResponseWriter, r *http.Request) {
 		if errors.Is(err, storage.ErrUserNotFound) {
 			log.Info("user not found")
 
-			http.Error(w, "user not found", http.StatusNotFound)
-			w.Write(lib.Err("user not found", http.StatusNotFound))
+			lib.HTPPErr(w, EventLogin, http.StatusBadRequest)
 
 			return
 		}
 
 		log.Error("failed to get user", err)
 
-		w.Write(lib.Err("internal error", http.StatusInternalServerError))
-		http.Error(w, "internal server error", http.StatusInternalServerError)
+		lib.HTPPErr(w, EventLogin, http.StatusInternalServerError)
 
 		return
 	}
@@ -65,22 +60,28 @@ func (m *Manager) LoginHandler(w http.ResponseWriter, r *http.Request) {
 	if err := bcrypt.CompareHashAndPassword(user.PassHash, []byte(request.Password)); err != nil {
 		log.Info("invalid credentials", err)
 
-		w.Write(lib.Err("invalid credentials", http.StatusUnauthorized))
-		http.Error(w, "invalid credentials", http.StatusUnauthorized)
+		lib.HTPPErr(w, EventLogin, http.StatusUnauthorized)
 
 		return
 	}
 
-	response := Response{
+	otp := ResponseOTP{
 		OTP: m.otps.NewOTP().Key,
+	}
+
+	otpJSON, _ := json.Marshal(otp)
+
+	response := Event{
+		Type:    EventLogin,
+		Status:  http.StatusOK,
+		Payload: otpJSON,
 	}
 
 	data, err := json.Marshal(response)
 	if err != nil {
 		log.Error("failed to marshal response", err)
 
-		w.Write(lib.Err("internal error", http.StatusInternalServerError))
-		http.Error(w, "internal server error", http.StatusInternalServerError)
+		lib.HTPPErr(w, EventLogin, http.StatusInternalServerError)
 
 		return
 	}
@@ -97,22 +98,23 @@ func (m *Manager) RegisterUser(w http.ResponseWriter, r *http.Request) {
 		slog.String("request_id", middleware.GetReqID(r.Context())),
 	)
 
+	type Request struct {
+		Login    string `json:"login"`
+		Password string `json:"password"`
+	}
+
 	var request Request
 
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
 		log.Error("failed to decode register request", err)
-
-		w.Write(lib.Err("invalid register request", http.StatusInternalServerError))
-
+		lib.HTPPErr(w, EventLogin, http.StatusInternalServerError)
 		return
 	}
 
 	passHash, err := bcrypt.GenerateFromPassword([]byte(request.Password), bcrypt.DefaultCost)
 	if err != nil {
 		log.Info("failed to generate password hash", err)
-
-		w.Write(lib.Err("internal error", http.StatusInternalServerError))
-
+		lib.HTPPErr(w, EventLogin, http.StatusInternalServerError)
 		return
 	}
 
@@ -120,32 +122,27 @@ func (m *Manager) RegisterUser(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		if errors.Is(err, storage.ErrUserAlreadyExists) {
 			log.Info("user already exists")
-
-			w.Write(lib.Err("user already exists", http.StatusBadRequest))
-
+			lib.HTPPErr(w, EventLogin, http.StatusBadRequest)
 			return
 		}
 
 		log.Error("failed to save user", err)
-
-		w.Write(lib.Err("internal error", http.StatusInternalServerError))
-
+		lib.HTPPErr(w, EventLogin, http.StatusInternalServerError)
 		return
 	}
 
 	log.Info("user registered")
 
-	resp := Response{
+	resp := Event{
+		Type:    EventRegister,
 		Status:  http.StatusOK,
-		Message: "user registered",
+		Payload: nil,
 	}
 
 	data, err := json.Marshal(&resp)
 	if err != nil {
 		log.Error("failed to marshal response", err)
-
-		w.Write(lib.Err("internal error", http.StatusInternalServerError))
-
+		lib.HTPPErr(w, EventLogin, http.StatusInternalServerError)
 		return
 	}
 

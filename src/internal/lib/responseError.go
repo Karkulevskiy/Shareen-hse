@@ -1,16 +1,33 @@
 package lib
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"net/http"
+)
 
-type ResponseError struct {
-	Message string `json:"message"`
-	Status  int    `json:"status"`
+type Response struct {
+	Type    string          `json:"type"`
+	Status  int             `json:"status"`
+	Payload json.RawMessage `json:"payload"`
 }
 
-func Err(message string, status int) []byte {
-	respErr := ResponseError{message, status}
+func HTPPErr(w http.ResponseWriter, eventType string, status int) {
 
-	data, _ := json.Marshal(respErr)
+	type ResponseErr struct {
+		Status int `json:"status"`
+	}
 
-	return data
+	statusData, _ := json.Marshal(ResponseErr{
+		Status: status,
+	})
+
+	respErr := Response{
+		Type:    eventType,
+		Status:  status,
+		Payload: statusData,
+	}
+
+	resp, _ := json.Marshal(respErr)
+	http.Error(w, "", status)
+	w.Write(resp)
 }

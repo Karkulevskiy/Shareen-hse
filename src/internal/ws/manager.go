@@ -3,7 +3,6 @@ package ws
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"log/slog"
 	"net/http"
 	"sync"
@@ -29,7 +28,7 @@ type Manager struct {
 	storage  *postgres.Postgres
 	otps     RetentionMap
 	clients  map[*Client]bool
-	lobbies  map[string]bool
+	lobbies  map[string][]*Client
 }
 
 func NewManager(storage *postgres.Postgres, log *slog.Logger, ctx context.Context) *Manager {
@@ -39,6 +38,7 @@ func NewManager(storage *postgres.Postgres, log *slog.Logger, ctx context.Contex
 		log:      log,
 		otps:     NewRetentionMap(ctx, 5*time.Minute), //TODO: потом выбрать время действия OTP
 		clients:  make(map[*Client]bool),
+		lobbies:  make(map[string][]*Client),
 	}
 
 	m.setupEventHandlers()
@@ -48,21 +48,16 @@ func NewManager(storage *postgres.Postgres, log *slog.Logger, ctx context.Contex
 
 func (m *Manager) setupEventHandlers() {
 	m.handlers[EventCreateLobby] = CreateLobbyHandler
+	m.handlers[EventJoinLobby] = JoinLobbyHandler
 	//TODO:
 	// m.handlers[]
 }
 
-func (m *Manager) routeEvent(event Event, c *Client) error {
+func (m *Manager) routeEvent(event Event, c *Client) {
 	if handler, ok := m.handlers[event.Type]; ok {
-		if err := handler(event, c); err != nil {
-			m.log.Error("failed to handle event", err)
-
-			return err
-		}
-
-		return nil
+		handler(event, c)
 	} else {
-		return errors.New("no such event type")
+		m.log.Error("no such event type")
 	}
 }
 
