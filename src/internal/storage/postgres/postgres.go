@@ -180,3 +180,9 @@ func (p *Postgres) User(login string) (*domain.User, error) {
 		PassHash: user.PassHash,
 	}, nil
 }
+
+func (p *Postgres) CreateLobby(lobbyURL string) error {
+
+}
+
+func (p *Postgres) JoinLobby() {}

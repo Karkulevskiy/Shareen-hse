@@ -29,7 +29,7 @@ type Manager struct {
 	storage  *postgres.Postgres
 	otps     RetentionMap
 	clients  map[*Client]bool
-	//TODO: сделать ещё lobby map
+	lobbies  map[string]bool
 }
 
 func NewManager(storage *postgres.Postgres, log *slog.Logger, ctx context.Context) *Manager {
@@ -37,7 +37,7 @@ func NewManager(storage *postgres.Postgres, log *slog.Logger, ctx context.Contex
 		handlers: make(map[string]EventHandler),
 		storage:  storage,
 		log:      log,
-		otps:     NewRetentionMap(ctx, 5*time.Second),
+		otps:     NewRetentionMap(ctx, 5*time.Minute), //TODO: потом выбрать время действия OTP
 		clients:  make(map[*Client]bool),
 	}
 

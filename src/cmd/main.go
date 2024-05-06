@@ -29,7 +29,7 @@ func main() {
 
 	log.Info("initialized db")
 
-	setupAPI(storage, log)
+	setupAPI(storage, log, context.Background())
 
 	log.Info("started server", slog.String("address", cfg.HTTPServer.Address))
 
@@ -40,8 +40,8 @@ func main() {
 	//TODO: graceful shutdown
 }
 
-func setupAPI(storage *postgres.Postgres, log *slog.Logger) {
-	m := ws.NewManager(storage, log, context.Background())
+func setupAPI(storage *postgres.Postgres, log *slog.Logger, ctx context.Context) {
+	m := ws.NewManager(storage, log, ctx)
 
 	http.HandleFunc("/ws", m.ServeWS)
 	http.HandleFunc("/login", m.LoginHandler)
