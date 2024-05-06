@@ -8,7 +8,6 @@ import (
 	"github.com/karkulevskiy/shareen/src/internal/domain"
 	"github.com/karkulevskiy/shareen/src/internal/storage"
 	"github.com/lib/pq"
-	_ "github.com/lib/pq"
 )
 
 type Postgres struct {
@@ -84,21 +83,56 @@ func execStmt(db *sql.DB, query string) {
 	}
 }
 
-func (p *Postgres) SaveUser(login string, passHash []byte) (int64, error) {
+func (p *Postgres) SaveUserUsers(login string) error {
+	const op = "storage.postgres.SaveUserUsers"
+
+	stmt, err := p.db.Prepare("INSERT INTO users (login) VALUES ($1)")
+	if err != nil {
+		return fmt.Errorf("%s: %w", op, err)
+	}
+
+	res, err := stmt.Exec(login)
+	if err != nil {
+		if postgresErr, ok := err.(*pq.Error); ok && postgresErr.Constraint != "" {
+			return fmt.Errorf("%s: %w", op, storage.ErrUserAlreadyExists)
+		}
+
+		return fmt.Errorf("%s: %w", op, err)
+	}
+
+	totalRows, err := res.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("%s: %w", op, err)
+	}
+
+	if totalRows == 0 {
+		return fmt.Errorf("%s: %w", op, storage.ErrUserAlreadyExists)
+	}
+
+	return nil
+}
+
+func (p *Postgres) SaveUser(login string, passHash []byte) error {
 	const op = "storage.postgres.SaveUser"
+
+	err := p.SaveUserUsers(login)
+
+	if err != nil {
+		return err
+	}
 
 	stmt, err := p.db.Prepare("INSERT INTO users_secrets (login, pass_hash) VALUES ($1, $2) RETURNING id")
 	if err != nil {
-		return 0, fmt.Errorf("%s: %w", op, err)
+		return fmt.Errorf("%s: %w", op, err)
 	}
 
 	rows, err := stmt.Query(login, passHash)
 	if err != nil {
 		if postgresErr, ok := err.(*pq.Error); ok && postgresErr.Constraint != "" {
-			return 0, fmt.Errorf("%s: %w", op, storage.ErrUserAlreadyExists)
+			return fmt.Errorf("%s: %w", op, storage.ErrUserAlreadyExists)
 		}
 
-		return 0, fmt.Errorf("%s: %w", op, err)
+		return fmt.Errorf("%s: %w", op, err)
 	}
 
 	defer rows.Close()
@@ -107,21 +141,21 @@ func (p *Postgres) SaveUser(login string, passHash []byte) (int64, error) {
 
 	for rows.Next() {
 		if err := rows.Scan(&userID); err != nil {
-			return 0, fmt.Errorf("%s: %w", op, err)
+			return fmt.Errorf("%s: %w", op, err)
 		}
 	}
 
 	if rows.Err() != nil {
-		return 0, fmt.Errorf("%s: %w", op, rows.Err())
+		return fmt.Errorf("%s: %w", op, rows.Err())
 	}
 
-	return userID, nil
+	return nil
 }
 
 func (p *Postgres) User(login string) (*domain.User, error) {
 	const op = "storage.Postgres.User"
 
-	stmt, err := p.db.Prepare("SELECT (id, login, pass_hash) FROM users_secrets WHERE login = $1")
+	stmt, err := p.db.Prepare("SELECT * FROM users_secrets WHERE login = $1")
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", op, err)
 	}
@@ -131,6 +165,7 @@ func (p *Postgres) User(login string) (*domain.User, error) {
 	var user domain.User
 
 	err = row.Scan(&user.ID, &user.Login, &user.PassHash)
+
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, fmt.Errorf("%s: %w", op, storage.ErrUserNotFound)

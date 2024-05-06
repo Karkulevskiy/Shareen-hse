@@ -3,7 +3,6 @@ package ws
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"log/slog"
 	"net/http"
 
@@ -19,7 +18,9 @@ type Request struct {
 }
 
 type Response struct {
-	OTP string `json:"otp"`
+	OTP     string `json:"otp,omitempty"`
+	Message string `json:"message,omitempty"`
+	Status  int    `json:"status,omitempty"`
 }
 
 func (m *Manager) LoginHandler(w http.ResponseWriter, r *http.Request) {
@@ -101,7 +102,7 @@ func (m *Manager) RegisterUser(w http.ResponseWriter, r *http.Request) {
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
 		log.Error("failed to decode register request", err)
 
-		http.Error(w, "invalid register request", http.StatusInternalServerError)
+		w.Write(lib.Err("invalid register request", http.StatusInternalServerError))
 
 		return
 	}
@@ -110,30 +111,44 @@ func (m *Manager) RegisterUser(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Info("failed to generate password hash", err)
 
-		http.Error(w, "internal server error", http.StatusInternalServerError)
+		w.Write(lib.Err("internal error", http.StatusInternalServerError))
 
 		return
 	}
 
-	userID, err := m.storage.SaveUser(request.Login, passHash)
+	err = m.storage.SaveUser(request.Login, passHash)
 	if err != nil {
 		if errors.Is(err, storage.ErrUserAlreadyExists) {
 			log.Info("user already exists")
 
-			http.Error(w, "user already exists", http.StatusBadRequest)
+			w.Write(lib.Err("user already exists", http.StatusBadRequest))
 
 			return
 		}
 
 		log.Error("failed to save user", err)
 
-		http.Error(w, "internal server error", http.StatusInternalServerError)
+		w.Write(lib.Err("internal error", http.StatusInternalServerError))
 
 		return
 	}
 
-	log.Info("user registered", slog.String("user_id", fmt.Sprint(userID)))
+	log.Info("user registered")
+
+	resp := Response{
+		Status:  http.StatusOK,
+		Message: "user registered",
+	}
+
+	data, err := json.Marshal(&resp)
+	if err != nil {
+		log.Error("failed to marshal response", err)
+
+		w.Write(lib.Err("internal error", http.StatusInternalServerError))
+
+		return
+	}
 
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(fmt.Sprint(userID)))
+	w.Write([]byte(data))
 }
