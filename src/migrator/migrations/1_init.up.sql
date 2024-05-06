@@ -37,4 +37,4 @@ CREATE TABLE IF NOT EXISTS users_secrets
     id SERIAL PRIMARY KEY,
     login VARCHAR(255) REFERENCES users (login) ON DELETE CASCADE, 
     pass_hash BYTEA NOT NULL
-)
+);

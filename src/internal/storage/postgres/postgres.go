@@ -32,19 +32,20 @@ func MustInitDB(connectionString string) *Postgres {
 func prepareDB(db *sql.DB) {
 	const (
 		lobbiesStmt = `
-			CREATE TABLE IF NOT EXISTS lobbies
-			(
-				id SERIAL PRIMARY KEY,
-				lobby_url varchar(255) UNIQUE NOT NULL,
-				video_url varchar(255)
-			);`
+		CREATE TABLE IF NOT EXISTS lobbies
+		(
+			id SERIAL PRIMARY KEY,
+			lobby_url varchar(255) UNIQUE NOT NULL,
+			video_url varchar(500)
+		);`
 		index     = `CREATE INDEX IF NOT EXISTS lobby_url_idx ON lobbies (lobby_url);`
 		usersStmt = `
-			CREATE TABLE IF NOT EXISTS users
-			(
-				id SERIAL PRIMARY KEY,
-				name VARCHAR(20) NOT NULL
-			);`
+		CREATE TABLE IF NOT EXISTS users
+		(
+			id SERIAL PRIMARY KEY,
+			login VARCHAR(20) NOT NULL UNIQUE
+		);`
+		index2           = `CREATE INDEX IF NOT EXISTS user_login_idx ON users (login);`
 		lobbiesUsersStmt = `
 		CREATE TABLE IF NOT EXISTS lobbies_users
 (
@@ -59,9 +60,15 @@ func prepareDB(db *sql.DB) {
 			id SERIAL PRIMARY KEY,
 			lobby_url VARCHAR(255) REFERENCES lobbies (lobby_url) ON DELETE CASCADE
 		);`
+		users_secrets = `CREATE TABLE IF NOT EXISTS users_secrets
+		(
+			id SERIAL PRIMARY KEY,
+			login VARCHAR(255) REFERENCES users (login) ON DELETE CASCADE, 
+			pass_hash BYTEA NOT NULL
+		);`
 	)
 
-	for _, query := range []string{lobbiesStmt, index, usersStmt, lobbiesUsersStmt, chatsStmt} {
+	for _, query := range []string{lobbiesStmt, index, usersStmt, index2, lobbiesUsersStmt, chatsStmt, users_secrets} {
 		execStmt(db, query)
 	}
 }
@@ -182,7 +189,7 @@ func (p *Postgres) User(login string) (*domain.User, error) {
 }
 
 func (p *Postgres) CreateLobby(lobbyURL string) error {
-
+	return nil
 }
 
 func (p *Postgres) JoinLobby() {}
