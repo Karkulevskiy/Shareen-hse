@@ -287,3 +287,72 @@ func (p *Postgres) Chat(lobbyID int64) ([]domain.Message, error) {
 
 	return chat, nil
 }
+
+func (p *Postgres) InsertVideo(lobbyURL, videoURL string) error {
+	const op = "storage.postgres.InsertVideo"
+
+	stmt, err := p.db.Prepare("UPDATE lobbies SET video_url = $1 WHERE lobby_url = $2")
+	if err != nil {
+		return fmt.Errorf("%s: %w", op, err)
+	}
+
+	res, err := stmt.Exec(videoURL, lobbyURL)
+	if err != nil {
+		return fmt.Errorf("%s: %w", op, err)
+	}
+
+	totalRows, err := res.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("%s: %w", op, err)
+	}
+
+	if totalRows == 0 {
+		return fmt.Errorf("%s: %w", op, storage.ErrLobbyNotFound)
+	}
+
+	return nil
+}
+
+func (p *Postgres) SaveMessage(lobbyURL, login, message string) error {
+	const op = "storage.postgres.SaveMessage"
+
+	lobbyID, err := p.LobbyID(lobbyURL)
+	if err != nil {
+		return err
+	}
+
+	stmt, err := p.db.Prepare("INSERT INTO chats (lobby_id, user_login, time, message) VALUES ($1, $2, $3, $4)")
+	if err != nil {
+		return fmt.Errorf("%s: %w", op, err)
+	}
+
+	_, err = stmt.Exec(lobbyID, login, time.Now(), message)
+	if err != nil {
+		return fmt.Errorf("%s: %w", op, err)
+	}
+
+	return nil
+}
+
+func (p *Postgres) LobbyID(lobbyURL string) (int64, error) {
+	const op = "storage.postgres.LobbyID"
+
+	stmt, err := p.db.Prepare("SELECT id FROM lobbies WHERE lobby_url = $1")
+	if err != nil {
+		return 0, fmt.Errorf("%s: %w", op, err)
+	}
+
+	rows := stmt.QueryRow(lobbyURL)
+
+	var lobbyID int64
+
+	err = rows.Scan(&lobbyID)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return 0, fmt.Errorf("%s: %w", op, storage.ErrLobbyNotFound)
+		}
+		return 0, fmt.Errorf("%s: %w", op, err)
+	}
+
+	return lobbyID, nil
+}

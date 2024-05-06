@@ -99,3 +99,92 @@
     }
 }
 //RESPONSE 
+
+
+
+
+// localhost:8080/ws
+//REQUEST
+{
+    "type" : "insert_video_url",
+    "payload" : {
+        "video_url" : "https://youtu.be/ibttZ",
+        "lobby_url" : "ibttZ"
+    }
+}
+//RESPONSE 200 OK
+{
+    "type": "insert_video_url",
+    "status": 200,
+    "payload" : {
+        "iframe" : "ifrjkfskbfksrbgksbrgksrbgusbguosbgousrgbousgbousrg" //iframe для вставки в плеер
+    }
+}
+//RESPONSE 400 BADREQUEST
+{
+    "type": "insert_video_url",
+    "status": 400,
+    "payload": {
+        "status": 400
+    }
+}
+
+
+// localhost:8080/ws
+//REQUEST
+{
+    "type" : "pause_video",
+    "payload" : {
+        "pause" : true,
+        "lobby_url" : "ibttZ"
+    }
+}
+
+//RESPONSE 200 OK
+{
+    "type": "pause_video",
+    "status": 200,
+    "payload": {
+        "pause" : true,
+    }
+}
+//RESPONSE 400 BADREQUEST
+{
+    "type": "pause_video",
+    "status": 400,
+    "payload": {
+        "status": 400
+    }
+}
+
+
+
+// localhost:8080/ws
+//REQUEST
+{
+    "type" : "send_message",
+    "payload" : {
+        "login" : "max",
+        "lobby_url" : "ibttZ",
+        "message" : "hello",
+    }
+}
+
+//RESPONSE 200 OK
+{
+    "type": "send_message",
+    "status": 200,
+    "payload": {
+        "message" : "hello",
+        "login" : "max",
+        "time" : "0001-01-01T00:00:00Z"
+    }
+}
+//RESPONSE 400 BADREQUEST
+{
+    "type": "send_message",
+    "status": 400,
+    "payload": {
+        "status": 400
+    }
+}

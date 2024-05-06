@@ -49,6 +49,9 @@ func NewManager(storage *postgres.Postgres, log *slog.Logger, ctx context.Contex
 func (m *Manager) setupEventHandlers() {
 	m.handlers[EventCreateLobby] = CreateLobbyHandler
 	m.handlers[EventJoinLobby] = JoinLobbyHandler
+	m.handlers[EventInsertVideoURL] = InsertVideoHandler
+	m.handlers[EventPauseVideo] = PauseVideoHandler
+	m.handlers[EventSendMessage] = SendMessageHandler
 	//TODO:
 	// m.handlers[]
 }

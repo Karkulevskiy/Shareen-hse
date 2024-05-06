@@ -42,9 +42,7 @@ func CreateLobbyHandler(event Event, c *Client) {
 	lobbyURL, err := c.m.storage.CreateLobby(lobbyURL)
 	if err != nil {
 		log.Error("failed to create lobby", err)
-
 		SendResponseError(event.Type, http.StatusInternalServerError, c)
-
 		return
 	}
 
@@ -54,9 +52,7 @@ func CreateLobbyHandler(event Event, c *Client) {
 	data, err := json.Marshal(CreateResponse{LobbyURL: lobbyURL})
 	if err != nil {
 		log.Error("failed to marshal lobby URL", err)
-
 		SendResponseError(event.Type, http.StatusInternalServerError, c)
-
 		return
 	}
 
@@ -80,9 +76,7 @@ func JoinLobbyHandler(event Event, c *Client) {
 
 	if err := json.Unmarshal(event.Payload, &request); err != nil {
 		log.Error("failed to unmarshal join lobby request", err)
-
 		SendResponseError(event.Type, http.StatusInternalServerError, c)
-
 		return
 	}
 
@@ -91,15 +85,12 @@ func JoinLobbyHandler(event Event, c *Client) {
 		fmt.Println("aa")
 		if errors.Is(err, storage.ErrLobbyNotFound) {
 			log.Info("lobby not found", err)
-
 			SendResponseError(event.Type, http.StatusBadRequest, c)
-
 			return
 
 		}
 
 		SendResponseError(event.Type, http.StatusInternalServerError, c)
-
 		return
 	}
 
@@ -132,9 +123,7 @@ func JoinLobbyHandler(event Event, c *Client) {
 	data, err := json.Marshal(&response)
 	if err != nil {
 		log.Error("failed to marshal join lobby response", err)
-
 		SendResponseError(event.Type, http.StatusInternalServerError, c)
-
 		return
 	}
 
@@ -154,9 +143,7 @@ func JoinLobbyHandler(event Event, c *Client) {
 	lobbyData, err := json.Marshal(&lobby)
 	if err != nil {
 		log.Error("failed to marshal lobby data", err)
-
 		SendResponseError(event.Type, http.StatusInternalServerError, c)
-
 		return
 	}
 
@@ -171,14 +158,102 @@ func JoinLobbyHandler(event Event, c *Client) {
 	log.Info("user joined lobby")
 }
 
-func InsertVideoHandler(event Event, c *Client) error {
-	return nil
+func InsertVideoHandler(event Event, c *Client) {
+	const op = "ws.InsertVideoHandler"
+
+	type InsertRequest struct {
+		VideoURL string `json:"video_url"`
+		LobbyURL string `json:"lobby_url"`
+	}
+
+	log := c.m.log.With(
+		slog.String("op", op),
+	)
+
+	var insertReq InsertRequest
+
+	err := json.Unmarshal(event.Payload, &insertReq)
+	if err != nil {
+		log.Error("failed to unmarshal insert video request", err)
+		SendResponseError(event.Type, http.StatusInternalServerError, c)
+		return
+	}
+
+	iframe, err := lib.GetIframe(insertReq.VideoURL)
+	if err != nil {
+		log.Warn("unsupported site", err)
+		SendResponseError(event.Type, http.StatusBadRequest, c)
+		return
+	}
+
+	err = c.m.storage.InsertVideo(insertReq.LobbyURL, iframe)
+	if err != nil {
+		if errors.Is(err, storage.ErrLobbyNotFound) {
+			log.Info("lobby not found", err)
+			SendResponseError(event.Type, http.StatusBadRequest, c)
+			return
+		}
+		log.Error("failed to insert video url", err)
+		SendResponseError(event.Type, http.StatusInternalServerError, c)
+		return
+	}
+
+	type InsertResponse struct {
+		Iframe string `json:"iframe"`
+	}
+
+	payloadData, _ := json.Marshal(InsertResponse{Iframe: iframe})
+
+	resp := Event{
+		Status:  http.StatusOK,
+		Type:    EventInsertVideoURL,
+		Payload: payloadData,
+	}
+
+	// Messages for lobby users to update video URL
+	for _, client := range c.m.lobbies[insertReq.LobbyURL] {
+		client.egress <- resp
+	}
 }
 
-func PauseVideoHandler(event Event, c *Client) error {
-	return nil
+func PauseVideoHandler(event Event, c *Client) {
+	const op = "ws.PauseVideoHandler"
+
+	type PauseRequest struct {
+		LobbyURL string `json:"lobby_url"`
+		Pause    bool   `json:"pause"`
+	}
+
+	log := c.m.log.With(
+		slog.String("op", op),
+	)
+
+	var pauseReq PauseRequest
+
+	err := json.Unmarshal(event.Payload, &pauseReq)
+	if err != nil {
+		log.Error("failed to unmarshal pause video request", err)
+		SendResponseError(event.Type, http.StatusInternalServerError, c)
+		return
+	}
+
+	type InsertResp struct {
+		Pause bool `json:"pause"`
+	}
+
+	insData, _ := json.Marshal(InsertResp{Pause: pauseReq.Pause})
+
+	resp := Event{
+		Status:  http.StatusOK,
+		Type:    EventPauseVideo,
+		Payload: insData,
+	}
+
+	// Messages for lobby users to START / PAUSE video
+	for _, client := range c.m.lobbies[pauseReq.LobbyURL] {
+		client.egress <- resp
+	}
 }
 
-func StartVideoHandler(event Event, c *Client) error {
-	return nil
-}
+//TODO: event to ask timing and action on video if exists!!
+//TODO: chat
