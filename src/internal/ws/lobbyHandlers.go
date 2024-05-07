@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
+	"time"
 
 	"github.com/karkulevskiy/shareen/src/internal/lib"
 	"github.com/karkulevskiy/shareen/src/internal/storage"
@@ -151,9 +152,9 @@ func JoinLobbyHandler(event Event, c *Client) {
 		delete(c.m.videoTimingMap, request.Login)
 
 		type ResponseTimingEvent struct {
-			Login  string `json:"login"`
-			Timing string `json:"timing"`
-			Pause  bool   `json:"pause"`
+			Login  string    `json:"login"`
+			Timing time.Time `json:"timing"`
+			Pause  bool      `json:"pause"`
 		}
 
 		var respTimingData ResponseTimingEvent
@@ -317,9 +318,9 @@ func GetVideoTiming(event Event, c *Client) {
 	)
 
 	type VideoTimingRequest struct {
-		Login  string `json:"login"`
-		Timing string `json:"timing"`
-		Pause  bool   `json:"pause"`
+		Login  string    `json:"login"`
+		Timing time.Time `json:"timing"`
+		Pause  bool      `json:"pause"`
 	}
 
 	var videoTimingRequest VideoTimingRequest
@@ -334,8 +335,8 @@ func GetVideoTiming(event Event, c *Client) {
 	}
 
 	type VideoTimingResponse struct {
-		Timing string `json:"timing"`
-		Pause  bool   `json:"pause"`
+		Timing time.Time `json:"timing"`
+		Pause  bool      `json:"pause"`
 	}
 
 	videoTimingResponseData, _ := json.Marshal(VideoTimingResponse{
