@@ -24,23 +24,24 @@ var (
 type Manager struct {
 	log *slog.Logger
 	sync.RWMutex
-	handlers map[string]EventHandler
-	storage  *postgres.Postgres
-	otps     RetentionMap
-	clients  map[*Client]bool
-	lobbies  map[string][]*Client
+	handlers       map[string]EventHandler
+	storage        *postgres.Postgres
+	otps           RetentionMap
+	clients        map[*Client]bool
+	lobbies        map[string][]*Client
+	videoTimingMap map[string]chan Event
 }
 
 func NewManager(storage *postgres.Postgres, log *slog.Logger, ctx context.Context) *Manager {
 	m := &Manager{
-		handlers: make(map[string]EventHandler),
-		storage:  storage,
-		log:      log,
-		otps:     NewRetentionMap(ctx, 5*time.Minute), //TODO: потом выбрать время действия OTP
-		clients:  make(map[*Client]bool),
-		lobbies:  make(map[string][]*Client),
+		handlers:       make(map[string]EventHandler),
+		storage:        storage,
+		log:            log,
+		otps:           NewRetentionMap(ctx, 5*time.Minute), //TODO: потом выбрать время действия OTP
+		clients:        make(map[*Client]bool),
+		lobbies:        make(map[string][]*Client),
+		videoTimingMap: make(map[string]chan Event),
 	}
-
 	m.setupEventHandlers()
 
 	return m
@@ -52,7 +53,7 @@ func (m *Manager) setupEventHandlers() {
 	m.handlers[EventInsertVideoURL] = InsertVideoHandler
 	m.handlers[EventPauseVideo] = PauseVideoHandler
 	m.handlers[EventSendMessage] = SendMessageHandler
-	//TODO:
+	m.handlers[EventGetVideoTiming] = GetVideoTiming
 	// m.handlers[]
 }
 
@@ -137,4 +138,15 @@ func (m *Manager) removeClient(c *Client) {
 		c.conn.Close()
 		delete(m.clients, c)
 	}
+}
+
+func (m *Manager) clientInLobby(lobbyURL string, c *Client) bool {
+	m.Lock()
+	defer m.Unlock()
+	for _, client := range m.lobbies[lobbyURL] {
+		if client == c {
+			return true
+		}
+	}
+	return false
 }

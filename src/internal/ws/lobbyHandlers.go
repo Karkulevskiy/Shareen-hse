@@ -140,6 +140,35 @@ func JoinLobbyHandler(event Event, c *Client) {
 		}
 	}
 
+	if len(c.m.lobbies[request.LobbyURL]) > 1 {
+		videoTimingCh := make(chan Event)
+		c.m.videoTimingMap[request.Login] = videoTimingCh
+
+		AskForVideoTiming(request.Login, c.m.lobbies[request.LobbyURL][0])
+
+		responseTiming := <-videoTimingCh
+
+		delete(c.m.videoTimingMap, request.Login)
+
+		type ResponseTimingEvent struct {
+			Login  string `json:"login"`
+			Timing string `json:"timing"`
+			Pause  bool   `json:"pause"`
+		}
+
+		var respTimingData ResponseTimingEvent
+
+		err := json.Unmarshal(responseTiming.Payload, &respTimingData)
+		if err != nil {
+			log.Error("failed to unmarshal response timing event", err)
+			SendResponseError(event.Type, http.StatusInternalServerError, c)
+			return
+		}
+
+		lobby.Pause = respTimingData.Pause
+		lobby.Timing = respTimingData.Timing
+	}
+
 	lobbyData, err := json.Marshal(&lobby)
 	if err != nil {
 		log.Error("failed to marshal lobby data", err)
@@ -161,6 +190,7 @@ func JoinLobbyHandler(event Event, c *Client) {
 func InsertVideoHandler(event Event, c *Client) {
 	const op = "ws.InsertVideoHandler"
 
+	//TODO : дыра, можно отправлять запросы и не находится в лобби
 	type InsertRequest struct {
 		VideoURL string `json:"video_url"`
 		LobbyURL string `json:"lobby_url"`
@@ -186,12 +216,10 @@ func InsertVideoHandler(event Event, c *Client) {
 		return
 	}
 
-	fmt.Println(iframe)
-
 	err = c.m.storage.InsertVideo(insertReq.LobbyURL, iframe)
 	if err != nil {
+		fmt.Println(err)
 		if errors.Is(err, storage.ErrLobbyNotFound) {
-			log.Info("lobby not found", err)
 			SendResponseError(event.Type, http.StatusBadRequest, c)
 			return
 		}
@@ -200,6 +228,7 @@ func InsertVideoHandler(event Event, c *Client) {
 		return
 	}
 
+	//TODO: broke encoding Спросить у матвея, мб можно перевести в строку JSON?
 	type InsertResponse struct {
 		Iframe string `json:"iframe"`
 	}
@@ -257,5 +286,68 @@ func PauseVideoHandler(event Event, c *Client) {
 	}
 }
 
-//TODO: event to ask timing and action on video if exists!!
-//TODO: chat
+func AskForVideoTiming(login string, c *Client) {
+	const op = "ws.AskForVideoTimingHandler"
+
+	log := c.m.log.With(
+		slog.String("op", op),
+	)
+
+	log.Info("ask for video timing")
+
+	type GetTimingRequest struct {
+		Login string `json:"login"`
+	}
+
+	getTimingData, _ := json.Marshal(GetTimingRequest{Login: login})
+	videoTimingResponse := Event{
+		Type:    EventGetVideoTiming,
+		Payload: getTimingData,
+	}
+
+	c.egress <- videoTimingResponse
+}
+
+// Сюда отправляем ответ от Клиента с информацией о видео
+func GetVideoTiming(event Event, c *Client) {
+	const op = "ws.GetVideoTiming"
+
+	log := c.m.log.With(
+		slog.String("op", op),
+	)
+
+	type VideoTimingRequest struct {
+		Login  string `json:"login"`
+		Timing string `json:"timing"`
+		Pause  bool   `json:"pause"`
+	}
+
+	var videoTimingRequest VideoTimingRequest
+
+	err := json.Unmarshal(event.Payload, &videoTimingRequest)
+	if err != nil {
+		c.m.videoTimingMap[videoTimingRequest.Login] <- Event{Status: http.StatusInternalServerError}
+
+		log.Error("failed to unmarshal video timing request", err)
+		SendResponseError(event.Type, http.StatusInternalServerError, c)
+		return
+	}
+
+	type VideoTimingResponse struct {
+		Timing string `json:"timing"`
+		Pause  bool   `json:"pause"`
+	}
+
+	videoTimingResponseData, _ := json.Marshal(VideoTimingResponse{
+		Timing: videoTimingRequest.Timing,
+		Pause:  videoTimingRequest.Pause,
+	})
+
+	resp := Event{
+		Status:  http.StatusOK,
+		Type:    EventGetVideoTiming,
+		Payload: videoTimingResponseData,
+	}
+
+	c.m.videoTimingMap[videoTimingRequest.Login] <- resp
+}

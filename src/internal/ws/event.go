@@ -14,6 +14,7 @@ const (
 	EventStartVideo     = "start_video"
 	EventRewindVideo    = "rewind_video"
 	EventInsertVideoURL = "insert_video_url"
+	EventGetVideoTiming = "get_video_timing"
 
 	// Events for login, register logic
 	EventLogin    = "login"
