@@ -82,7 +82,6 @@ func JoinLobbyHandler(event Event, c *Client) {
 
 	lobby, err := c.m.storage.Lobby(request.LobbyURL)
 	if err != nil {
-		fmt.Println("aa")
 		if errors.Is(err, storage.ErrLobbyNotFound) {
 			log.Info("lobby not found", err)
 			SendResponseError(event.Type, http.StatusBadRequest, c)
@@ -90,6 +89,7 @@ func JoinLobbyHandler(event Event, c *Client) {
 
 		}
 
+		log.Error("failed to get lobby", err)
 		SendResponseError(event.Type, http.StatusInternalServerError, c)
 		return
 	}
@@ -185,6 +185,8 @@ func InsertVideoHandler(event Event, c *Client) {
 		SendResponseError(event.Type, http.StatusBadRequest, c)
 		return
 	}
+
+	fmt.Println(iframe)
 
 	err = c.m.storage.InsertVideo(insertReq.LobbyURL, iframe)
 	if err != nil {

@@ -22,7 +22,7 @@ func MustInitDB(connectionString string) *Postgres {
 		panic("failed to init db: " + err.Error())
 	}
 
-	prepareDB(db)
+	//prepareDB(db)
 
 	return &Postgres{
 		db: db,
