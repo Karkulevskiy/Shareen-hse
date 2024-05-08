@@ -227,7 +227,7 @@ func (p *Postgres) Lobby(lobbyURL string) (*domain.Lobby, error) {
 	var lobbyURL_ string
 	var videoURL sql.NullString
 	var pause bool
-	var timing sql.NullTime
+	var timing sql.NullString
 
 	err = rows.Scan(&lobbyID, &lobbyURL_, &videoURL, &pause, &timing)
 	if err != nil {
@@ -241,7 +241,7 @@ func (p *Postgres) Lobby(lobbyURL string) (*domain.Lobby, error) {
 		LobbyURL: lobbyURL_,
 		VideoURL: videoURL.String,
 		Pause:    pause,
-		Timing:   timing.Time,
+		Timing:   timing.String,
 	}
 
 	chat, err := p.Chat(lobbyID)
@@ -271,7 +271,7 @@ func (p *Postgres) Chat(lobbyID int64) ([]domain.Message, error) {
 	var chat []domain.Message
 
 	var login, message string
-	var time time.Time
+	var time sql.NullString
 
 	for rows.Next() {
 		err = rows.Scan(&login, &time, &message)
@@ -281,7 +281,7 @@ func (p *Postgres) Chat(lobbyID int64) ([]domain.Message, error) {
 		chat = append(chat, domain.Message{
 			Login: login,
 			Text:  message,
-			Time:  time,
+			Time:  time.String,
 		})
 	}
 
@@ -326,7 +326,8 @@ func (p *Postgres) SaveMessage(lobbyURL, login, message string) error {
 		return fmt.Errorf("%s: %w", op, err)
 	}
 
-	_, err = stmt.Exec(lobbyID, login, time.Now(), message)
+	// интересный вариант формата времени, почему так?
+	_, err = stmt.Exec(lobbyID, login, time.Now().Format("15:04:05"), message)
 	if err != nil {
 		return fmt.Errorf("%s: %w", op, err)
 	}

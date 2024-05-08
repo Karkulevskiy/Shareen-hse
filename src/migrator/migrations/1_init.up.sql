@@ -2,10 +2,10 @@
 CREATE TABLE IF NOT EXISTS lobbies
 (
     id SERIAL PRIMARY KEY,
-    lobby_url varchar(255) UNIQUE NOT NULL,
+    lobby_url varchar(10) UNIQUE NOT NULL,
     video_url varchar(500) DEFAULT NULL,
     pause BOOLEAN DEFAULT FALSE,
-    timing TIME
+    timing VARCHAR(8)
 );
 --creating index for lobby_url
 CREATE INDEX IF NOT EXISTS lobby_url_idx ON lobbies (lobby_url);

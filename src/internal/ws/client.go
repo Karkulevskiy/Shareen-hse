@@ -9,7 +9,7 @@ import (
 )
 
 var (
-	pongWait   = time.Second * 10
+	pongWait   = time.Minute * 10
 	pingPeriod = (pongWait * 9) / 10
 )
 
@@ -19,7 +19,7 @@ type Client struct {
 	egress chan Event
 }
 
-func NewClient(conn *websocket.Conn, m *Manager) *Client {
+func NewClient(conn *websocket.Conn, m *Manager, login string) *Client {
 	return &Client{
 		conn:   conn,
 		m:      m,

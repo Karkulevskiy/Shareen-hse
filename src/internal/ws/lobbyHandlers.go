@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
-	"time"
 
+	"github.com/karkulevskiy/shareen/src/internal/domain"
 	"github.com/karkulevskiy/shareen/src/internal/lib"
 	"github.com/karkulevskiy/shareen/src/internal/storage"
 )
@@ -100,20 +100,7 @@ func JoinLobbyHandler(event Event, c *Client) {
 	}
 
 	// Add user to lobby in RAM
-	if _, ok := c.m.lobbies[request.LobbyURL]; ok {
-		flag := false
-		for _, client := range c.m.lobbies[request.LobbyURL] {
-			if client == c {
-				flag = true
-				break
-			}
-		}
-		if !flag {
-			c.m.lobbies[request.LobbyURL] = append(c.m.lobbies[request.LobbyURL], c)
-		}
-	} else {
-		c.m.lobbies[request.LobbyURL] = append(c.m.lobbies[request.LobbyURL], c)
-	}
+	c.m.lobbies[request.LobbyURL] = append(c.m.lobbies[request.LobbyURL], c)
 
 	//TODO: send notify in chat that user was disconnected
 	response := JoinLobbyEvent{
@@ -138,6 +125,9 @@ func JoinLobbyHandler(event Event, c *Client) {
 	for _, client := range c.m.lobbies[request.LobbyURL] {
 		if client != c {
 			client.egress <- userConnectedEvent
+
+			//BUG: надо в лобби как то отправлять логины пользователей, откуда их брать?
+			lobby.Users = append(lobby.Users, &domain.User{Login: request.Login})
 		}
 	}
 
@@ -152,9 +142,9 @@ func JoinLobbyHandler(event Event, c *Client) {
 		delete(c.m.videoTimingMap, request.Login)
 
 		type ResponseTimingEvent struct {
-			Login  string    `json:"login"`
-			Timing time.Time `json:"timing"`
-			Pause  bool      `json:"pause"`
+			Login  string `json:"login"`
+			Timing string `json:"timing"`
+			Pause  bool   `json:"pause"`
 		}
 
 		var respTimingData ResponseTimingEvent
@@ -318,9 +308,9 @@ func GetVideoTiming(event Event, c *Client) {
 	)
 
 	type VideoTimingRequest struct {
-		Login  string    `json:"login"`
-		Timing time.Time `json:"timing"`
-		Pause  bool      `json:"pause"`
+		Login  string `json:"login"`
+		Timing string `json:"timing"`
+		Pause  bool   `json:"pause"`
 	}
 
 	var videoTimingRequest VideoTimingRequest
@@ -334,9 +324,11 @@ func GetVideoTiming(event Event, c *Client) {
 		return
 	}
 
+	log.Info("get video timing", slog.String("user_login", videoTimingRequest.Login))
+
 	type VideoTimingResponse struct {
-		Timing time.Time `json:"timing"`
-		Pause  bool      `json:"pause"`
+		Timing string `json:"timing"`
+		Pause  bool   `json:"pause"`
 	}
 
 	videoTimingResponseData, _ := json.Marshal(VideoTimingResponse{

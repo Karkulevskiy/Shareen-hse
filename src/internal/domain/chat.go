@@ -1,9 +1,7 @@
 package domain
 
-import "time"
-
 type Message struct {
 	Login string
-	Time  time.Time
+	Time  string
 	Text  string
 }
