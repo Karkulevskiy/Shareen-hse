@@ -49,7 +49,7 @@ function signHandler(event){
         "password":data[1].value
     }
     if ($signbtn.value=="Sign in"){
-        let MaxURL = "ws://localhost:8080/login";
+        let MaxURL = "http://localhost:8080/login";
         axios.post(MaxURL,JSON.stringify(UserData))
         .then(response =>{
             let ans = JSON.parse(response);
@@ -58,7 +58,7 @@ function signHandler(event){
 
                 }
                 const otp = ans.payload.otp;
-                MaxURL = "ws://localhost:8080/ws?otp="+otp;
+                MaxURL = "http://localhost:8080/ws?otp="+otp;
                 axios.post(MaxURL);
             }
             else{
@@ -67,7 +67,7 @@ function signHandler(event){
         })
     }
     else{
-        const MaxURL = "ws://localhost:8080/register";
+        const MaxURL = "http://localhost:8080/register";
         axios.post(MaxURL,JSON.stringify(UserData))
         .then(response => {
             if (JSON.parse(response).status==200){
@@ -124,9 +124,9 @@ function connectWebsocket(otp){
             // parse websocket message as JSON
             const eventData = JSON.parse(event.data);
             // Assign JSON data to new Event Object
-            const event = Object.assign(new Event, eventData);
+            const NewEvent = Object.assign(new Event, eventData);
             // Let router manage message
-            routeEvent(event);
+            routeEvent(NewEvent);
         }
 
     } else {
