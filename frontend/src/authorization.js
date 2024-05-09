@@ -1,5 +1,6 @@
 import axios from "axios";
 import { show } from "./utils.js";
+import {routeEvent} from "./websocket.js"
 
 const signInHTML = `<div id="blur" onclick=""></div>
         <form class="mui-form">
@@ -37,9 +38,6 @@ const signInHTML = `<div id="blur" onclick=""></div>
         <button style="color:blue;background-color:transparent;border:none;font-size:18px;margin-top:22px">Sign in!</button>`
 
 function signHandler(event){
-    debugger;
-    console.log(event.target);
-
     event.preventDefault();
     const $signbtn = document.querySelector("#submit-btn");
     $submit.disabled = true;
@@ -54,12 +52,7 @@ function signHandler(event){
         .then(response =>{
             let ans = JSON.parse(response);
             if (ans.status==200){
-                if (window["WebSocket"]){
-
-                }
-                const otp = ans.payload.otp;
-                MaxURL = "http://localhost:8080/ws?otp="+otp;
-                axios.post(MaxURL);
+                connectWebsocket(ans.payload.otp);
             }
             else{
                 alert("Ошибка!");
@@ -71,6 +64,7 @@ function signHandler(event){
         axios.post(MaxURL,JSON.stringify(UserData))
         .then(response => {
             if (JSON.parse(response).status==200){
+                localStorage.setItem("login",UserData.login);
                 alert("Кайф братишка!");
             }
             else{
@@ -85,7 +79,7 @@ export function showSignInForm(event){
     $app.innerHTML+=signInHTML;
     const $btn = document.querySelector("#submit-btn");
     $btn.addEventListener("submit",signHandler);
-    const $form = document.querySelector(".mui-form");
+    const $form = document.querySelector(".mui-form"); //Комментарий
     const $back = document.getElementById("blur");
     show("block");
     $back.addEventListener("click",function(){

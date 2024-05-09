@@ -1,6 +1,7 @@
 import { takeButton } from "./clickhandler.js";
 
-export function loadLobby(lobbyLink = null){
+export function loadLobby(LobbyEvent){
+    localStorage.setItem("lobby_url",LobbyEvent.URL);
     const $app = document.querySelector("#app");
     let image = document.createElement("img");
     image.src = "assets/search.svg";
@@ -60,15 +61,44 @@ export function loadLobby(lobbyLink = null){
 
     const $sendbtn = $app.querySelector(".send-btn");
     $sendbtn.addEventListener("click",takeButton);
+
+    insertVideo(LobbyEvent.curVideo);
+
+    configureLobby(LobbyEvent.users,LobbyEvent.chat);
+
+    
 }
 
-export function configureLobby(users,chat=[]){
+export function configureLobby(users,chat){
     users.forEach((user) => {
         let listElem = `<li><span class="status online"><i class="fa fa-circle-o"></i></span><span>` + user + `</span></li>`;
         const $memlist = document.querySelector(".member-list");
         $memlist.innerHTML+=listElem;
     });
     chat.forEach(message => {
-        
+        addMessage(message)
     });
+}
+
+export function addMessage(event){
+    let userclass = ""
+    if (event.login == ""){
+        userclass="me";
+    }
+    let tag = `<li class="`+userclass+`">
+    <div class="name">
+        <span class="">`+event.login+`</span>
+    </div>
+    <div class="message">
+        <p>` + event.message + `</p>
+        <span class="msg-time">` + event.time + `</span>
+    </div>
+    </li>`
+    const $chatlist = document.querySelector("#chat-list");
+    $chatlist.innerHTML += tag;
+}
+
+export function insertVideo(EmbedHTML){
+    var player=document.getElementById('player'); //Комментарий
+    player.innerHTML=EmbedHTML;
 }
