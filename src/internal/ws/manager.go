@@ -18,6 +18,7 @@ var (
 		//TODO: CheckOrigin:     checkOrigin, НАТСРОИТЬ CORS
 		ReadBufferSize:  1024, //TODO: посмотреть сколько нужно ставить буффер
 		WriteBufferSize: 1024,
+		CheckOrigin:     checkOrigin,
 	}
 )
 
@@ -150,4 +151,29 @@ func (m *Manager) clientInLobby(lobbyURL string, c *Client) bool {
 		}
 	}
 	return false
+}
+
+func checkOrigin(r *http.Request) bool {
+
+	// // Grab the request origin
+	// origin := r.Header.Get("Origin")
+
+	// switch origin {
+	// // Update this to HTTPS
+	// case "http://localhost:5001":
+	// 	return true
+	// default:
+	// 	return false
+	// }
+	return true
+}
+
+func accessControlMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST")
+		w.Header().Set("Access-Control-Allow-Headers", "Origin, Content-Type")
+
+		next.ServeHTTP(w, r)
+	})
 }

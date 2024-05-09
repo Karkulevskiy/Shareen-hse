@@ -40,7 +40,7 @@ const signInHTML = `<div id="blur" onclick=""></div>
 function signHandler(event){
     event.preventDefault();
     const $signbtn = document.querySelector("#submit-btn");
-    $submit.disabled = true;
+    $signbtn.disabled = true;
     const data = event.target.getElementsByTagName("input");
     let UserData = {
         "login":data[0].value,
@@ -70,6 +70,8 @@ function signHandler(event){
             else{
                 alert("Ошибка!")
             }
+        }).catch(error => {
+            console.log("Pizdec:" + error);
         });
     }
 }
