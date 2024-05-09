@@ -1,5 +1,6 @@
 .vscode
 .idea
+.cache/
 .parcel_cache
 node_modules
 dist

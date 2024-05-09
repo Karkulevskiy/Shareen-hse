@@ -69,22 +69,18 @@ export function parseHTMLFile(content){
     return content 
 }
 
-export function addMessage(person="",content,time=""){
+export function addMessage(event){
     let userclass = ""
-    if (person == ""){
+    if (event.login == ""){
         userclass="me";
-    }
-    if (time==""){
-        let curDate = new Date();
-        time+=curDate.getHours() +":" + curDate.getMinutes();
     }
     let tag = `<li class="`+userclass+`">
     <div class="name">
-        <span class="">`+person+`</span>
+        <span class="">`+event.login+`</span>
     </div>
     <div class="message">
-        <p>` + content + `</p>
-        <span class="msg-time">` + time + `</span>
+        <p>` + event.message + `</p>
+        <span class="msg-time">` + event.time + `</span>
     </div>
     </li>`
     const $chatlist = document.querySelector("#chat-list");
