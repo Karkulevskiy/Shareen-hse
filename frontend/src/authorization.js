@@ -40,7 +40,7 @@ const signInHTML = `<div id="blur" onclick=""></div>
 function signHandler(event){
     event.preventDefault();
     const $signbtn = document.querySelector("#submit-btn");
-    $submit.disabled = true;
+    $signbtn.disabled = true;
     const data = event.target.getElementsByTagName("input");
     let UserData = {
         "login":data[0].value,
@@ -48,7 +48,13 @@ function signHandler(event){
     }
     if ($signbtn.value=="Sign in"){
         let MaxURL = "http://localhost:8080/login";
-        axios.post(MaxURL,JSON.stringify(UserData))
+        const headers = {
+            'Content-Type': 'application/json',
+            "Access-Control-Allow-Origin":"*"
+        }
+        axios.post(MaxURL,JSON.stringify(UserData),{
+            headers:headers
+        })
         .then(response =>{
             let ans = JSON.parse(response);
             if (ans.status==200){
@@ -58,6 +64,9 @@ function signHandler(event){
                 alert("Ошибка!");
             }
         })
+        .catch(error => {
+            console.log("Pizdec:" + error);
+        });
     }
     else{
         const MaxURL = "http://localhost:8080/register";
@@ -70,6 +79,9 @@ function signHandler(event){
             else{
                 alert("Ошибка!")
             }
+        })
+        .catch(error => {
+            console.log("Pizdec:" + error);
         });
     }
 }
@@ -93,7 +105,6 @@ function showSighUpForm(event){
     event.preventDefault;
     const form = event.target.form;
     form.innerHTML = signUpHTML;
-    console.log(event);
 
 }
 
