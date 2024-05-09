@@ -271,17 +271,17 @@ func (p *Postgres) Chat(lobbyID int64) ([]domain.Message, error) {
 	var chat []domain.Message
 
 	var login, message string
-	var time sql.NullString
+	var time_ sql.NullTime
 
 	for rows.Next() {
-		err = rows.Scan(&login, &time, &message)
+		err = rows.Scan(&login, &time_, &message)
 		if err != nil {
 			return nil, fmt.Errorf("%s: %w", op, err)
 		}
 		chat = append(chat, domain.Message{
 			Login: login,
 			Text:  message,
-			Time:  time.String,
+			Time:  time_.Time,
 		})
 	}
 
@@ -327,7 +327,7 @@ func (p *Postgres) SaveMessage(lobbyURL, login, message string) error {
 	}
 
 	// интересный вариант формата времени, почему так?
-	_, err = stmt.Exec(lobbyID, login, time.Now().Format("15:04:05"), message)
+	_, err = stmt.Exec(lobbyID, login, time.Now(), message)
 	if err != nil {
 		return fmt.Errorf("%s: %w", op, err)
 	}

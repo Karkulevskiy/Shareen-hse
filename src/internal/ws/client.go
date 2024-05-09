@@ -19,7 +19,7 @@ type Client struct {
 	egress chan Event
 }
 
-func NewClient(conn *websocket.Conn, m *Manager, login string) *Client {
+func NewClient(conn *websocket.Conn, m *Manager) *Client {
 	return &Client{
 		conn:   conn,
 		m:      m,

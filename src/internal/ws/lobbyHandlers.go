@@ -300,7 +300,7 @@ func AskForVideoTiming(login string, c *Client) {
 }
 
 // Сюда отправляем ответ от Клиента с информацией о видео
-func GetVideoTiming(event Event, c *Client) {
+func GetVideoTimingHandler(event Event, c *Client) {
 	const op = "ws.GetVideoTiming"
 
 	log := c.m.log.With(
@@ -343,4 +343,31 @@ func GetVideoTiming(event Event, c *Client) {
 	}
 
 	c.m.videoTimingMap[videoTimingRequest.Login] <- resp
+}
+
+// RewindVideoHandler rewinds video in lobby
+func RewindVideoHandler(event Event, c *Client) {
+	const op = "ws.RewindVideoHandler"
+
+	log := c.m.log.With(
+		slog.String("op", op),
+	)
+
+	type RewindRequest struct {
+		LobbyURL string `json:"lobby_url"`
+		Timing   string `json:"timing"`
+	}
+
+	var rewindReq RewindRequest
+
+	err := json.Unmarshal(event.Payload, &rewindReq)
+	if err != nil {
+		log.Error("failed to unmarshal rewind video request", err)
+		SendResponseError(event.Type, http.StatusInternalServerError, c)
+		return
+	}
+
+	for _, client := range c.m.lobbies[rewindReq.LobbyURL] {
+		client.egress <- event
+	}
 }

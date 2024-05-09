@@ -53,7 +53,8 @@ func (m *Manager) setupEventHandlers() {
 	m.handlers[EventInsertVideoURL] = InsertVideoHandler
 	m.handlers[EventPauseVideo] = PauseVideoHandler
 	m.handlers[EventSendMessage] = SendMessageHandler
-	m.handlers[EventGetVideoTiming] = GetVideoTiming
+	m.handlers[EventGetVideoTiming] = GetVideoTimingHandler
+	m.handlers[EventRewindVideo] = RewindVideoHandler
 	// m.handlers[]
 }
 
