@@ -79,8 +79,12 @@ function signHandler(event){
             else{
                 alert("Ошибка!")
             }
+<<<<<<< HEAD
         })
         .catch(error => {
+=======
+        }).catch(error => {
+>>>>>>> 5ca3b151a8f7ca2024a567212eab486f7dfd1cfe
             console.log("Pizdec:" + error);
         });
     }
