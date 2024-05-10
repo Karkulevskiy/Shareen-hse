@@ -62,8 +62,7 @@ export function loadLobby(LobbyEvent){
 
     insertVideo(LobbyEvent.curVideo);
 
-
-    
+    addLobbyUrl();
 }
 
 export function configureLobby(users,chat){
@@ -101,7 +100,7 @@ export function insertVideo(EmbedHTML){
 }
 
 function addLobbyUrl(){
-    const tag = `<input value="${localStorage.getItem("lobby_url")}" class = "copyurl" type="url">`
+    const tag = `<input value="${localStorage.getItem("lobby_url")}" class = "copyurl" type="text" readonly disabled>`
     const $app = document.querySelector("#app");
     $app.insertAdjacentHTML("beforeend",tag);
     const $copyinput = document.querySelector(".copyurl");

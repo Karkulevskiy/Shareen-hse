@@ -1,5 +1,6 @@
 import axios from "axios";
-import {routeEvent} from "./websocket.js"
+import {connection,routeEvent} from "./websocket.js"
+import { Event } from "./classes/events.js";
 
 const signInHTML = `<div id="blur"></div>
         <form class="mui-form">
@@ -45,13 +46,12 @@ function signHandler(event){
         "login":data[0].value,
         "password":data[1].value
     }
-    console.log($signbtn.textContent);
     if ($signbtn.textContent=="Sign in"){
         let MaxURL = "http://localhost:8080/login";
         axios.post(MaxURL,JSON.stringify(UserData))
         .then(response =>{
-            let ans = JSON.parse(response);
-            if (ans.status==200){
+            let ans = response.data
+            if (response.status==200){
                 connectWebsocket(ans.payload.otp);
             }
             else{
@@ -66,7 +66,7 @@ function signHandler(event){
         const MaxURL = "http://localhost:8080/register";
         axios.post(MaxURL,JSON.stringify(UserData))
         .then(response => {
-            if (JSON.parse(response).status==200){
+            if (response.status==200){
                 localStorage.setItem("login",UserData.login);
                 alert("Кайф братишка!");
             }
@@ -82,7 +82,6 @@ function signHandler(event){
 
 export function showSignInForm(event){
     event.preventDefault;
-    debugger;
     let $app =  document.querySelector("#app");
     if (event.target.form!=null){
         event.target.form.remove();
@@ -130,15 +129,17 @@ function connectWebsocket(otp){
         }
 
         // Add a listener to the onmessage event
+        
         conn.onmessage = function (event) {
+            debugger;
             console.log(event);
             // parse websocket message as JSON
             const eventData = JSON.parse(event.data);
             // Assign JSON data to new Event Object
-            const NewEvent = Object.assign(new Event, eventData);
-            // Let router manage message
+            const NewEvent = Object.assign(new Event,eventData);
             routeEvent(NewEvent);
         }
+        connection.push(conn);
 
     } else {
         alert("Not supporting websockets");

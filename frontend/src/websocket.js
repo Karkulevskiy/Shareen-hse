@@ -1,6 +1,8 @@
 import { Event,NewMessageEvent,LobbyEvent } from "./classes/events";
 import { addMessage,loadLobby,insertVideo } from "./lobbyloader";
 
+export let connection = [];
+
 export function routeEvent(event) {
 
     if (event.type === undefined) {
@@ -9,6 +11,7 @@ export function routeEvent(event) {
     if (event.status!=200){
         alert(`Unexpected websocket error(response status is ${event.status})`)
     }
+    debugger;
     switch (event.type) {
         case "send_message":
             const messageEvent = Object.assign(new NewMessageEvent, event.payload);
@@ -37,5 +40,5 @@ export function routeEvent(event) {
 
 export function sendEvent(eventName, payload) {
     const event = new Event(eventName, payload);
-    conn.send(JSON.stringify(event));
+    connection[0].send(JSON.stringify(event));
 }

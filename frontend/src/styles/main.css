@@ -35,6 +35,20 @@ body{
     
 }
 
+.copyurl{
+	text-align: center;
+    color: #344E41;
+    background-color: #dad7cd;
+    border-width: 1px;
+    border-color: #588157;
+    padding: 10px;
+    font-size: 30px;
+    position: absolute;
+    bottom: 10%;
+    box-shadow: 0 0.2em 0.5em;
+	caret-color: transparent;
+}
+
 .choice__btn{
     color: #76885B;
 	border-color:transparent;
