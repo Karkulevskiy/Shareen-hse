@@ -1,8 +1,7 @@
 import axios from "axios";
-import { show } from "./utils.js";
 import {routeEvent} from "./websocket.js"
 
-const signInHTML = `<div id="blur" onclick=""></div>
+const signInHTML = `<div id="blur"></div>
         <form class="mui-form">
             <legend style="margin-top:10px">Authorisation</legend>
             <small style="font-size: 130%;">Enter your login and password</small>
@@ -35,7 +34,7 @@ const signInHTML = `<div id="blur" onclick=""></div>
         <br>
         <small style="font-size: 150%;position:relative;top:20px">Already have an account?</small>
         <br>
-        <button style="color:blue;background-color:transparent;border:none;font-size:18px;margin-top:22px">Sign in!</button>`
+        <button style="color:blue;background-color:transparent;border:none;font-size:18px;margin-top:22px" id="registration-btn">Sign in!</button>`
 
 function signHandler(event){
     event.preventDefault();
@@ -46,15 +45,10 @@ function signHandler(event){
         "login":data[0].value,
         "password":data[1].value
     }
-    if ($signbtn.value=="Sign in"){
+    console.log($signbtn.textContent);
+    if ($signbtn.textContent=="Sign in"){
         let MaxURL = "http://localhost:8080/login";
-        const headers = {
-            'Content-Type': 'application/json',
-            "Access-Control-Allow-Origin":"*"
-        }
-        axios.post(MaxURL,JSON.stringify(UserData),{
-            headers:headers
-        })
+        axios.post(MaxURL,JSON.stringify(UserData))
         .then(response =>{
             let ans = JSON.parse(response);
             if (ans.status==200){
@@ -79,27 +73,29 @@ function signHandler(event){
             else{
                 alert("Ошибка!")
             }
-<<<<<<< HEAD
-        })
-        .catch(error => {
-=======
         }).catch(error => {
->>>>>>> 5ca3b151a8f7ca2024a567212eab486f7dfd1cfe
             console.log("Pizdec:" + error);
         });
     }
+    $signbtn.disabled = false;
 }
 
 export function showSignInForm(event){
-    const $app = document.querySelector("#app");
-    $app.innerHTML+=signInHTML;
+    event.preventDefault;
+    debugger;
+    let $app =  document.querySelector("#app");
+    if (event.target.form!=null){
+        event.target.form.remove();
+        document.getElementById("blur").remove();
+    }
+    $app.insertAdjacentHTML("beforeend",signInHTML);
     const $btn = document.querySelector("#submit-btn");
     $btn.addEventListener("submit",signHandler);
     const $form = document.querySelector(".mui-form"); //Комментарий
     const $back = document.getElementById("blur");
-    show("block");
     $back.addEventListener("click",function(){
-        show("none");
+        $form.remove();
+        $back.remove();
     })
     $form.addEventListener("submit",signHandler);
     document.querySelector("#registration-btn").addEventListener("click",showSighUpForm);
@@ -107,9 +103,15 @@ export function showSignInForm(event){
 
 function showSighUpForm(event){
     event.preventDefault;
-    const form = event.target.form;
-    form.innerHTML = signUpHTML;
-
+    const $form = event.target.form;
+    const $back = document.getElementById("blur");
+    $back.addEventListener("click",function(){
+        $form.remove();
+        $back.remove();
+    })
+    $form.innerHTML = signUpHTML;
+    $form.addEventListener("submit",signHandler);
+    document.querySelector("#registration-btn").addEventListener("click",showSignInForm);
 }
 
 function connectWebsocket(otp){

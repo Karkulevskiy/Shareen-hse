@@ -452,13 +452,11 @@ ul.tabs-container{
 	border-radius: 5px;
 	width: 600px;
 	height: 350px;
-	display: none;
 	background-color: #DDDDDD;
 	
 }
 
 #blur{
-	display: none;
 	position: fixed;
 	left:0;right: 0;top:0;bottom: 0;
 	backdrop-filter:blur(5px);
