@@ -4,12 +4,13 @@ export function takeButton(event){
     const id = event.target.id;
     event.preventDefault();
     if (id =="search-form"){
+        debugger;
         const form = event.target.elements;
         let payload = {
             "video_url":form[0].value,
             "lobby_url":localStorage.getItem("lobby_url")
         }
-        sendEvent("insert_video_url",JSON.stringify.payload);
+        sendEvent("insert_video_url",payload);
     }
     else if (id =="lobby-form"){
         const lobbyLink = document.getElementById("search_lobby").value;

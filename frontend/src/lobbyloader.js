@@ -1,4 +1,6 @@
 import { takeButton } from "./clickhandler.js";
+import img from "./assets/copy.svg"
+import searchimg from "./assets/search.svg"
 
 export function loadLobby(LobbyEvent){
     localStorage.setItem("lobby_url",LobbyEvent.URL);
@@ -7,7 +9,7 @@ export function loadLobby(LobbyEvent){
     $app.innerHTML = `<form role="search" id="search-form" type="submit">
     <input placeholder="Enter the link..." class="search-form__txt" type="search">
     <button class="search-form__btn">
-    <img src="assets/search.svg" class="search-form__img" alt="Поиск">
+    <img src=${searchimg} class="search-form__img" alt="Поиск">
     </button>
     </form>
     <div id="player" class="content">
@@ -86,8 +88,9 @@ export function addMessage(event){
         <span class="">`+event.login+`</span>
     </div>
     <div class="message">
+        <span class="msg-time">` + convertTime(String(new Date(event.time))) + `</span>
+        <br>
         <p>` + event.message + `</p>
-        <span class="msg-time">` + event.time + `</span>
     </div>
     </li>`
     const $chatlist = document.querySelector("#chat-list");
@@ -100,11 +103,20 @@ export function insertVideo(EmbedHTML){
 }
 
 function addLobbyUrl(){
-    const tag = `<input value="${localStorage.getItem("lobby_url")}" class = "copyurl" type="text" readonly disabled>`
+    const tag = `<div class="copydiv">
+    <input value="${localStorage.getItem("lobby_url")}" class = "copyurl" type="text" readonly disabled>
+    <input type="image" src=${img} class="copybtn" alt="Кнопка копирования">
+    </div>`
     const $app = document.querySelector("#app");
     $app.insertAdjacentHTML("beforeend",tag);
     const $copyinput = document.querySelector(".copyurl");
-    $copyinput.addEventListener("click",function(){
+    document.querySelector(".copybtn").addEventListener("click",function(){
         navigator.clipboard.writeText($copyinput.value);
     })
+}
+
+function convertTime(time){
+    let NewTime = time.substring(4,10);
+    NewTime+=" " + time.substring(16,24);
+    return NewTime;
 }
