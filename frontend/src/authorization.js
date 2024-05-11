@@ -52,7 +52,7 @@ function signHandler(event){
         .then(response =>{
             let ans = response.data
             if (response.status==200){
-                connectWebsocket(ans.payload.otp);
+                connectWebsocket(ans.payload.otp,UserData.login);
             }
             else{
                 alert("Ошибка!");
@@ -67,7 +67,6 @@ function signHandler(event){
         axios.post(MaxURL,JSON.stringify(UserData))
         .then(response => {
             if (response.status==200){
-                localStorage.setItem("login",UserData.login);
                 alert("Кайф братишка!");
             }
             else{
@@ -113,7 +112,7 @@ function showSighUpForm(event){
     document.querySelector("#registration-btn").addEventListener("click",showSignInForm);
 }
 
-function connectWebsocket(otp){
+function connectWebsocket(otp,login){
     if (window["WebSocket"]) {
         // Connect to websocket using OTP as a GET parameter
         const MaxURL = "ws://localhost:8080/ws?otp="+otp;
@@ -121,6 +120,7 @@ function connectWebsocket(otp){
 
         // Onopen
         conn.onopen = function (event) {
+            localStorage.setItem("login",login);
             console.log("Connected to WebSocket")
         }
 

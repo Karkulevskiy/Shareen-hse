@@ -20,6 +20,7 @@ export function takeButton(event){
         sendEvent("join_lobby",payload);
     }
     else if (id=="send-chat"){
+        debugger;
         const $input = document.querySelector(".input-wrapper");
         let text = $input.getElementsByTagName("input")[0].value;
         let payload = {
