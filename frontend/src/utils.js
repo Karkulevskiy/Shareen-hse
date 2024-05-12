@@ -15,13 +15,6 @@ export function css(styles = {}){
     
 }
 
-export function show(status){
-    const $form = document.querySelector(".mui-form");
-    const $back = document.getElementById("blur");
-    $form.style.display = status;
-    $back.style.display = status;
-}
-
 export function addScript(source){
         const tag = document.createElement('script');
         tag.setAttribute('src',source);
@@ -67,22 +60,4 @@ export function parseHTMLFile(content){
     content = content.slice(BodyStart,BodyEnd);
     content +=`</body>`
     return content 
-}
-
-export function addMessage(event){
-    let userclass = ""
-    if (event.login == ""){
-        userclass="me";
-    }
-    let tag = `<li class="`+userclass+`">
-    <div class="name">
-        <span class="">`+event.login+`</span>
-    </div>
-    <div class="message">
-        <p>` + event.message + `</p>
-        <span class="msg-time">` + event.time + `</span>
-    </div>
-    </li>`
-    const $chatlist = document.querySelector("#chat-list");
-    $chatlist.innerHTML += tag;
 }

@@ -35,6 +35,35 @@ body{
     
 }
 
+.copyurl{
+	text-align: center;
+    color: #344E41;
+    background-color: #dad7cd;
+    border-width: 1px;
+    border-color: #588157;
+    padding: 10px;
+    font-size: 30px;
+	caret-color: transparent;
+}
+
+.copydiv{
+    color: #0000;
+    bottom: 10%;
+    box-shadow: 0 0.2em 0.5em;
+    position: absolute;
+    left: 37%;
+}
+
+.copybtn{
+	position: absolute;
+	padding: 10px;
+	width: 70px;
+	height: 56.5px;
+	background-color: #dad7cd;
+	border-width: 1px;
+    border-color: #588157;
+}
+
 .choice__btn{
     color: #76885B;
 	border-color:transparent;
@@ -279,34 +308,36 @@ b{
 	margin-right: -4px;
 }
 .chat-area ul > li{
-	border-top: 1px solid #cfdae1;
+	border-top: 1px solid #DDDDDD;
 	overflow: hidden;
 	position: relative;
 }
 .chat-area ul > li.me{
-	background: #e4eaee;
+	background: #A3B18A;
 }
 .chat-area ul > li:first-child{
 	border-top: none;
 }
 .chat-area ul .name{
-	padding: 14px;
-	text-align: right;
-	width: 100px;
-	float: left;
-	color: #5d7185;
-	font-weight: bold;
-	line-height: 20px;
+	text-align: center;
+    float: left;
+    color: #344e41;
+    padding-left: 10px;
+    font-weight: bold;
+    line-height: 20px;
+    font-size: 20px;
+    padding-right: 10px;
+    padding-top: 10px;
 }
 .chat-area ul .message{
 	padding: 14px;
 	border-left: 1px solid #cfdae1;
-	float: left;
 	color: #333f4d;
-	width: 214px;
+	width: 470px;
 }
 .chat-area ul .message > p{
 	line-height: 20px;
+	word-wrap: break-word;
 }
 .chat-area ul .message > p > .blue-label{
 	background: #6ea0ff;
@@ -315,11 +346,11 @@ b{
 	border-radius: 3px;
 }
 .chat-area ul .message .msg-time{
-	position: absolute;
-	top:16px;
-	right: 15px;
-	color: #738ba3;
-	font-size: 9px;
+	color: #3A5A40;
+    font-size: 11px;
+    position: absolute;
+    top: 12px;
+    right: 14px;
 }
 .input-area{
 	background: #e4eaee;
@@ -339,14 +370,14 @@ b{
 	float: left;
 }
 .input-area .input-wrapper input{
-	height: 30px;
+	height: 34px;
 	line-height: 30px;
 	border: 0;
 	margin: 0;
 	padding: 0 10px;
 	outline: none;
 	color: #5D7185;
-	min-width: 271px;
+	min-width: 370px;
 }
 .input-area .input-wrapper i{
 	font-size: 18px;
@@ -452,13 +483,11 @@ ul.tabs-container{
 	border-radius: 5px;
 	width: 600px;
 	height: 350px;
-	display: none;
 	background-color: #DDDDDD;
 	
 }
 
 #blur{
-	display: none;
 	position: fixed;
 	left:0;right: 0;top:0;bottom: 0;
 	backdrop-filter:blur(5px);
@@ -482,17 +511,17 @@ ul.tabs-container{
 }
 
 input#send-chat.send-btn{
-	background-color: #76885B;
-	color: #EEEEEE;
+	background-color: #EEEEEE;
+	color: #76885B;
 }
 
 .input-area{
 	color: #A3B18A;
-	background-color:#A3B18A ;
+	background-color:#76885b ;
 }
 
 .window-title{
-	background-color:#A3B18A 
+	background-color:#76885b 
 }
 
 .title{

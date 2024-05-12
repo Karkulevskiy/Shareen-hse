@@ -5,7 +5,7 @@ import * as handlers from "./clickhandler.js";
 import { sendEvent } from "./websocket.js";
 
 
-async function createLobby(){
+function createLobby(){
     sendEvent("create_lobby",{"payload":""});
 }
 

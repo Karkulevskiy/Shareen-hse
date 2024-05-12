@@ -28,7 +28,7 @@ export class NewLobbyEvent{
 }
 
 export class LobbyEvent{
-    constructor(lobbyURL="",videoURL="",Timing="",Pause="",Users="",Chat=""){
+    constructor(lobbyURL="",videoURL="",Timing="",Pause=false,Users=[],Chat=[]){
         this.URL = lobbyURL;
         this.curVideo = videoURL;
         this.timing = Timing;

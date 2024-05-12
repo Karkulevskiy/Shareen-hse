@@ -1,15 +1,15 @@
 import { takeButton } from "./clickhandler.js";
+import img from "./assets/copy.svg"
+import searchimg from "./assets/search.svg"
 
 export function loadLobby(LobbyEvent){
     localStorage.setItem("lobby_url",LobbyEvent.URL);
     const $app = document.querySelector("#app");
-    let image = document.createElement("img");
-    image.src = "assets/search.svg";
-    image.class = "search-form__img";
 
     $app.innerHTML = `<form role="search" id="search-form" type="submit">
     <input placeholder="Enter the link..." class="search-form__txt" type="search">
     <button class="search-form__btn">
+    <img src=${searchimg} class="search-form__img" alt="Поиск">
     </button>
     </form>
     <div id="player" class="content">
@@ -54,26 +54,24 @@ export function loadLobby(LobbyEvent){
     </div>
     </div>
     </div>`;
-    let $btn = $app.querySelector(".search-form__btn");
-    $btn.appendChild(image);
     const $form = document.getElementById("search-form");
     $form.addEventListener("submit",takeButton);
 
     const $sendbtn = $app.querySelector(".send-btn");
     $sendbtn.addEventListener("click",takeButton);
 
-    insertVideo(LobbyEvent.curVideo);
-
     configureLobby(LobbyEvent.users,LobbyEvent.chat);
 
-    
+    insertVideo(LobbyEvent.curVideo);
+
+    addLobbyUrl();
 }
 
 export function configureLobby(users,chat){
     users.forEach((user) => {
         let listElem = `<li><span class="status online"><i class="fa fa-circle-o"></i></span><span>` + user + `</span></li>`;
         const $memlist = document.querySelector(".member-list");
-        $memlist.innerHTML+=listElem;
+        $memlist.insertAdjacentHTML("beforebegin",listElem);
     });
     chat.forEach(message => {
         addMessage(message)
@@ -82,7 +80,7 @@ export function configureLobby(users,chat){
 
 export function addMessage(event){
     let userclass = ""
-    if (event.login == ""){
+    if (event.login == localStorage.getItem("login")){
         userclass="me";
     }
     let tag = `<li class="`+userclass+`">
@@ -90,8 +88,9 @@ export function addMessage(event){
         <span class="">`+event.login+`</span>
     </div>
     <div class="message">
+        <span class="msg-time">` + convertTime(String(new Date(event.time))) + `</span>
+        <br>
         <p>` + event.message + `</p>
-        <span class="msg-time">` + event.time + `</span>
     </div>
     </li>`
     const $chatlist = document.querySelector("#chat-list");
@@ -101,4 +100,23 @@ export function addMessage(event){
 export function insertVideo(EmbedHTML){
     var player=document.getElementById('player'); //Комментарий
     player.innerHTML=EmbedHTML;
+}
+
+function addLobbyUrl(){
+    const tag = `<div class="copydiv">
+    <input value="${localStorage.getItem("lobby_url")}" class = "copyurl" type="text" readonly disabled>
+    <input type="image" src=${img} class="copybtn" alt="Кнопка копирования">
+    </div>`
+    const $app = document.querySelector("#app");
+    $app.insertAdjacentHTML("beforeend",tag);
+    const $copyinput = document.querySelector(".copyurl");
+    document.querySelector(".copybtn").addEventListener("click",function(){
+        navigator.clipboard.writeText($copyinput.value);
+    })
+}
+
+function convertTime(time){
+    let NewTime = time.substring(4,10);
+    NewTime+=" " + time.substring(16,24);
+    return NewTime;
 }

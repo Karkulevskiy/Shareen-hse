@@ -1,8 +1,8 @@
 import axios from "axios";
-import { show } from "./utils.js";
-import {routeEvent} from "./websocket.js"
+import {connection,routeEvent} from "./websocket.js"
+import { Event } from "./classes/events.js";
 
-const signInHTML = `<div id="blur" onclick=""></div>
+const signInHTML = `<div id="blur"></div>
         <form class="mui-form">
             <legend style="margin-top:10px">Authorisation</legend>
             <small style="font-size: 130%;">Enter your login and password</small>
@@ -35,7 +35,7 @@ const signInHTML = `<div id="blur" onclick=""></div>
         <br>
         <small style="font-size: 150%;position:relative;top:20px">Already have an account?</small>
         <br>
-        <button style="color:blue;background-color:transparent;border:none;font-size:18px;margin-top:22px">Sign in!</button>`
+        <button style="color:blue;background-color:transparent;border:none;font-size:18px;margin-top:22px" id="registration-btn">Sign in!</button>`
 
 function signHandler(event){
     event.preventDefault();
@@ -46,27 +46,28 @@ function signHandler(event){
         "login":data[0].value,
         "password":data[1].value
     }
-    console.log($signbtn.innerHTML)
-    if ($signbtn.value=="Sign in"){
+    if ($signbtn.textContent=="Sign in"){
         let MaxURL = "http://localhost:8080/login";
         console.log(JSON.stringify(UserData))
         axios.post(MaxURL,JSON.stringify(UserData))
         .then(response =>{
-            let ans = JSON.parse(response);
-            if (ans.status==200){
-                connectWebsocket(ans.payload.otp);
+            let ans = response.data
+            if (response.status==200){
+                connectWebsocket(ans.payload.otp,UserData.login);
             }
             else{
                 alert("Ошибка!");
             }
         })
+        .catch(error => {
+            console.log("Pizdec:" + error);
+        });
     }
     else{
         const MaxURL = "http://localhost:8080/register";
         axios.post(MaxURL,JSON.stringify(UserData))
         .then(response => {
-            if (JSON.parse(response).status==200){
-                localStorage.setItem("login",UserData.login);
+            if (response.status==200){
                 alert("Кайф братишка!");
             }
             else{
@@ -76,18 +77,24 @@ function signHandler(event){
             console.log("Pizdec:" + error);
         });
     }
+    $signbtn.disabled = false;
 }
 
 export function showSignInForm(event){
-    const $app = document.querySelector("#app");
-    $app.innerHTML+=signInHTML;
+    event.preventDefault;
+    let $app =  document.querySelector("#app");
+    if (event.target.form!=null){
+        event.target.form.remove();
+        document.getElementById("blur").remove();
+    }
+    $app.insertAdjacentHTML("beforeend",signInHTML);
     const $btn = document.querySelector("#submit-btn");
     $btn.addEventListener("submit",signHandler);
     const $form = document.querySelector(".mui-form"); //Комментарий
     const $back = document.getElementById("blur");
-    show("block");
     $back.addEventListener("click",function(){
-        show("none");
+        $form.remove();
+        $back.remove();
     })
     $form.addEventListener("submit",signHandler);
     document.querySelector("#registration-btn").addEventListener("click",showSighUpForm);
@@ -95,13 +102,18 @@ export function showSignInForm(event){
 
 function showSighUpForm(event){
     event.preventDefault;
-    const form = event.target.form;
-    form.innerHTML = signUpHTML;
-    console.log(event);
-
+    const $form = event.target.form;
+    const $back = document.getElementById("blur");
+    $back.addEventListener("click",function(){
+        $form.remove();
+        $back.remove();
+    })
+    $form.innerHTML = signUpHTML;
+    $form.addEventListener("submit",signHandler);
+    document.querySelector("#registration-btn").addEventListener("click",showSignInForm);
 }
 
-function connectWebsocket(otp){
+function connectWebsocket(otp,login){
     if (window["WebSocket"]) {
         // Connect to websocket using OTP as a GET parameter
         const MaxURL = "ws://localhost:8080/ws?otp="+otp;
@@ -109,6 +121,7 @@ function connectWebsocket(otp){
 
         // Onopen
         conn.onopen = function (event) {
+            localStorage.setItem("login",login);
             console.log("Connected to WebSocket")
         }
 
@@ -117,15 +130,17 @@ function connectWebsocket(otp){
         }
 
         // Add a listener to the onmessage event
+        
         conn.onmessage = function (event) {
+            debugger;
             console.log(event);
             // parse websocket message as JSON
             const eventData = JSON.parse(event.data);
             // Assign JSON data to new Event Object
-            const NewEvent = Object.assign(new Event, eventData);
-            // Let router manage message
+            const NewEvent = Object.assign(new Event,eventData);
             routeEvent(NewEvent);
         }
+        connection.push(conn);
 
     } else {
         alert("Not supporting websockets");
