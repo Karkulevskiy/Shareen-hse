@@ -15,17 +15,15 @@ export function loadLobby(LobbyEvent){
     <div id="player" class="content">
     </div>
     <div class="right-tabs">
-    <ul class="tabs">
+    <div class="window-title">
         <div class="title">
             <span>Members</span>
         </div>
         
-    </ul>
-    <ul class="tabs-container">
-        <li class="active">
-            <ul class="member-list">
-                <li><span class="status online"><i class="fa fa-circle-o"></i></span><span>You</span></li>
-            </ul>
+    </div>
+    <ul class="member-list">
+        <li>
+            <span>You</span></li>
         </li>
     </ul>
     <div></div>
@@ -98,9 +96,26 @@ export function addMessage(event){
 }
 
 export function insertVideo(EmbedHTML){
+    debugger
     var player=document.getElementById('player'); //Комментарий
-    player.innerHTML=EmbedHTML;
+    player.innerHTML=test;
+    // playerOne = new YT.Player('check', {
+    //     events: {
+    //       'onReady': onPlayerReady,
+    //       'onStateChange': onPlayerStateChange
+    //     }
+    //   });
+
 }
+
+// function  onPlayerReady(event) {
+//     // Или возобновить его
+//     console.log("IJJDJIWIO")
+//     event.target.playVideo();
+// }
+// function onPlayerStateChange(event) {
+//     console.log('Player state:', event.data);
+// }
 
 function addLobbyUrl(){
     const tag = `<div class="copydiv">
@@ -120,3 +135,7 @@ function convertTime(time){
     NewTime+=" " + time.substring(16,24);
     return NewTime;
 }
+
+
+let test = `<iframe id="check" width="1024" height="640" src="https://www.youtube.com/embed/J_NiG9AHcvI?start=10&autoplay=1&controls=0" title="YouTube video player" 
+frameborder="yes" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; " web-share"="" allowfullscreen=""></iframe>`

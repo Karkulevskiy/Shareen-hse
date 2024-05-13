@@ -13,6 +13,7 @@ export function takeButton(event){
         sendEvent("insert_video_url",payload);
     }
     else if (id =="lobby-form"){
+        debugger;
         const lobbyLink = document.getElementById("search_lobby").value;
         let payload = {
             "login":localStorage.getItem("login"),

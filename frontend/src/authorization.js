@@ -1,11 +1,12 @@
 import axios from "axios";
 import {connection,routeEvent} from "./websocket.js"
 import { Event } from "./classes/events.js";
+import { MyAlert } from "./utils.js";
 
 const signInHTML = `<div id="blur"></div>
         <form class="mui-form">
-            <legend style="margin-top:10px">Authorisation</legend>
-            <small style="font-size: 130%;">Enter your login and password</small>
+            <legend style="margin-top:10px;caret-color:transparent;">Authorization</legend>
+            <small style="font-size: 130%;caret-color:transparent;">Enter your login and password</small>
             <div class="mui-textfield mui-textfield--float-label">
                 <input type="text" placeholder="Login">
                 <label>Login</label>
@@ -16,9 +17,9 @@ const signInHTML = `<div id="blur"></div>
             </div>
             <button type="submit" class="mui-btn mui-btn--raised mui-btn--danger" id="submit-btn">Sign in</button>
             <br>
-            <small style="font-size: 150%;position:relative;top:20px">No account?</small>
+            <small style="font-size: 150%;position:relative;top:20px;caret-color:transparent;">No account?</small>
             <br>
-            <button style="color:blue;background-color:transparent;border:none;font-size:18px;margin-top:22px" id="registration-btn">Sign up!</button>
+            <button style="color:blue;background-color:transparent;border:none;font-size:18px;margin-top:22px;caret-color:transparent;" id="registration-btn">Sign up!</button>
         </form>`
 
         const signUpHTML = `<legend style="margin-top:10px">Registration</legend>
@@ -48,41 +49,58 @@ function signHandler(event){
     }
     if ($signbtn.textContent=="Sign in"){
         let MaxURL = "http://localhost:8080/login";
+        debugger;
         axios.post(MaxURL,JSON.stringify(UserData))
         .then(response =>{
-            let ans = response.data
-            if (response.status==200){
+            let ans = response.data;
+            if (ans.status==200){
                 connectWebsocket(ans.payload.otp,UserData.login);
-            }
-            else{
-                alert("Ошибка!");
             }
         })
         .catch(error => {
-            console.log("Pizdec:" + error);
+            let ans = error.response;
+            if(ans.status==400){
+                MyAlert("Wrong login or password","error");
+            }
+            else if(ans.status==500){
+                MyAlert("Internal server error","error");
+            }
+            console.log("UNEXPECTED ERROR: "+error);
         });
     }
     else{
         const MaxURL = "http://localhost:8080/register";
         axios.post(MaxURL,JSON.stringify(UserData))
         .then(response => {
-            if (response.status==200){
-                alert("Кайф братишка!");
+            let ans = response.data
+            if (ans.status==200){
+                MyAlert("You have successfully signed up!","success");
+                showSignInForm(null);
+            }
+            else if(ans.status==400){
+                MyAlert("This login has already been registered!","error")
             }
             else{
-                alert("Ошибка!")
+                MyAlert("Internal server error","error");
             }
         }).catch(error => {
-            console.log("Pizdec:" + error);
+            console.log("Error: " + error);
         });
     }
     $signbtn.disabled = false;
 }
 
 export function showSignInForm(event){
+    if (connection.length==1){
+        MyAlert("You have already signed in!","error");
+    }
     event.preventDefault;
     let $app =  document.querySelector("#app");
-    if (event.target.form!=null){
+    if (event==null){
+        document.getElementsByClassName("mui-form").remove();
+        document.getElementById("blur").remove();
+    }
+    else if (event.target.form!=null){
         event.target.form.remove();
         document.getElementById("blur").remove();
     }
@@ -117,11 +135,11 @@ function connectWebsocket(otp,login){
         // Connect to websocket using OTP as a GET parameter
         const MaxURL = "ws://localhost:8080/ws?otp="+otp;
         conn = new WebSocket(MaxURL);
-
         // Onopen
         conn.onopen = function (event) {
             localStorage.setItem("login",login);
-            console.log("Connected to WebSocket")
+            document.getElementById('blur').click();
+            MyAlert("You have successfully signed in!","success");
         }
 
         conn.onclose = function (event) {
@@ -131,8 +149,6 @@ function connectWebsocket(otp,login){
         // Add a listener to the onmessage event
         
         conn.onmessage = function (event) {
-            debugger;
-            console.log(event);
             // parse websocket message as JSON
             const eventData = JSON.parse(event.data);
             // Assign JSON data to new Event Object
@@ -142,6 +158,6 @@ function connectWebsocket(otp,login){
         connection.push(conn);
 
     } else {
-        alert("Not supporting websockets");
+        MyAlert("This browser is not supporting websockets!", "error");
     }
 }

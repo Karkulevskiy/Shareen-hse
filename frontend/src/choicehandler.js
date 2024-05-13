@@ -2,7 +2,8 @@ import { App } from "./classes/app.js";
 import { InputBlock,ButtonBlock,FormBlock } from "./classes/blocks.js";
 import { model } from "./model.js";
 import * as handlers from "./clickhandler.js";
-import { sendEvent } from "./websocket.js";
+import { sendEvent,connection } from "./websocket.js";
+import { MyAlert } from "./utils.js";
 
 
 function createLobby(){
@@ -11,6 +12,10 @@ function createLobby(){
 
 export function choiceHandler(event){
     if (event.target.tagName=="DIV"){
+        return;
+    }
+    if (connection.length==0){
+        MyAlert("You have to sign in before getting Shareen experience","info");
         return;
     }
     const value = event.target.innerText;

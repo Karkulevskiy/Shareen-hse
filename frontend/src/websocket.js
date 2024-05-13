@@ -1,17 +1,23 @@
 import { Event,NewMessageEvent,LobbyEvent } from "./classes/events";
 import { addMessage,loadLobby,insertVideo } from "./lobbyloader";
+import { MyAlert } from "./utils";
 
 export let connection = [];
 
 export function routeEvent(event) {
-
+    debugger;
     if (event.type === undefined) {
-        alert("no 'type' field in event");
+        console.log("no 'type' field in event(report about that to the developer)");
+        return;
+    }
+    if (event.type=="join_lobby" && event.status==400){
+        MyAlert("Lobby with entered ID does not exist!","error");
+        return;
     }
     if (event.status!=200){
-        alert(`Unexpected websocket error(response status is ${event.status})`)
+        console.log(`Unexpected websocket error(response status is ${event.status})`)
+        return;
     }
-    debugger;
     switch (event.type) {
         case "send_message":
             const messageEvent = Object.assign(new NewMessageEvent, event.payload);
@@ -30,6 +36,9 @@ export function routeEvent(event) {
             break;
         case "pause_video":
 
+            break;
+        case "get_video_timing":
+            
             break;
         default:
             alert("unsupported message type");
