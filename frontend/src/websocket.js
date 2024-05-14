@@ -1,6 +1,7 @@
 import { Event,NewMessageEvent,LobbyEvent } from "./classes/events";
-import { addMessage,loadLobby,insertVideo,routeVideo } from "./lobbyloader";
+import { addMessage,loadLobby,insertVideo } from "./lobbyloader";
 import { MyAlert } from "./utils";
+import { Player } from "./classes/videoplayer";
 
 export let connection = [];
 
@@ -23,21 +24,30 @@ export function routeEvent(event) {
             addMessage(messageEvent);
             break;
         case "create_lobby":
-            const newLobby = new LobbyEvent(event.payload.lobby_url);
+            const newLobby = new LobbyEvent(event.payload.lobby_url,"","",true,[localStorage.getItem("login")]);
             loadLobby(newLobby);
             break;
         case "join_lobby":
             const lobby = Object.assign(new LobbyEvent,event.payload);
-            loadLobby(newLobby);
+            loadLobby(lobby);
             break;
         case "insert_video_url":
             insertVideo(event.payload.url);
             break;
         case "pause_video":
-
+            if (event.payload.pause==true){
+                Player.pause();
+            }
+            else{
+                Player.play();
+            }
             break;
         case "get_video_timing":
-            
+            let timing = Player.getTiming();
+            sendEvent("get_video_timing",{
+                "pause":Player.isPaused(),
+                "timing":Player.getTiming()
+            })
             break;
         default:
             alert("unsupported message type");

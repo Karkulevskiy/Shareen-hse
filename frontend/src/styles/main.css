@@ -24,6 +24,7 @@ body{
 .infotext{
 	font-size:30px;	
 	position: absolute;
+	caret-color: transparent;
 	top: 75%;
 }
 
@@ -101,7 +102,7 @@ body{
     overflow: hidden;
     background-color: #588157;
     top:3%;
-    left: 50%;
+    left: 47%;
     transform: translate(-50%);
 
 }
@@ -411,7 +412,6 @@ b{
     position: absolute;
     top: 20%;
     bottom: 40%;
-    overflow: auto;
     box-shadow: 0.05em 0.05em 0.5em 0.01em;
 }
 /* .right-tabs > ul.tabs{
@@ -446,22 +446,30 @@ b{
 	font-size: 18px
 } */
 
-
-.member-list > li{
-	padding: 15px 0;
-    align-items: center;
-    list-style-type: none;
+.member-list{
+	flex-direction: column;
     display: flex;
+    overflow-y: scroll;
+    height: 334px;
+	flex-direction: column;
 }
 
+.member-list::-webkit-scrollbar { 
+	display: none; 
+} 
 
-.member-list > li span{
-	left:30%;
-	position: absolute;
-	color: #EEEEEE;
+.member-list > div{
+	color: #000;
+    font-size: 20px;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 15px;
+    display: flex;
+	caret-color: transparent;
 }
 
-.member-list > li.me{
+.member-list > div.me{
 	background-color:#588157 ;
 }
 
@@ -475,6 +483,7 @@ b{
 .mui-form{	
 	position: fixed;
 	border-width: 2px;
+	caret-color: transparent;
 	border-color: #000000;
 	border-style: solid;
 	top:30%;
@@ -497,6 +506,7 @@ b{
 	margin-left: 15px;
 	margin-bottom: 5px;
 	width: 70%;
+	caret-color: black;
 }
 
 
@@ -509,6 +519,7 @@ b{
 .mui-textfield{
 	width: 90%;
 	margin-left: 10px;
+	caret-color: transparent;
 }
 
 input#send-chat.send-btn{
@@ -529,6 +540,7 @@ input#send-chat.send-btn{
 	color: #eee;
     text-align: center;
     font-weight: bold;
+	caret-color: transparent;
 }	
 
 .banner {
@@ -543,6 +555,7 @@ input#send-chat.send-btn{
     position: fixed;
     display: flex;
 	left:15%;
+	caret-color: transparent;
   
 	.banner-message {
 	  flex: 1;

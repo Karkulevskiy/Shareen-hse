@@ -40,8 +40,7 @@ export class LobbyEvent{
 
 
 export class VideoEvent{
-    constructor(vidID,pause=false,timing=""){
-        this.vidID = vidID;
+    constructor(pause=false,timing=""){
         this.pause=pause;
         this.timing = timing;
     }

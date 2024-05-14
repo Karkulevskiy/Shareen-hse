@@ -8,7 +8,7 @@ export function loadLobby(LobbyEvent){
     const $app = document.querySelector("#app");
 
     $app.innerHTML = `<form role="search" id="search-form" type="submit">
-    <input placeholder="Enter the link..." class="search-form__txt" type="search">
+    <input placeholder="Enter the link..." class="search-form__txt" type="url">
     <button class="search-form__btn">
     <img src=${searchimg} class="search-form__img" alt="Поиск">
     </button>
@@ -22,11 +22,8 @@ export function loadLobby(LobbyEvent){
         </div>
         
     </div>
-    <ul class="member-list">
-        <li>
-            <span>You</span></li>
-        </li>
-    </ul>
+    <div class="member-list">
+    </div>
     <div></div>
     </div>
     <div class="window-wrapper">
@@ -55,6 +52,7 @@ export function loadLobby(LobbyEvent){
     </div>`;
     const $form = document.getElementById("search-form");
     $form.addEventListener("submit",takeButton);
+    debugger;
 
     const $sendbtn = $app.querySelector(".send-btn");
     $sendbtn.addEventListener("click",takeButton);
@@ -67,14 +65,24 @@ export function loadLobby(LobbyEvent){
 }
 
 export function configureLobby(users,chat){
-    users.forEach((user) => {
-        let listElem = `<li><span class="status online"><i class="fa fa-circle-o"></i></span><span>` + user + `</span></li>`;
-        const $memlist = document.querySelector(".member-list");
-        $memlist.insertAdjacentHTML("beforebegin",listElem);
+    users.forEach((login) => {
+        addUser(login);
     });
     chat.forEach(message => {
         addMessage(message)
     });
+}
+
+function addUser(user){
+    let userclass ="";
+    if (user==localStorage.getItem("login")){
+        userclass="me";
+    }
+    let elem = `<div class="${userclass}">
+                    <span>${user}</span>
+                </div>`
+    const $memlist = document.querySelector(".member-list");
+    $memlist.insertAdjacentHTML("beforeend",elem);
 }
 
 export function addMessage(event){
@@ -97,16 +105,16 @@ export function addMessage(event){
 }
 
 export function insertVideo(url){
-    url = "https://vk.com/video?z=video-167127847_456279379%2Fpl_cat_trends";
+    debugger;
+    let playerdiv = document.querySelector("#player");
+    playerdiv.innerHTML="";
     let options = {
         "width":1024,
         "height":640
 
     }
     let vidID="";
-    let service="";
     if (url.indexOf("twitch.tv")!=-1){
-        service = "twitch";
         vidID = takeTwitchChannel(url);
         options["channel"] = vidID;
         Player.player = new Twitch.Player("player", options);
@@ -114,7 +122,6 @@ export function insertVideo(url){
         
     }
     else if (url.indexOf("youtube.com")!=-1){
-        service = "youtube";
         vidID = takeYoutubeVideo(url);
         options["videoId"] = vidID;
         options["events"] = {
@@ -123,8 +130,7 @@ export function insertVideo(url){
         Player.player = new YT.Player('player', options);
         Player.status = "youtube";
     }
-    else{
-        service = "vkvideo";
+    else if (url.indexOf("vk.com")!=-1){
         attrs = takeVKattributes(url);
         let iframe = `<iframe src="https://vk.com/video_ext.php?oid=${attrs.oid}&id=${attrs.id}&hd=2&js_api=1" width="1024" height="640" 
         allow="autoplay; encrypted-media; fullscreen; picture-in-picture;" frameborder="0" allowfullscreen ></iframe>`
@@ -136,8 +142,6 @@ export function insertVideo(url){
         Player.status = "vkvideo";
                 
     }
-    console.log(Player.getTiming());
-    Player.play();
 
 }
 
