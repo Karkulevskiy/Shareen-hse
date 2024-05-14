@@ -7,7 +7,6 @@ import (
 const (
 	// Events for lobby logic
 	EventCreateLobby = "create_lobby"
-	EventJoinLobby   = "join_lobby"
 	EventDisconnect  = "disconnect"
 
 	// Events for video logic
