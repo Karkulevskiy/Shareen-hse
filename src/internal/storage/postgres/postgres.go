@@ -257,7 +257,7 @@ func (p *Postgres) Lobby(lobbyURL string) (*domain.Lobby, error) {
 func (p *Postgres) Chat(lobbyID int64) ([]domain.Message, error) {
 	const op = "storage.postgres.Chat"
 
-	stmt, err := p.db.Prepare("SELECT (user_login, time, message) FROM chats WHERE lobby_id = $1")
+	stmt, err := p.db.Prepare("SELECT user_login, time, message FROM chats WHERE lobby_id = $1")
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", op, err)
 	}
