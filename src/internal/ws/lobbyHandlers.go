@@ -50,7 +50,6 @@ func CreateLobbyHandler(event Event, c *Client) {
 
 func JoinLobbyHandler(event Event, c *Client) {
 	const op = "ws.JoinLobbyHandler"
-	fmt.Println(event)
 
 	log := c.m.log.With(
 		slog.String("op", op),
@@ -85,8 +84,10 @@ func JoinLobbyHandler(event Event, c *Client) {
 
 		c.m.videoTimingMap[request.Login] = videoTimingCh
 
+		log.Info("we here")
 		AskForVideoTiming(request.Login, c.m.lobbies[request.LobbyURL][0])
 
+		log.Info("we pass")
 		responseTiming := <-videoTimingCh
 
 		delete(c.m.videoTimingMap, request.Login)

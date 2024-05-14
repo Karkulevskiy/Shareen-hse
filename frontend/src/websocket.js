@@ -46,7 +46,7 @@ export function routeEvent(event) {
             debugger;
             let timing = Player.getTiming().toString();
             sendEvent("get_video_timing",{
-                "login":localStorage.getItem("login"),
+                "login":event.payload.login,
                 "pause":Player.isPaused(),
                 "timing":timing
             })
