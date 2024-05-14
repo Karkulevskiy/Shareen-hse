@@ -49,7 +49,6 @@ function signHandler(event){
     }
     if ($signbtn.textContent=="Sign in"){
         let MaxURL = "http://localhost:8080/login";
-        console.log(JSON.stringify(UserData))
         axios.post(MaxURL,JSON.stringify(UserData))
         .then(response =>{
             let ans = response.data;

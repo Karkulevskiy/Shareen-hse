@@ -92,6 +92,7 @@ body{
 #search-form{
     position: absolute;
     border: 1px solid #DAD7CD;
+	caret-color: #dad7cd;
     display: inline-flex;
     padding: 10px;
     align-items: center;

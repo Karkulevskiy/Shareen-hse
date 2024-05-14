@@ -1,6 +1,7 @@
 import { takeButton } from "./clickhandler.js";
 import img from "./assets/copy.svg"
 import searchimg from "./assets/search.svg"
+import {Player} from "./classes/videoplayer.js"
 
 export function loadLobby(LobbyEvent){
     localStorage.setItem("lobby_url",LobbyEvent.URL);
@@ -95,27 +96,94 @@ export function addMessage(event){
     $chatlist.innerHTML += tag;
 }
 
-export function insertVideo(EmbedHTML){
-    debugger
-    var player=document.getElementById('player'); //Комментарий
-    player.innerHTML=test;
-    // playerOne = new YT.Player('check', {
-    //     events: {
-    //       'onReady': onPlayerReady,
-    //       'onStateChange': onPlayerStateChange
-    //     }
-    //   });
+export function insertVideo(url){
+    url = "https://vk.com/video?z=video-167127847_456279379%2Fpl_cat_trends";
+    let options = {
+        "width":1024,
+        "height":640
+
+    }
+    let vidID="";
+    let service="";
+    if (url.indexOf("twitch.tv")!=-1){
+        service = "twitch";
+        vidID = takeTwitchChannel(url);
+        options["channel"] = vidID;
+        Player.player = new Twitch.Player("player", options);
+        Player.status = "twitch";
+        
+    }
+    else if (url.indexOf("youtube.com")!=-1){
+        service = "youtube";
+        vidID = takeYoutubeVideo(url);
+        options["videoId"] = vidID;
+        options["events"] = {
+            'onReady':onPlayerReady
+        }
+        Player.player = new YT.Player('player', options);
+        Player.status = "youtube";
+    }
+    else{
+        service = "vkvideo";
+        attrs = takeVKattributes(url);
+        let iframe = `<iframe src="https://vk.com/video_ext.php?oid=${attrs.oid}&id=${attrs.id}&hd=2&js_api=1" width="1024" height="640" 
+        allow="autoplay; encrypted-media; fullscreen; picture-in-picture;" frameborder="0" allowfullscreen ></iframe>`
+        let playerdiv = document.querySelector("#player");
+        playerdiv.insertAdjacentHTML("afterbegin",iframe)
+        debugger
+        iframe = playerdiv.childNodes[0];
+        Player.player = VK.VideoPlayer(iframe);
+        Player.status = "vkvideo";
+                
+    }
+    console.log(Player.getTiming());
+    Player.play();
 
 }
 
-// function  onPlayerReady(event) {
-//     // Или возобновить его
-//     console.log("IJJDJIWIO")
-//     event.target.playVideo();
-// }
-// function onPlayerStateChange(event) {
-//     console.log('Player state:', event.data);
-// }
+function onPlayerReady(event){
+    event.target.playVideo();
+
+}
+
+function takeTwitchChannel(url){
+    let channel = "";
+    let idx = url.indexOf("twitch.tv/")+10;
+    for (let i=idx;i<url.length;i++){
+        if (url[i]=='/'){
+            return channel;
+        }
+        else{
+            channel+=url[i];
+        }
+    }
+    return channel;
+}
+
+function takeVKattributes(url){
+    let regex = /-?\d*[0-9]_\d*[0-9]/
+    let str =  url.match(regex)[0];
+    let idx = str.indexOf("_");
+    attributes = {
+        "oid":str.substring(0,idx),
+        "id":str.substring(idx+1)
+    }
+    return attributes;
+}
+
+function takeYoutubeVideo(url){
+    let idx = url.indexOf("watch?v=")+8;
+    let vidID = "";
+        for (let i=idx;i<url.length;i++){
+            if (url[i]=="&"){
+                return vidID;
+            }
+            else{
+                vidID+=url[i];
+            }
+        }
+        return vidID;
+}
 
 function addLobbyUrl(){
     const tag = `<div class="copydiv">
@@ -135,7 +203,3 @@ function convertTime(time){
     NewTime+=" " + time.substring(16,24);
     return NewTime;
 }
-
-
-let test = `<iframe id="check" width="1024" height="640" src="https://www.youtube.com/embed/J_NiG9AHcvI?start=10&autoplay=1&controls=0" title="YouTube video player" 
-frameborder="yes" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; " web-share"="" allowfullscreen=""></iframe>`

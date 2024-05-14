@@ -38,26 +38,12 @@ export class LobbyEvent{
     }
 }
 
-// export class VideoEvent{
-//     constructor(iframe,pause=true,timing=""){
-//         let tag = document.createElement('script');
-//         tag.src = 'https://www.youtube.com/iframe_api'
-//         document.body.insertAdjacentHTML("beforeend",iframe);
-//         this.player = new YT.Player("player",{
-//             "events":{
-//                 'onReady':this.onPlayerReady,
-//                 'onStateChange':this.onPlayerStateChange
-//         }});
-//         this.pause = pause;
-//         this.timing = this.player.getCurrentTime();
-//         this.iframe = iframe;
-//     }
-//     onPlayerReady(event) {
-//         // Или возобновить его
-//         event.target.playVideo();
-//     }
-//     onPlayerStateChange(event) {
-//         console.log('Player state:', event.data);
-//     }
 
-// }
+export class VideoEvent{
+    constructor(vidID,pause=false,timing=""){
+        this.vidID = vidID;
+        this.pause=pause;
+        this.timing = timing;
+    }
+
+}

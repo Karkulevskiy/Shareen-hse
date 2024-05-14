@@ -1,11 +1,10 @@
 import { Event,NewMessageEvent,LobbyEvent } from "./classes/events";
-import { addMessage,loadLobby,insertVideo } from "./lobbyloader";
+import { addMessage,loadLobby,insertVideo,routeVideo } from "./lobbyloader";
 import { MyAlert } from "./utils";
 
 export let connection = [];
 
 export function routeEvent(event) {
-    debugger;
     if (event.type === undefined) {
         console.log("no 'type' field in event(report about that to the developer)");
         return;
@@ -32,7 +31,7 @@ export function routeEvent(event) {
             loadLobby(newLobby);
             break;
         case "insert_video_url":
-            insertVideo(event.payload.iframe);
+            insertVideo(event.payload.url);
             break;
         case "pause_video":
 
