@@ -8,6 +8,7 @@ const (
 	// Events for lobby logic
 	EventCreateLobby = "create_lobby"
 	EventDisconnect  = "disconnect"
+	EventJoinLobby   = "join_lobby"
 
 	// Events for video logic
 	EventPauseVideo     = "pause_video"

@@ -125,7 +125,7 @@ func JoinLobbyHandler(event Event, c *Client) {
 		return
 	}
 
-	response := CreateEvent(http.StatusOK, EventUserJoinLobby, payload)
+	response := CreateEvent(http.StatusOK, EventJoinLobby, payload)
 
 	// Отправляем ответ
 	c.egress <- response
