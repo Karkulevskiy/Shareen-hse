@@ -5,13 +5,6 @@ export class Event {
     }
 }
 
-class SendMessageEvent {
-    constructor(message, from) {
-        this.message = message;
-        this.from = from;
-    }
-}
-
 
 export class NewMessageEvent {
     constructor(message, from, sent) {
@@ -28,13 +21,13 @@ export class NewLobbyEvent{
 }
 
 export class LobbyEvent{
-    constructor(lobbyURL="",videoURL="",Timing="",Pause=false,Users=[],Chat=[]){
-        this.URL = lobbyURL;
-        this.curVideo = videoURL;
-        this.timing = Timing;
-        this.pause = Pause;
-        this.users = Users;
-        this.chat = Chat;
+    constructor(lobbyURL="",videoURL="",timing="",pause=false,users=[],chat=[]){
+        this.lobbyURL = lobbyURL;
+        this.videoURL = videoURL;
+        this.timing = timing;
+        this.pause = pause;
+        this.users = users;
+        this.chat = chat;
     }
 }
 
