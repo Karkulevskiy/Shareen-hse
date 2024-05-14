@@ -50,6 +50,7 @@ func CreateLobbyHandler(event Event, c *Client) {
 
 func JoinLobbyHandler(event Event, c *Client) {
 	const op = "ws.JoinLobbyHandler"
+	fmt.Println(event)
 
 	log := c.m.log.With(
 		slog.String("op", op),

@@ -43,10 +43,12 @@ export function routeEvent(event) {
             }
             break;
         case "get_video_timing":
-            let timing = Player.getTiming();
+            debugger;
+            let timing = Player.getTiming().toString();
             sendEvent("get_video_timing",{
+                "login":localStorage.getItem("login"),
                 "pause":Player.isPaused(),
-                "timing":Player.getTiming()
+                "timing":timing
             })
             break;
         default:
