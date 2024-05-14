@@ -79,7 +79,7 @@ func JoinLobbyHandler(event Event, c *Client) {
 	}
 
 	// Если в лобби, кто то есть еще, то обратимся к нему и спросим про актуальный тайминг в видео, и стоит ли пауза
-	if len(c.m.lobbies[request.LobbyURL]) > 1 {
+	if len(c.m.lobbies[request.LobbyURL]) >= 1 {
 		videoTimingCh := make(chan Event)
 
 		c.m.videoTimingMap[request.Login] = videoTimingCh
