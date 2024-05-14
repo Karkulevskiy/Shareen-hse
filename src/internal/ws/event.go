@@ -8,6 +8,7 @@ const (
 	// Events for lobby logic
 	EventCreateLobby = "create_lobby"
 	EventJoinLobby   = "join_lobby"
+	EventDisconnect  = "disconnect"
 
 	// Events for video logic
 	EventPauseVideo     = "pause_video"
@@ -52,4 +53,12 @@ func SendResponseError(eventType string, status int, c *Client) {
 	}
 
 	c.egress <- respEvent
+}
+
+func CreateEvent(status int, eventType string, payload json.RawMessage) Event {
+	return Event{
+		Status:  status,
+		Type:    eventType,
+		Payload: payload,
+	}
 }

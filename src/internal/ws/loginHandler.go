@@ -17,6 +17,7 @@ func (m *Manager) LoginHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE")
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+
 	const op = "ws.manager.loginHandler"
 
 	log := m.log.With(
@@ -100,6 +101,7 @@ func (m *Manager) RegisterUser(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE")
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+
 	const op = "ws.manager.registerUser"
 
 	log := m.log.With(

@@ -14,9 +14,11 @@ var (
 )
 
 type Client struct {
-	conn   *websocket.Conn
-	m      *Manager
-	egress chan Event
+	conn     *websocket.Conn
+	m        *Manager
+	egress   chan Event
+	login    string
+	lobbyURL string
 }
 
 func NewClient(conn *websocket.Conn, m *Manager) *Client {
@@ -53,7 +55,8 @@ func (c *Client) readMessages() {
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
 				log.Error("failed to read message", err)
 			}
-
+			// Польхователь отключился, уведомляем об этом других в лобби
+			notifyUserDisconnect(c)
 			break
 		}
 
