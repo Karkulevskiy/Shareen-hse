@@ -88,6 +88,7 @@ func JoinLobbyHandler(event Event, c *Client) {
 		AskForVideoTiming(request.Login, c.m.lobbies[request.LobbyURL][0])
 
 		log.Info("we pass")
+
 		responseTiming := <-videoTimingCh
 
 		delete(c.m.videoTimingMap, request.Login)

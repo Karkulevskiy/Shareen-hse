@@ -279,9 +279,9 @@ func (p *Postgres) Chat(lobbyID int64) ([]domain.Message, error) {
 			return nil, fmt.Errorf("%s: %w", op, err)
 		}
 		chat = append(chat, domain.Message{
-			Login: login,
-			Text:  message,
-			Time:  time_.Time,
+			Login:   login,
+			Message: message,
+			Time:    time_.Time,
 		})
 	}
 

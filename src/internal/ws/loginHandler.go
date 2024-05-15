@@ -3,7 +3,6 @@ package ws
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"log/slog"
 	"net/http"
 
@@ -35,8 +34,6 @@ func (m *Manager) LoginHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var request Request
-
-	fmt.Println(r.Body)
 
 	err := json.NewDecoder(r.Body).Decode(&request)
 	if err != nil {
