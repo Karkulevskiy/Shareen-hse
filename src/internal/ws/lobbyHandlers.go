@@ -21,11 +21,20 @@ func CreateLobbyHandler(event Event, c *Client) {
 		slog.String("op", op),
 	)
 
+	var createLobbyEvent events.CreateLobbyEvent
+
+	err := json.Unmarshal(event.Payload, &createLobbyEvent)
+	if err != nil {
+		log.Error("failed to unmarshal create lobby request", err)
+		SendResponseError(event.Type, http.StatusInternalServerError, c)
+		return
+	}
+
 	// Generate unique lobby URL
 	lobbyURL := lib.GenerateURL()
 
 	// Save lobby URL in DB
-	lobbyURL, err := c.m.storage.CreateLobby(lobbyURL)
+	_, err = c.m.storage.CreateLobby(lobbyURL)
 	if err != nil {
 		log.Error("failed to create lobby", err)
 		SendResponseError(event.Type, http.StatusInternalServerError, c)
@@ -35,6 +44,7 @@ func CreateLobbyHandler(event Event, c *Client) {
 	// Add client to lobby in RAM
 	c.m.lobbies[lobbyURL] = append(c.m.lobbies[lobbyURL], c)
 	c.lobbyURL = lobbyURL
+	c.login = createLobbyEvent.Login
 
 	payload, err := json.Marshal(events.CreateLobbyEventResponse{LobbyURL: lobbyURL})
 	if err != nil {
@@ -75,6 +85,27 @@ func JoinLobbyHandler(event Event, c *Client) {
 
 		log.Error("failed to get lobby", err)
 		SendResponseError(event.Type, http.StatusInternalServerError, c)
+		return
+	}
+
+	// Проверяем, есть ли уже в лобби этот юзер
+	if _, ok := c.m.lobbies[request.LobbyURL]; ok &&
+		isUserInLobby(request.Login, c.m.lobbies[request.LobbyURL]) {
+
+		log.Info("user already in lobby")
+
+		payload, err := json.Marshal(&lobby)
+		if err != nil {
+			log.Error("failed to marshal lobby data", err)
+			SendResponseError(event.Type, http.StatusInternalServerError, c)
+			return
+		}
+
+		response := CreateEvent(http.StatusOK, EventJoinLobby, payload)
+
+		// Отправляем ответ
+		c.egress <- response
+
 		return
 	}
 
@@ -305,6 +336,11 @@ func GetVideoTimingHandler(event Event, c *Client) {
 		return
 	}
 
+	if isUserInLobby(videoTimingRequest.Login, c.m.lobbies[c.lobbyURL]) {
+		log.Info("user already in lobby")
+		return
+	}
+
 	log.Info("get video timing", slog.String("user_login", videoTimingRequest.Login))
 
 	payload, _ := json.Marshal(events.GetVideoTimingResponse{
@@ -337,4 +373,13 @@ func RewindVideoHandler(event Event, c *Client) {
 	for _, client := range c.m.lobbies[rewindReq.LobbyURL] {
 		client.egress <- event
 	}
+}
+
+func isUserInLobby(login string, clients []*Client) bool {
+	for _, client := range clients {
+		if client.login == login {
+			return true
+		}
+	}
+	return false
 }

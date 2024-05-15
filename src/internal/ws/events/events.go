@@ -5,6 +5,10 @@ type JoinLobbyEvent struct {
 	LobbyURL string `json:"lobby_url"`
 }
 
+type CreateLobbyEvent struct {
+	Login string `json:"login"`
+}
+
 type CreateLobbyEventResponse struct {
 	LobbyURL string `json:"lobby_url"`
 }
