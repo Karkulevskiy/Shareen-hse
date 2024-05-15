@@ -88,11 +88,21 @@ func JoinLobbyHandler(event Event, c *Client) {
 		return
 	}
 
+	if lobby.Chat == nil {
+		lobby.Chat = []domain.Message{}
+	}
+
 	// Проверяем, есть ли уже в лобби этот юзер
 	if _, ok := c.m.lobbies[request.LobbyURL]; ok &&
 		isUserInLobby(request.Login, c.m.lobbies[request.LobbyURL]) {
 
 		log.Info("user already in lobby")
+
+		for _, client := range c.m.lobbies[request.LobbyURL] {
+			lobby.Users = append(lobby.Users, &domain.User{
+				Login: client.login,
+			})
+		}
 
 		payload, err := json.Marshal(&lobby)
 		if err != nil {
