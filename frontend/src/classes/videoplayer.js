@@ -45,6 +45,17 @@ class VideoPlayer{
                 }
         }
     }
+    rewindVideo(timing){
+        switch(this.player.status){
+            case "youtube":
+                this.player.seekTo(timing);
+                break;
+            case "vkvideo":
+            case "twitch":
+                this.player.seek(timing);
+                break;
+        }
+    }
 }
 
 export let Player = new VideoPlayer()

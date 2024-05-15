@@ -61,6 +61,8 @@ export function loadLobby(LobbyEvent){
 
     insertVideo(LobbyEvent.video_url);
 
+    Player.rewindVideo(Number(LobbyEvent.timing));
+
     addLobbyUrl();
 }
 
@@ -83,6 +85,15 @@ export function addUser(user){
                 </div>`
     const $memlist = document.querySelector(".member-list");
     $memlist.insertAdjacentHTML("beforeend",elem);
+}
+
+export function removeUser(login){
+    const $memlist = document.querySelector(".member-list");
+    $memlist.childNodes.forEach((span)=> {
+        if (span.innerHTML==login){
+            $memlist.removeChild(span);
+        }
+    })
 }
 
 export function addMessage(event){
@@ -142,7 +153,6 @@ export function insertVideo(url){
         iframe = playerdiv.childNodes[0];
         Player.player = VK.VideoPlayer(iframe);
         Player.status = "vkvideo";
-                
     }
 
 }

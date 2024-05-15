@@ -7,7 +7,8 @@ import { MyAlert } from "./utils.js";
 
 
 function createLobby(){
-    sendEvent("create_lobby",{"payload":""});
+    debugger;
+    sendEvent("create_lobby",{"payload":{"login":localStorage.getItem("login")}});
 }
 
 export function choiceHandler(event){
