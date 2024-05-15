@@ -14,16 +14,12 @@ export class NewMessageEvent {
     }
 }
 
-export class NewLobbyEvent{
-    constructor(lobbyURL){
-        this.URL = lobbyURL;
-    }
-}
 
 export class LobbyEvent{
-    constructor(lobbyURL="",videoURL="",timing="",pause=false,users=[],chat=[]){
-        this.lobbyURL = lobbyURL;
-        this.videoURL = videoURL;
+    constructor(lobby_url="",video_url="",timing="",pause=false,users=[],chat=[]){
+        debugger;
+        this.lobby_url = lobby_url;
+        this.video_url = video_url;
         this.timing = timing;
         this.pause = pause;
         this.users = users;

@@ -24,6 +24,7 @@ export function routeEvent(event) {
             addMessage(messageEvent);
             break;
         case "create_lobby":
+            debugger;
             const newLobby = new LobbyEvent(event.payload.lobby_url,"","",true,[{"login":localStorage.getItem("login")}]);
             loadLobby(newLobby);
             break;
@@ -55,6 +56,9 @@ export function routeEvent(event) {
             addUser(event.payload.login);
             break;
         case "disconnected":
+            removeUser(event.payload.login);
+            break;
+        case "rewind_video":
             break;
         default:
             alert("unsupported message type");
