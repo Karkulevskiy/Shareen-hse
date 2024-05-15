@@ -8,7 +8,7 @@ import { MyAlert } from "./utils.js";
 
 function createLobby(){
     debugger;
-    sendEvent("create_lobby",{"payload":{"login":localStorage.getItem("login")}});
+    sendEvent("create_lobby",{"login":localStorage.getItem("login")});
 }
 
 export function choiceHandler(event){
@@ -24,33 +24,14 @@ export function choiceHandler(event){
         createLobby();
     }
     else if (value=="JOIN"){
-        model.length=0;
-        model.push(
-            new FormBlock({
-                id:"lobby-form",
-                onsubmit:"event.preventDefault();",
-                role:"search"
-            },
-            [
-                new InputBlock(
-                    "",
-                    {
-                        id:"search_lobby",
-                        type:"search",
-                        placeholder:"Write lobby link..."
-                    }
-                ),
-                new ButtonBlock(
-                    "Go",
-                    {
-                        id:"go_lobby",
-                        type:"submit",
-                        class:"check-lobby__btn"
-                    }
-                )
-            ])
-        )
-        new App(model).render();
+        let $app = document.querySelector(".app");
+        $app.insertAdjacentHTML("afterbegin",HTML);
+
+        let HTML = `<form id="lobby-form" onsubmit="event.preventDefault();" role="search">
+                        <input id="search_lobby" type="search" placeholder="Write lobby link...">
+                        <button id="go_lobby" type="submit" class="check-lobby__btn">Go</button>
+                    </form>`
+        
         const $form = document.getElementById("lobby-form");
         $form.addEventListener("submit",handlers.takeButton);
     }

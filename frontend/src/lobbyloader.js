@@ -2,6 +2,7 @@ import { takeButton } from "./clickhandler.js";
 import img from "./assets/copy.svg"
 import searchimg from "./assets/search.svg"
 import {Player} from "./classes/videoplayer.js"
+import { sendEvent } from "./websocket.js";
 
 export function loadLobby(LobbyEvent){
     localStorage.setItem("lobby_url",LobbyEvent.lobby_url);
@@ -90,7 +91,7 @@ export function addUser(user){
 export function removeUser(login){
     const $memlist = document.querySelector(".member-list");
     $memlist.childNodes.forEach((span)=> {
-        if (span.innerHTML==login){
+        if (span.nodeName=="DIV" && span.innerText==login){
             $memlist.removeChild(span);
         }
     })
@@ -129,6 +130,14 @@ export function insertVideo(url){
         vidID = takeTwitchChannel(url);
         options["channel"] = vidID;
         Player.player = new Twitch.Player("player", options);
+        Player.player.addEventListener(Twitch.Player.PAUSE,sendEvent("pause_video",{
+            "lobby_url":localStorage.getItem("login"),
+            "pause":true
+        }))
+        Player.player.addEventListener(Twitch.Player.PLAY,sendEvent("pause_video",{
+            "lobby_url":localStorage.getItem("login"),
+            "pause":false
+        }))
         Player.status = "twitch";
         
     }
@@ -138,7 +147,8 @@ export function insertVideo(url){
         vidID = takeYoutubeVideo(url);
         options["videoId"] = vidID;
         options["events"] = {
-            'onReady':onPlayerReady
+            'onReady':onPlayerReady,
+            "onStateChange":onPlayerStateChange
         }
         Player.player = new YT.Player('player-yt', options);
         Player.status = "youtube";
@@ -149,16 +159,48 @@ export function insertVideo(url){
         allow="autoplay; encrypted-media; fullscreen; picture-in-picture;" frameborder="0" allowfullscreen ></iframe>`
         let playerdiv = document.querySelector("#player");
         playerdiv.insertAdjacentHTML("afterbegin",iframe)
-        debugger
         iframe = playerdiv.childNodes[0];
         Player.player = VK.VideoPlayer(iframe);
+        Player.player.on("inited",onPlayerReady)
+        Player.player.on("timeupdate",rewindVideo);
+        Player.player.on("paused",sendEvent("pause_video",{
+            "lobby_url":localStorage.getItem("login"),
+            "pause":true
+        }))
+        Player.player.on("resumed",sendEvent("pause_video",{
+            "lobby_url":localStorage.getItem("login"),
+            "pause":false
+        }))
         Player.status = "vkvideo";
     }
 
 }
 
+function onPlayerStateChange(event){
+    if (event.data == YT.PlayerState.PAUSED){
+        sendEvent("pause_video",{
+            "lobby_url":localStorage.getItem("login"),
+            "pause":true
+        })
+    }
+    else if (event.data == YT.PlayerState.BUFFERING || event.data == YT.PlayerState.PLAYING){
+        sendEvent("pause_video",{
+            "lobby_url":localStorage.getItem("login"),
+            "pause":false
+        })
+    }
+}
+
 function onPlayerReady(event){
-    event.target.playVideo();
+    Player.play();
+}
+
+export function rewindVideo(event){
+    let timing = Player.getTiming();
+    sendEvent("get_video_timing",{
+        "lobby_url":localStorage.getItem("lobby_url"),
+        "timing":timing.toString()
+    })
 }
 
 function takeTwitchChannel(url){

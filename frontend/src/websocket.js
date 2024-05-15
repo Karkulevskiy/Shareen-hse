@@ -1,5 +1,5 @@
 import { Event,NewMessageEvent,LobbyEvent } from "./classes/events";
-import { addMessage,loadLobby,insertVideo,addUser } from "./lobbyloader";
+import { addMessage,loadLobby,insertVideo,addUser,removeUser } from "./lobbyloader";
 import { MyAlert } from "./utils";
 import { Player } from "./classes/videoplayer";
 
@@ -55,7 +55,7 @@ export function routeEvent(event) {
         case "user_join_lobby":
             addUser(event.payload.login);
             break;
-        case "disconnected":
+        case "disconnect":
             removeUser(event.payload.login);
             break;
         case "rewind_video":

@@ -23,9 +23,15 @@ class VideoPlayer{
         }
     }
     getTiming(){
+        if (this.player==""){
+            return 0;
+        }
         return this.player.getCurrentTime()
     }
     isPaused(){
+        if (this.player==""){
+            return true;
+        }
         switch (this.status){
             case "twitch":
                 return this.player.isPaused();
