@@ -4,7 +4,7 @@ import searchimg from "./assets/search.svg"
 import {Player} from "./classes/videoplayer.js"
 
 export function loadLobby(LobbyEvent){
-    localStorage.setItem("lobby_url",LobbyEvent.URL);
+    localStorage.setItem("lobby_url",LobbyEvent.lobby_url);
     const $app = document.querySelector("#app");
 
     $app.innerHTML = `<form role="search" id="search-form" type="submit">
@@ -59,21 +59,21 @@ export function loadLobby(LobbyEvent){
 
     configureLobby(LobbyEvent.users,LobbyEvent.chat);
 
-    insertVideo(LobbyEvent.curVideo);
+    insertVideo(LobbyEvent.video_url);
 
     addLobbyUrl();
 }
 
 export function configureLobby(users,chat){
-    users.forEach((login) => {
-        addUser(login);
+    users.forEach((user) => {
+        addUser(user.login);
     });
     chat.forEach(message => {
         addMessage(message)
     });
 }
 
-function addUser(user){
+export function addUser(user){
     let userclass ="";
     if (user==localStorage.getItem("login")){
         userclass="me";
@@ -122,12 +122,14 @@ export function insertVideo(url){
         
     }
     else if (url.indexOf("youtube.com")!=-1){
+        let html = `<div id="player-yt"></div>`;
+        document.querySelector("#player").insertAdjacentHTML("afterbegin",html);
         vidID = takeYoutubeVideo(url);
         options["videoId"] = vidID;
         options["events"] = {
             'onReady':onPlayerReady
         }
-        Player.player = new YT.Player('player', options);
+        Player.player = new YT.Player('player-yt', options);
         Player.status = "youtube";
     }
     else if (url.indexOf("vk.com")!=-1){
@@ -147,7 +149,6 @@ export function insertVideo(url){
 
 function onPlayerReady(event){
     event.target.playVideo();
-
 }
 
 function takeTwitchChannel(url){
