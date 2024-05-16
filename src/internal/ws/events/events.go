@@ -64,6 +64,11 @@ type RewindVideoEvent struct {
 	Timing   string `json:"timing"`
 }
 
+type RewindVideoResponse struct {
+	LobbyURL string `json:"lobby_url"`
+	Timing   string `json:"timing"`
+}
+
 type UserDisconnectedEvent struct {
 	Login string `json:"login"`
 }

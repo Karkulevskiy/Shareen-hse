@@ -380,8 +380,21 @@ func RewindVideoHandler(event Event, c *Client) {
 		return
 	}
 
+	payload, err := json.Marshal(&events.RewindVideoResponse{
+		Timing:   rewindReq.Timing,
+		LobbyURL: rewindReq.LobbyURL,
+	})
+
+	if err != nil {
+		log.Error("failed to marshal rewind video response", err)
+		SendResponseError(event.Type, http.StatusInternalServerError, c)
+		return
+	}
+
+	response := CreateEvent(http.StatusOK, EventRewindVideo, payload)
+
 	for _, client := range c.m.lobbies[rewindReq.LobbyURL] {
-		client.egress <- event
+		client.egress <- response
 	}
 }
 
