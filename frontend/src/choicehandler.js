@@ -24,15 +24,19 @@ export function choiceHandler(event){
         createLobby();
     }
     else if (value=="JOIN"){
-        let $app = document.querySelector(".app");
-        $app.insertAdjacentHTML("afterbegin",HTML);
+        if (document.getElementById("lobby-form")!=undefined){
+            return;
+        }
+        let $app = document.querySelector("#app");
 
         let HTML = `<form id="lobby-form" onsubmit="event.preventDefault();" role="search">
-                        <input id="search_lobby" type="search" placeholder="Write lobby link...">
+                        <input id="search_lobby" type="text" placeholder="Write lobby link...">
                         <button id="go_lobby" type="submit" class="check-lobby__btn">Go</button>
                     </form>`
         
+        $app.insertAdjacentHTML("afterbegin",HTML);
         const $form = document.getElementById("lobby-form");
+        $form.classList.add("active");
         $form.addEventListener("submit",handlers.takeButton);
     }
 

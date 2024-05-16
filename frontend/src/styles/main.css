@@ -32,7 +32,7 @@ body{
 		position: absolute;
 		left:400px;
 		top: 250px;
-        height: 100vh;
+		z-index: 2;
     
 }
 
@@ -75,7 +75,7 @@ body{
 	border-radius: 2%;
 	font-size: 25px;
     transition: 0.25s;
-    background: none;
+    background: #eee;
     line-height: 5;
     width: 400px;
     margin: 0.5em;
@@ -150,12 +150,42 @@ body{
 }
 
 #lobby-form{
+	background: #76885b;
+    border-radius: 0.7rem;
+    width: 25rem;
     position: relative;
-    width: 30rem;
-    background: #57bd84;
-    border-radius: .7rem;
+    left: 400px;
+    top: 350px;
+    z-index: 1;
+    opacity: 0;
+	caret-color: transparent;
 }
 
+#lobby-form.active{
+	animation-name: show-form;
+	animation-duration: 1s;
+	animation-direction: forwards;
+	animation-timing-function: ease-in-out;
+	animation-fill-mode: forwards;
+	animation-iteration-count: 1;
+
+}
+
+@keyframes show-form {
+	0% {
+	  transform: translateY(0);
+	  opacity: 0;
+	}
+  
+	50% {
+		opacity: 0.3;
+	}
+  
+	100% {
+		opacity: 1;
+	  	transform: translateY(95px);
+	}
+  }
 label {
     position: absolute;
     clip: rect(1px, 1px, 1px, 1px);
@@ -174,7 +204,7 @@ label {
     font-size: 1.8rem;
 }
 
-#search_lobby[type="search"] {
+#search_lobby[type="text"] {
     width: 100%;
     background: #fff;
     padding: 0 1.6rem;
@@ -193,27 +223,20 @@ label {
     right: 0;
     width: 6rem;
     font-weight: bold;
-    background: #57bd84;
+	background: #76885B;
+    color: #DDDDDD;
     border-radius: 0 .7rem .7rem 0;
   }
 
 #search_lobby:not(:placeholder-shown) {
     border-radius: .7rem 0 0 .7rem;
+	outline: none;
     width: calc(100% - 6rem);
     + #go_lobby {
       display: block;
     }
   }
 
-  
-
-
-  /* 
-  HTML implementation of a Hip Chat redesign based on Jan Dvořák Dribbble shot.
-  https://dribbble.com/shots/1529065-HipChat-Redesign
-*/
-
-/* HTML5 display-role reset for older browsers */
 
 
 blockquote:before, blockquote:after,
@@ -493,6 +516,7 @@ b{
 	width: 600px;
 	height: 350px;
 	background-color: #DDDDDD;
+	z-index: 3;
 	
 }
 
