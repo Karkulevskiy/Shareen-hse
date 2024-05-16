@@ -52,7 +52,7 @@ class VideoPlayer{
         }
     }
     rewindVideo(timing){
-        switch(this.player.status){
+        switch(this.status){
             case "youtube":
                 this.player.seekTo(timing);
                 break;

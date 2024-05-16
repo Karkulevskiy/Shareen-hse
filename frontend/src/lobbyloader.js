@@ -130,14 +130,8 @@ export function insertVideo(url){
         vidID = takeTwitchChannel(url);
         options["channel"] = vidID;
         Player.player = new Twitch.Player("player", options);
-        Player.player.addEventListener(Twitch.Player.PAUSE,sendEvent("pause_video",{
-            "lobby_url":localStorage.getItem("login"),
-            "pause":true
-        }))
-        Player.player.addEventListener(Twitch.Player.PLAY,sendEvent("pause_video",{
-            "lobby_url":localStorage.getItem("login"),
-            "pause":false
-        }))
+        Player.player.addEventListener(Twitch.Player.PAUSE,sendPauseState)
+        Player.player.addEventListener(Twitch.Player.PLAY,sendPlayState)
         Player.status = "twitch";
         
     }
@@ -163,31 +157,33 @@ export function insertVideo(url){
         Player.player = VK.VideoPlayer(iframe);
         Player.player.on("inited",onPlayerReady)
         Player.player.on("timeupdate",rewindVideo);
-        Player.player.on("paused",sendEvent("pause_video",{
-            "lobby_url":localStorage.getItem("login"),
-            "pause":true
-        }))
-        Player.player.on("resumed",sendEvent("pause_video",{
-            "lobby_url":localStorage.getItem("login"),
-            "pause":false
-        }))
+        Player.player.on("paused",sendPauseState)
+        Player.player.on("resumed",sendPlayState)
         Player.status = "vkvideo";
     }
 
 }
 
+export function sendPauseState(event){
+    sendEvent("pause_video",{
+        "lobby_url":localStorage.getItem("lobby_url"),
+        "pause":true
+    })
+}
+
+export function sendPlayState(event){
+    sendEvent("pause_video",{
+        "lobby_url":localStorage.getItem("lobby_url"),
+        "pause":false
+    })
+}
+
 function onPlayerStateChange(event){
     if (event.data == YT.PlayerState.PAUSED){
-        sendEvent("pause_video",{
-            "lobby_url":localStorage.getItem("login"),
-            "pause":true
-        })
+        sendPauseState(null);
     }
     else if (event.data == YT.PlayerState.BUFFERING || event.data == YT.PlayerState.PLAYING){
-        sendEvent("pause_video",{
-            "lobby_url":localStorage.getItem("login"),
-            "pause":false
-        })
+        sendPlayState(null);
     }
 }
 
@@ -197,7 +193,7 @@ function onPlayerReady(event){
 
 export function rewindVideo(event){
     let timing = Player.getTiming();
-    sendEvent("get_video_timing",{
+    sendEvent("rewind_video",{
         "lobby_url":localStorage.getItem("lobby_url"),
         "timing":timing.toString()
     })

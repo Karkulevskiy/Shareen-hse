@@ -1,5 +1,5 @@
 import { Event,NewMessageEvent,LobbyEvent } from "./classes/events";
-import { addMessage,loadLobby,insertVideo,addUser,removeUser } from "./lobbyloader";
+import { addMessage,loadLobby,insertVideo,addUser,removeUser, rewindVideo,sendPauseState,sendPlayState } from "./lobbyloader";
 import { MyAlert } from "./utils";
 import { Player } from "./classes/videoplayer";
 
@@ -37,10 +37,22 @@ export function routeEvent(event) {
             break;
         case "pause_video":
             if (event.payload.pause==true){
+                if (Player.status=="vkvideo"){
+                    Player.player.off("paused",sendPauseState);
+                }
                 Player.pause();
+                if (Player.status=="vkvideo"){
+                    Player.player.on("paused",sendPauseState);
+                }
             }
             else{
+                if (Player.status=="vkvideo"){
+                    Player.player.off("resumed",sendPauseState);
+                }
                 Player.play();
+                if (Player.status=="vkvideo"){
+                    Player.player.on("resumed",sendPauseState);
+                }
             }
             break;
         case "get_video_timing":
@@ -59,6 +71,11 @@ export function routeEvent(event) {
             removeUser(event.payload.login);
             break;
         case "rewind_video":
+            if (Player.status=="vkvideo"){
+                Player.player.off("timeupdate",rewindVideo);
+            }
+            Player.rewindVideo(event.payload.timing);
+            Player.player.on("timeupdate",rewindVideo);
             break;
         default:
             alert("unsupported message type");
