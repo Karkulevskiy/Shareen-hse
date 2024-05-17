@@ -1,10 +1,12 @@
 import { takeButton } from "./clickhandler.js";
 import img from "./assets/copy.svg"
 import searchimg from "./assets/search.svg"
-import {Player} from "./classes/videoplayer.js"
+import {Player,TimeChecker} from "./classes/videoplayer.js"
 import { sendEvent } from "./websocket.js";
 
 export function loadLobby(LobbyEvent){
+    Player.paused = LobbyEvent.pause;
+    Player.timing = LobbyEvent.timing;
     localStorage.setItem("lobby_url",LobbyEvent.lobby_url);
     const $app = document.querySelector("#app");
 
@@ -61,8 +63,6 @@ export function loadLobby(LobbyEvent){
     configureLobby(LobbyEvent.users,LobbyEvent.chat);
 
     insertVideo(LobbyEvent.video_url);
-
-    Player.rewindVideo(Number(LobbyEvent.timing));
 
     addLobbyUrl();
 }
@@ -146,6 +146,8 @@ export function insertVideo(url){
         }
         Player.player = new YT.Player('player-yt', options);
         Player.status = "youtube";
+        TimeChecker.startCheck();
+
     }
     else if (url.indexOf("vk.com")!=-1){
         attrs = takeVKattributes(url);
@@ -181,14 +183,19 @@ export function sendPlayState(event){
 function onPlayerStateChange(event){
     if (event.data == YT.PlayerState.PAUSED){
         sendPauseState(null);
+        TimeChecker.endCheck();
     }
     else if (event.data == YT.PlayerState.BUFFERING || event.data == YT.PlayerState.PLAYING){
         sendPlayState(null);
+        TimeChecker.startCheck();
     }
 }
 
 function onPlayerReady(event){
-    Player.play();
+    Player.rewindVideo(Player.timing);
+    if (Player.paused==true){
+        Player.pause();
+    }
 }
 
 export function rewindVideo(event){

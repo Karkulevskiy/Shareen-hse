@@ -1,11 +1,16 @@
+import { sendEvent } from "../websocket";
+
 class VideoPlayer{
     player;
     status;
+    paused;
+    timing;
     constructor(player="",status=""){
         this.player = player;
         this.status = status;
     }
     pause(){
+        this.paused=true;
         if (this.status=="youtube"){
             this.player.pauseVideo();
         }
@@ -15,6 +20,7 @@ class VideoPlayer{
 
     }
     play(){
+        this.paused = false;
         if (this.status=="youtube"){
             this.player.playVideo();
         }
@@ -26,7 +32,8 @@ class VideoPlayer{
         if (this.player==""){
             return 0;
         }
-        return this.player.getCurrentTime()
+        this.timing = this.player.getCurrentTime();
+        return this.timing;
     }
     isPaused(){
         if (this.player==""){
@@ -65,3 +72,30 @@ class VideoPlayer{
 }
 
 export let Player = new VideoPlayer()
+
+class TimerChecker{
+    TimeChecker
+    constructor(){
+
+    }
+    startCheck(){
+        Player.getTiming();
+        this.TimeChecker = setInterval(this.checkTime,1000); 
+    }
+    checkTime(){
+        let pastTiming = Player.timing;
+        let curTiming = Player.getTiming();
+        if (Math.abs(curTiming-pastTiming)>1.5){
+            sendEvent("rewind_video",{
+                "lobby_url":localStorage.getItem("lobby_url"),
+                "timing":curTiming.toString()
+            })
+        }
+    
+    }
+    endCheck(){
+        clearInterval(this.TimeChecker);
+    }
+}
+
+export let TimeChecker = new TimerChecker();

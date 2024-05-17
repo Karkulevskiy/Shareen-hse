@@ -475,6 +475,7 @@ b{
     overflow-y: scroll;
     height: 334px;
 	flex-direction: column;
+	background-color: white;
 }
 
 .member-list::-webkit-scrollbar { 
@@ -490,6 +491,7 @@ b{
     padding: 15px;
     display: flex;
 	caret-color: transparent;
+	background-color: #ddd;
 }
 
 .member-list > div.me{

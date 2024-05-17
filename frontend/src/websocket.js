@@ -25,6 +25,7 @@ export function routeEvent(event) {
             break;
         case "create_lobby":
             debugger;
+            Player.paused = false;
             const newLobby = new LobbyEvent(event.payload.lobby_url,"","",true,[{"login":localStorage.getItem("login")}]);
             loadLobby(newLobby);
             break;
@@ -33,6 +34,7 @@ export function routeEvent(event) {
             loadLobby(lobby);
             break;
         case "insert_video_url":
+            Player.paused = false;
             insertVideo(event.payload.url);
             break;
         case "pause_video":
@@ -75,7 +77,9 @@ export function routeEvent(event) {
                 Player.player.off("timeupdate",rewindVideo);
             }
             Player.rewindVideo(event.payload.timing);
-            Player.player.on("timeupdate",rewindVideo);
+            if (Player.status=="vkvideo"){
+                Player.player.on("timeupdate",rewindVideo);
+            }
             break;
         default:
             alert("unsupported message type");
