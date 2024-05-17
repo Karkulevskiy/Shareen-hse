@@ -17,7 +17,6 @@ export class NewMessageEvent {
 
 export class LobbyEvent{
     constructor(lobby_url="",video_url="",timing="",pause=false,users=[],chat=[]){
-        debugger;
         this.lobby_url = lobby_url;
         this.video_url = video_url;
         this.timing = timing;

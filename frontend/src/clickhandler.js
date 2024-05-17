@@ -4,7 +4,6 @@ export function takeButton(event){
     const id = event.target.id;
     event.preventDefault();
     if (id =="search-form"){
-        debugger;
         const form = event.target.elements;
         let payload = {
             "video_url":form[0].value,
@@ -13,7 +12,6 @@ export function takeButton(event){
         sendEvent("insert_video_url",payload);
     }
     else if (id =="lobby-form"){
-        debugger;
         const lobbyLink = document.getElementById("search_lobby").value;
         let payload = {
             "login":localStorage.getItem("login"),
@@ -22,7 +20,6 @@ export function takeButton(event){
         sendEvent("join_lobby",payload);
     }
     else if (id=="send-chat"){
-        debugger;
         const $input = document.querySelector(".input-wrapper");
         let text = $input.getElementsByTagName("input")[0].value;
         let payload = {

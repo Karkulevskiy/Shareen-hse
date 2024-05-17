@@ -55,7 +55,6 @@ export function loadLobby(LobbyEvent){
     </div>`;
     const $form = document.getElementById("search-form");
     $form.addEventListener("submit",takeButton);
-    debugger;
 
     const $sendbtn = $app.querySelector(".send-btn");
     $sendbtn.addEventListener("click",takeButton);
@@ -117,7 +116,6 @@ export function addMessage(event){
 }
 
 export function insertVideo(url){
-    debugger;
     let playerdiv = document.querySelector("#player");
     playerdiv.innerHTML="";
     let options = {

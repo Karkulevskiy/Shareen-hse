@@ -67,7 +67,6 @@ export function parseHTMLFile(content){
 }
 
 export function MyAlert(text,status){
-    debugger;
     let alert = `<div class="banner ${status} hidden">
                     <img src=${findIcon(status)} class="banner-icon">
                     <div class="banner-message">${text}

@@ -24,7 +24,6 @@ export function routeEvent(event) {
             addMessage(messageEvent);
             break;
         case "create_lobby":
-            debugger;
             Player.paused = false;
             const newLobby = new LobbyEvent(event.payload.lobby_url,"","",true,[{"login":localStorage.getItem("login")}]);
             loadLobby(newLobby);
@@ -49,16 +48,15 @@ export function routeEvent(event) {
             }
             else{
                 if (Player.status=="vkvideo"){
-                    Player.player.off("resumed",sendPauseState);
+                    Player.player.off("resumed",sendPlayState);
                 }
                 Player.play();
                 if (Player.status=="vkvideo"){
-                    Player.player.on("resumed",sendPauseState);
+                    Player.player.on("resumed",sendPlayState);
                 }
             }
             break;
         case "get_video_timing":
-            debugger;
             let timing = Player.getTiming().toString();
             sendEvent("get_video_timing",{
                 "login":event.payload.login,

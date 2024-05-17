@@ -7,7 +7,6 @@ import { MyAlert } from "./utils.js";
 
 
 function createLobby(){
-    debugger;
     sendEvent("create_lobby",{"login":localStorage.getItem("login")});
 }
 
