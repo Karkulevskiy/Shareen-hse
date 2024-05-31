@@ -16,8 +16,11 @@ CREATE TABLE IF NOT EXISTS users
     id SERIAL PRIMARY KEY,
     login VARCHAR(20) NOT NULL UNIQUE
 );
+
+--creating index for login
 CREATE INDEX IF NOT EXISTS user_login_idx ON users (login);
 
+--creating table chats
 CREATE TABLE IF NOT EXISTS chats
 (
     id SERIAL PRIMARY KEY,
@@ -27,6 +30,7 @@ CREATE TABLE IF NOT EXISTS chats
     message VARCHAR(1000)
 );
 
+--creating table users_secrets
 CREATE TABLE IF NOT EXISTS users_secrets
 (
     id SERIAL PRIMARY KEY,

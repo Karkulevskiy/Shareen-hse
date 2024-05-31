@@ -61,6 +61,16 @@ func (m *Manager) LoginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	for client := range m.clients {
+		if client.login == request.Login {
+			log.Info("user already logged in")
+
+			lib.HTPPErr(w, EventLogin, http.StatusBadRequest)
+
+			return
+		}
+	}
+
 	if err := bcrypt.CompareHashAndPassword(user.PassHash, []byte(request.Password)); err != nil {
 		log.Info("invalid credentials", err)
 
