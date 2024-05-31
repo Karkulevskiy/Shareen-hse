@@ -65,7 +65,7 @@ func (m *Manager) LoginHandler(w http.ResponseWriter, r *http.Request) {
 		if client.login == request.Login {
 			log.Info("user already logged in")
 
-			lib.HTPPErr(w, EventLogin, http.StatusBadRequest)
+			lib.HTPPErr(w, EventLogin, http.StatusNotAcceptable)
 
 			return
 		}
