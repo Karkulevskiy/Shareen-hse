@@ -1,6 +1,3 @@
-import { App } from "./classes/app.js";
-import { InputBlock,ButtonBlock,FormBlock } from "./classes/blocks.js";
-import { model } from "./model.js";
 import * as handlers from "./clickhandler.js";
 import { sendEvent,connection } from "./websocket.js";
 import { MyAlert } from "./utils.js";

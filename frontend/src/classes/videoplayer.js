@@ -15,6 +15,8 @@ class VideoPlayer{
             this.player.pauseVideo();
         }
         else{
+            if (this.status=="vkvideo"){
+            }
             this.player.pause();
         }
 
@@ -25,6 +27,8 @@ class VideoPlayer{
             this.player.playVideo();
         }
         else{
+            if (this.status=="vkvideo"){
+            }
             this.player.play();
         }
     }
@@ -64,6 +68,8 @@ class VideoPlayer{
                 this.player.seekTo(timing);
                 break;
             case "vkvideo":
+                this.player.seek(timing);
+                break;
             case "twitch":
                 this.player.seek(timing);
                 break;

@@ -98,5 +98,4 @@ function findIcon(status){
     }
     else if(status=="success") return successIcon;
     else return infoIcon;
-
 }

@@ -190,18 +190,26 @@ function onPlayerStateChange(event){
 }
 
 function onPlayerReady(event){
+    debugger;
     Player.rewindVideo(Player.timing);
     if (Player.paused==true){
         Player.pause();
     }
+    else{
+        Player.play();
+    }
 }
 
 export function rewindVideo(event){
-    let timing = Player.getTiming();
-    sendEvent("rewind_video",{
+    let old = Player.timing;
+    Player.timing = event.time;
+    if (Math.abs(Player.timing-old)>1){
+        let timing = Player.timing;
+        sendEvent("rewind_video",{
         "lobby_url":localStorage.getItem("lobby_url"),
         "timing":timing.toString()
-    })
+        })
+    }
 }
 
 function takeTwitchChannel(url){

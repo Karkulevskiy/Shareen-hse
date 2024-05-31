@@ -1,4 +1,3 @@
-//import image from "./assets/search.svg"
 import { ButtonBlock,DivBlock, TextBlock } from "./classes/blocks.js"
  
 export const model = [

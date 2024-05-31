@@ -37,23 +37,13 @@ export function routeEvent(event) {
             insertVideo(event.payload.url);
             break;
         case "pause_video":
+            if (Player.status=="vkvideo"){
+            }
             if (event.payload.pause==true){
-                if (Player.status=="vkvideo"){
-                    Player.player.off("paused",sendPauseState);
-                }
                 Player.pause();
-                if (Player.status=="vkvideo"){
-                    Player.player.on("paused",sendPauseState);
-                }
             }
             else{
-                if (Player.status=="vkvideo"){
-                    Player.player.off("resumed",sendPlayState);
-                }
                 Player.play();
-                if (Player.status=="vkvideo"){
-                    Player.player.on("resumed",sendPlayState);
-                }
             }
             break;
         case "get_video_timing":
@@ -72,12 +62,8 @@ export function routeEvent(event) {
             break;
         case "rewind_video":
             if (Player.status=="vkvideo"){
-                Player.player.off("timeupdate",rewindVideo);
             }
             Player.rewindVideo(event.payload.timing);
-            if (Player.status=="vkvideo"){
-                Player.player.on("timeupdate",rewindVideo);
-            }
             break;
         default:
             alert("unsupported message type");
@@ -87,6 +73,7 @@ export function routeEvent(event) {
 }
 
 export function sendEvent(eventName, payload) {
+    debugger;
     const event = new Event(eventName, payload);
     connection[0].send(JSON.stringify(event));
 }
