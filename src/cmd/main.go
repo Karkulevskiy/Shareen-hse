@@ -43,12 +43,6 @@ func main() {
 func setupAPI(storage *postgres.Postgres, log *slog.Logger, ctx context.Context) {
 	m := ws.NewManager(storage, log, ctx)
 
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Access-Control-Allow-Origin", "*")
-		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE")
-		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
-	})
-
 	http.HandleFunc("/ws", m.ServeWS)
 	http.HandleFunc("/login", m.LoginHandler)
 	http.HandleFunc("/register", m.RegisterUser)

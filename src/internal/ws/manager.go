@@ -17,7 +17,7 @@ var (
 	websocketUpgrader = websocket.Upgrader{
 		ReadBufferSize:  1024,
 		WriteBufferSize: 1024,
-		CheckOrigin:     func(r *http.Request) bool { return true }, //TODO: CORS Policy
+		CheckOrigin:     checkOrigin, //TODO: CORS Policy
 	}
 )
 
@@ -139,3 +139,11 @@ func (m *Manager) removeClient(c *Client) {
 	}
 }
 
+func checkOrigin(r *http.Request) bool {
+	switch  r.Host{
+	case "localhost:8080":
+		return true
+	default:
+		return false
+	}
+}
