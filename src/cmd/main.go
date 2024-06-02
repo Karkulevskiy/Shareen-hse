@@ -11,18 +11,13 @@ import (
 	"github.com/karkulevskiy/shareen/src/internal/ws"
 )
 
-//TODO: Надо поделить все на папки (handlers), но сейчас есть цикличные зависимости
+//TODO: CORS policy
 
 const (
 	envLocal = "local"
 	envProd  = "prod"
 )
 
-// main is the entry point of the application. It loads the configuration, sets up the logger, initializes the database,
-// sets up the API, starts the server, and handles graceful shutdown.
-//
-// No parameters.
-// No return values.
 func main() {
 	cfg := config.MustLoad()
 
@@ -30,9 +25,9 @@ func main() {
 
 	log.Info("starting application", slog.String("env", cfg.Env))
 
-	storage := postgres.MustInitDB(cfg.ConnectionString)
+	storage := postgres.MustInit(cfg.ConnectionString)
 
-	log.Info("initialized db")
+	log.Info("initialized Database")
 
 	setupAPI(storage, log, context.Background())
 
@@ -45,15 +40,6 @@ func main() {
 	//TODO: graceful shutdown
 }
 
-// setupAPI sets up the API endpoints for the application.
-//
-// Parameters:
-// - storage: a pointer to a postgres.Postgres object representing the database connection.
-// - log: a pointer to a slog.Logger object representing the logger.
-// - ctx: a context.Context object representing the context.
-//
-// Return:
-// None.
 func setupAPI(storage *postgres.Postgres, log *slog.Logger, ctx context.Context) {
 	m := ws.NewManager(storage, log, ctx)
 
@@ -68,13 +54,6 @@ func setupAPI(storage *postgres.Postgres, log *slog.Logger, ctx context.Context)
 	http.HandleFunc("/register", m.RegisterUser)
 }
 
-// setupLogger initializes a logger based on the provided environment.
-//
-// Parameters:
-// - env: a string representing the environment (e.g., "local", "prod").
-//
-// Returns:
-// - *slog.Logger: a pointer to the initialized logger.
 func setupLogger(env string) *slog.Logger {
 	var log *slog.Logger
 	switch env {

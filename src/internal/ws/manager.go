@@ -15,10 +15,9 @@ import (
 
 var (
 	websocketUpgrader = websocket.Upgrader{
-		//TODO: CheckOrigin:     checkOrigin, НАТСРОИТЬ CORS
-		ReadBufferSize:  1024, //TODO: посмотреть сколько нужно ставить буффер
+		ReadBufferSize:  1024,
 		WriteBufferSize: 1024,
-		CheckOrigin:     checkOrigin,
+		CheckOrigin:     func(r *http.Request) bool { return true }, //TODO: CORS Policy
 	}
 )
 
@@ -44,7 +43,6 @@ func NewManager(storage *postgres.Postgres, log *slog.Logger, ctx context.Contex
 		videoTimingMap: make(map[string]chan Event),
 	}
 	m.setupEventHandlers()
-
 	return m
 }
 
@@ -56,7 +54,6 @@ func (m *Manager) setupEventHandlers() {
 	m.handlers[EventSendMessage] = SendMessageHandler
 	m.handlers[EventGetVideoTiming] = GetVideoTimingHandler
 	m.handlers[EventRewindVideo] = RewindVideoHandler
-	// m.handlers[]
 }
 
 func (m *Manager) routeEvent(event Event, c *Client) {
@@ -142,38 +139,3 @@ func (m *Manager) removeClient(c *Client) {
 	}
 }
 
-func (m *Manager) clientInLobby(lobbyURL string, c *Client) bool {
-	m.Lock()
-	defer m.Unlock()
-	for _, client := range m.lobbies[lobbyURL] {
-		if client == c {
-			return true
-		}
-	}
-	return false
-}
-
-func checkOrigin(r *http.Request) bool {
-
-	// // Grab the request origin
-	// origin := r.Header.Get("Origin")
-
-	// switch origin {
-	// // Update this to HTTPS
-	// case "http://localhost:5001":
-	// 	return true
-	// default:
-	// 	return false
-	// }
-	return true
-}
-
-func accessControlMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Access-Control-Allow-Origin", "*")
-		w.Header().Set("Access-Control-Allow-Methods", "GET, POST")
-		w.Header().Set("Access-Control-Allow-Headers", "Origin, Content-Type")
-
-		next.ServeHTTP(w, r)
-	})
-}
