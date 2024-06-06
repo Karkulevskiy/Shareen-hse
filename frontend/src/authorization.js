@@ -61,6 +61,9 @@ function signHandler(event){
             if(ans.status==400){
                 MyAlert("Wrong login or password","error");
             }
+            else if(ans.status==406){
+                MyAlert("This user had already authorised","error");
+            }
             else if(ans.status==500){
                 MyAlert("Internal server error","error");
             }
