@@ -11,83 +11,23 @@ import (
 	"github.com/lib/pq"
 )
 
+const (
+	postgres = "postgres"
+)
+
 type Postgres struct {
 	db *sql.DB
 }
 
-// MustInitDB - initializes DB
-func MustInitDB(connectionString string) *Postgres {
-	db, err := sql.Open("postgres", connectionString)
+// MustInitDB creates postgres connection
+func MustInit(connectionString string) *Postgres {
+	db, err := sql.Open(postgres, connectionString)
 	if err != nil {
-		panic("failed to init db: " + err.Error())
+		panic("failed to initialize Database: " + err.Error())
 	}
-
-	//prepareDB(db)
 
 	return &Postgres{
 		db: db,
-	}
-}
-
-// prepareDB - describes prepared statement for DB initializing
-func prepareDB(db *sql.DB) {
-	const (
-		lobbiesStmt = `
-		CREATE TABLE IF NOT EXISTS lobbies
-		(
-			id SERIAL PRIMARY KEY,
-			lobby_url varchar(255) UNIQUE NOT NULL,
-			video_url varchar(500)
-		);`
-		index     = `CREATE INDEX IF NOT EXISTS lobby_url_idx ON lobbies (lobby_url);`
-		usersStmt = `
-		CREATE TABLE IF NOT EXISTS users
-		(
-			id SERIAL PRIMARY KEY,
-			login VARCHAR(20) NOT NULL UNIQUE
-		);`
-		index2           = `CREATE INDEX IF NOT EXISTS user_login_idx ON users (login);`
-		lobbiesUsersStmt = `
-		CREATE TABLE IF NOT EXISTS lobbies_users
-(
-    id SERIAL PRIMARY KEY,
-    user_id SERIAL REFERENCES users ON DELETE CASCADE, --Проверить поведение БД, при удалении пользователя и лобби
-    lobby_url VARCHAR(255) REFERENCES lobbies (lobby_url) ON DELETE CASCADE,
-    UNIQUE(user_id, lobby_url)
-);`
-		chatsStmt = `
-		CREATE TABLE IF NOT EXISTS chats 
-		(
-			id SERIAL PRIMARY KEY,
-			lobby_url VARCHAR(255) REFERENCES lobbies (lobby_url) ON DELETE CASCADE
-		);`
-		users_secrets = `CREATE TABLE IF NOT EXISTS users_secrets
-		(
-			id SERIAL PRIMARY KEY,
-			login VARCHAR(255) REFERENCES users (login) ON DELETE CASCADE, 
-			pass_hash BYTEA NOT NULL
-		);`
-	)
-
-	for _, query := range []string{lobbiesStmt, index, usersStmt, index2, lobbiesUsersStmt, chatsStmt, users_secrets} {
-		execStmt(db, query)
-	}
-}
-
-// execStmt executes prepared statement
-func execStmt(db *sql.DB, query string) {
-	const op = "storage.postgres.execStmt"
-
-	stmt, err := db.Prepare(query)
-
-	if err != nil {
-		panic(fmt.Errorf("%s: %w", op, err))
-	}
-
-	_, err = stmt.Exec()
-
-	if err != nil {
-		panic(fmt.Errorf("%s: %w", op, err))
 	}
 }
 
@@ -326,7 +266,6 @@ func (p *Postgres) SaveMessage(lobbyURL, login, message string) error {
 		return fmt.Errorf("%s: %w", op, err)
 	}
 
-	// интересный вариант формата времени, почему так?
 	_, err = stmt.Exec(lobbyID, login, time.Now(), message)
 	if err != nil {
 		return fmt.Errorf("%s: %w", op, err)

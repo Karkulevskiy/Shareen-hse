@@ -1,5 +1,5 @@
 env: "local"
-connection_string: "host=localhost port=5432 user=postgres password=230704 dbname=postgres sslmode=disable"
+connection_string: "host=localhost port=5432 user=karkulevskiy password=230704 dbname=postgres sslmode=disable"
 http_server:
   address: ":8080"
   timeout: "4s"

@@ -1,5 +1,7 @@
 package events
 
+import "time"
+
 type JoinLobbyEvent struct {
 	Login    string `json:"login"`
 	LobbyURL string `json:"lobby_url"`
@@ -71,4 +73,16 @@ type RewindVideoResponse struct {
 
 type UserDisconnectedEvent struct {
 	Login string `json:"login"`
+}
+
+type SendMessageRequest struct {
+	LobbyURL string `json:"lobby_url"`
+	Login    string `json:"login"`
+	Message  string `json:"message"`
+}
+
+type SendMessageResponse struct {
+	Login   string    `json:"login"`
+	Message string    `json:"message"`
+	Time    time.Time `json:"time"`
 }

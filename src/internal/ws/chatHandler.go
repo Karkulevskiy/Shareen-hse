@@ -5,8 +5,11 @@ import (
 	"log/slog"
 	"net/http"
 	"time"
+
+	"github.com/karkulevskiy/shareen/src/internal/ws/events"
 )
 
+// SendMessageHandler sends message in certail lobby.
 func SendMessageHandler(event Event, c *Client) {
 	const op = "ws.SendMessage"
 
@@ -14,13 +17,8 @@ func SendMessageHandler(event Event, c *Client) {
 		slog.String("op", op),
 	)
 
-	type SendMessageRequest struct {
-		LobbyURL string `json:"lobby_url"`
-		Login    string `json:"login"`
-		Message  string `json:"message"`
-	}
+	var req events.SendMessageRequest
 
-	var req SendMessageRequest
 	if err := json.Unmarshal(event.Payload, &req); err != nil {
 		log.Error("failed to unmarshal send message request", err)
 		SendResponseError(event.Type, http.StatusInternalServerError, c)
@@ -34,13 +32,7 @@ func SendMessageHandler(event Event, c *Client) {
 		return
 	}
 
-	type SendMessageResponse struct {
-		Login   string    `json:"login"`
-		Message string    `json:"message"`
-		Time    time.Time `json:"time"`
-	}
-
-	sendData, _ := json.Marshal(SendMessageResponse{
+	sendData, _ := json.Marshal(events.SendMessageResponse{
 		Login:   req.Login,
 		Message: req.Message,
 		Time:    time.Now(),
