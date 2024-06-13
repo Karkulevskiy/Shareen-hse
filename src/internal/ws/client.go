@@ -13,6 +13,8 @@ var (
 	pingPeriod = (pongWait * 9) / 10
 )
 
+// Client describes websocket client.
+
 type Client struct {
 	conn     *websocket.Conn
 	m        *Manager
@@ -21,6 +23,7 @@ type Client struct {
 	lobbyURL string
 }
 
+// NewClient creates new websocket client.
 func NewClient(conn *websocket.Conn, m *Manager) *Client {
 	return &Client{
 		conn:   conn,
@@ -29,6 +32,7 @@ func NewClient(conn *websocket.Conn, m *Manager) *Client {
 	}
 }
 
+// readMessages reads messages from websocket.
 func (c *Client) readMessages() {
 	defer func() {
 		c.m.removeClient(c)
@@ -72,6 +76,7 @@ func (c *Client) readMessages() {
 	}
 }
 
+// writeMessages writes messages to websocket.
 func (c *Client) writeMessages() {
 	defer func() {
 		c.m.removeClient(c)
@@ -121,6 +126,7 @@ func (c *Client) writeMessages() {
 	}
 }
 
+// pongHandler handles pong messages.
 func (c *Client) pongHandler(pongMsg string) error {
 	c.m.log.Info("pong")
 

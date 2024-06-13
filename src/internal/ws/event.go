@@ -32,12 +32,14 @@ const (
 
 type EventHandler func(event Event, c *Client)
 
+// Event struct
 type Event struct {
 	Type    string          `json:"type,omitempty"`
 	Status  int             `json:"status,omitempty"`
 	Payload json.RawMessage `json:"payload,omitempty"`
 }
 
+// SendResponseError sends error response.
 func SendResponseError(eventType string, status int, c *Client) {
 
 	type ResponseErr struct {
@@ -55,6 +57,7 @@ func SendResponseError(eventType string, status int, c *Client) {
 	c.egress <- respEvent
 }
 
+// CreateEvent creates new event.
 func CreateEvent(status int, eventType string, payload json.RawMessage) Event {
 	return Event{
 		Status:  status,

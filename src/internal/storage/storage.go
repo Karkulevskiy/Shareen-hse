@@ -2,6 +2,7 @@ package storage
 
 import "errors"
 
+// Errors
 var (
 	ErrURLExists     = errors.New("url already exists")
 	ErrLobbyNotFound = errors.New("lobby not found")

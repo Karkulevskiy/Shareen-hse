@@ -1,5 +1,7 @@
 package domain
 
+// Lobby describes lobby.
+
 type Lobby struct {
 	ID       int64     `json:"id,omitempty"`
 	LobbyURL string    `json:"lobby_url"`

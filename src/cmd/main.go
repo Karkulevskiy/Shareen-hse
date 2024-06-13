@@ -18,9 +18,9 @@ const (
 	envProd  = "prod"
 )
 
+// main starts application
 func main() {
 	cfg := config.MustLoad()
-
 	log := setupLogger(cfg.Env)
 
 	log.Info("starting application", slog.String("env", cfg.Env))
@@ -40,6 +40,7 @@ func main() {
 	//TODO: graceful shutdown
 }
 
+// setupAPI sets up http handlers
 func setupAPI(storage *postgres.Postgres, log *slog.Logger, ctx context.Context) {
 	m := ws.NewManager(storage, log, ctx)
 
@@ -48,6 +49,7 @@ func setupAPI(storage *postgres.Postgres, log *slog.Logger, ctx context.Context)
 	http.HandleFunc("/register", m.RegisterUser)
 }
 
+// setupLogger sets up logger
 func setupLogger(env string) *slog.Logger {
 	var log *slog.Logger
 	switch env {

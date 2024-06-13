@@ -6,6 +6,7 @@ import (
 	"github.com/karkulevskiy/shareen/src/internal/lib"
 )
 
+// TestGenerateURL tests GenerateURL
 func TestGenerateURL(t *testing.T) {
 	cases := []struct {
 		Name string

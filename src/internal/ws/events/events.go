@@ -2,6 +2,7 @@ package events
 
 import "time"
 
+// Event types
 type JoinLobbyEvent struct {
 	Login    string `json:"login"`
 	LobbyURL string `json:"lobby_url"`

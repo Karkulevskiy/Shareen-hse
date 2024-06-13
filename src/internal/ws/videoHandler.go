@@ -87,7 +87,12 @@ func AskForVideoTiming(login string, c *Client) {
 
 	log.Info("ask for video timing")
 
-	payload, _ := json.Marshal(events.AskVideoTimingEvent{Login: login})
+	payload, err := json.Marshal(events.AskVideoTimingEvent{Login: login})
+	if err != nil {
+		log.Error("failed to unmarshal ask video timing request", err)
+		SendResponseError(EventGetVideoTiming, http.StatusInternalServerError, c)
+		return
+	}
 
 	response := CreateEvent(http.StatusOK, EventGetVideoTiming, payload)
 

@@ -15,6 +15,7 @@ const (
 	postgres = "postgres"
 )
 
+// Postgres implements storage.Storage
 type Postgres struct {
 	db *sql.DB
 }
@@ -31,6 +32,7 @@ func MustInit(connectionString string) *Postgres {
 	}
 }
 
+// SaveUserUsers checks if user already exists
 func (p *Postgres) SaveUserUsers(login string) error {
 	const op = "storage.postgres.SaveUserUsers"
 
@@ -59,6 +61,8 @@ func (p *Postgres) SaveUserUsers(login string) error {
 
 	return nil
 }
+
+// SaveUser saves user
 
 func (p *Postgres) SaveUser(login string, passHash []byte) error {
 	const op = "storage.postgres.SaveUser"
@@ -100,6 +104,7 @@ func (p *Postgres) SaveUser(login string, passHash []byte) error {
 	return nil
 }
 
+// User returns user
 func (p *Postgres) User(login string) (*domain.User, error) {
 	const op = "storage.Postgres.User"
 
@@ -129,6 +134,8 @@ func (p *Postgres) User(login string) (*domain.User, error) {
 	}, nil
 }
 
+// CreateLobby creates lobby
+
 func (p *Postgres) CreateLobby(lobbyURL string) (string, error) {
 	const op = "postgres.CreateLobby"
 
@@ -152,6 +159,8 @@ func (p *Postgres) CreateLobby(lobbyURL string) (string, error) {
 
 	return lobbyURL, nil
 }
+
+// Lobby returns lobby
 
 func (p *Postgres) Lobby(lobbyURL string) (*domain.Lobby, error) {
 	const op = "postgres.Lobby"
@@ -194,6 +203,8 @@ func (p *Postgres) Lobby(lobbyURL string) (*domain.Lobby, error) {
 	return lobby, nil
 }
 
+// Chat returns chat
+
 func (p *Postgres) Chat(lobbyID int64) ([]domain.Message, error) {
 	const op = "storage.postgres.Chat"
 
@@ -228,6 +239,7 @@ func (p *Postgres) Chat(lobbyID int64) ([]domain.Message, error) {
 	return chat, nil
 }
 
+// InsertVideo updates video URL
 func (p *Postgres) InsertVideo(lobbyURL, videoURL string) error {
 	const op = "storage.postgres.InsertVideo"
 
@@ -253,6 +265,7 @@ func (p *Postgres) InsertVideo(lobbyURL, videoURL string) error {
 	return nil
 }
 
+// SaveMessage saves message
 func (p *Postgres) SaveMessage(lobbyURL, login, message string) error {
 	const op = "storage.postgres.SaveMessage"
 
@@ -274,6 +287,7 @@ func (p *Postgres) SaveMessage(lobbyURL, login, message string) error {
 	return nil
 }
 
+// LobbyID returns lobby ID
 func (p *Postgres) LobbyID(lobbyURL string) (int64, error) {
 	const op = "storage.postgres.LobbyID"
 

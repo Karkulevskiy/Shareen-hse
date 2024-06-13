@@ -21,6 +21,7 @@ var (
 	}
 )
 
+// Manager describes websocket manager
 type Manager struct {
 	log *slog.Logger
 	sync.RWMutex
@@ -32,6 +33,7 @@ type Manager struct {
 	videoTimingMap map[string]chan Event
 }
 
+// NewManager creates new websocket manager
 func NewManager(storage *postgres.Postgres, log *slog.Logger, ctx context.Context) *Manager {
 	m := &Manager{
 		handlers:       make(map[string]EventHandler),
@@ -46,6 +48,7 @@ func NewManager(storage *postgres.Postgres, log *slog.Logger, ctx context.Contex
 	return m
 }
 
+// setupEventHandlers sets up event handlers
 func (m *Manager) setupEventHandlers() {
 	m.handlers[EventCreateLobby] = CreateLobbyHandler
 	m.handlers[EventJoinLobby] = JoinLobbyHandler
@@ -56,6 +59,7 @@ func (m *Manager) setupEventHandlers() {
 	m.handlers[EventRewindVideo] = RewindVideoHandler
 }
 
+// routeEvent routes event to handler
 func (m *Manager) routeEvent(event Event, c *Client) {
 	if handler, ok := m.handlers[event.Type]; ok {
 		handler(event, c)
@@ -64,6 +68,7 @@ func (m *Manager) routeEvent(event Event, c *Client) {
 	}
 }
 
+// ServeWS handles websocket requests
 func (m *Manager) ServeWS(w http.ResponseWriter, r *http.Request) {
 	const op = "ws.manager.serveWS"
 
@@ -124,12 +129,14 @@ func (m *Manager) ServeWS(w http.ResponseWriter, r *http.Request) {
 	go client.writeMessages()
 }
 
+// addClient adds client to manager
 func (m *Manager) addClient(c *Client) {
 	m.Lock()
 	defer m.Unlock()
 	m.clients[c] = true
 }
 
+// removeClient removes client from manager
 func (m *Manager) removeClient(c *Client) {
 	m.Lock()
 	defer m.Unlock()
@@ -139,8 +146,9 @@ func (m *Manager) removeClient(c *Client) {
 	}
 }
 
+// checkOrigin checks origin
 func checkOrigin(r *http.Request) bool {
-	switch  r.Host{
+	switch r.Host {
 	case "localhost:8080":
 		return true
 	default:

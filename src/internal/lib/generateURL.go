@@ -7,6 +7,7 @@ import (
 	"unicode/utf8"
 )
 
+// GenerateURL generates unique URL
 func GenerateURL() string {
 	const alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 

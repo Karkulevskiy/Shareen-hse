@@ -8,12 +8,14 @@ import (
 	"github.com/ilyakaznacheev/cleanenv"
 )
 
+// Config is a description for application
 type Config struct {
 	Env              string `yaml:"env" env:"ENV" env-default:"local"`
 	ConnectionString string `yaml:"connection_string"`
 	HTTPServer       `yaml:"http_server"`
 }
 
+// HTTPServer is a description for http server
 type HTTPServer struct {
 	Address     string        `yaml:"address" env-default:"localhost:8080"`
 	Timeout     time.Duration `yaml:"timeout" env-default:"4s"`
