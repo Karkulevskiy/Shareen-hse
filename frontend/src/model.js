@@ -1,20 +1,20 @@
 import { ButtonBlock,DivBlock, TextBlock } from "./classes/blocks.js"
  
 export const model = [
-    new DivBlock(
+    new DivBlock( //Тэг див
         {
             id:"start-choice"
         },
         [
-            new ButtonBlock(
-                "JOIN",
+            new ButtonBlock( //Внутри div две кнопки(Присоединиться и создать)
+                "Присоединиться",
                 {
                     type:"button",
                     class:"choice__btn"
                 },
             ),
             new ButtonBlock(
-                "CREATE",
+                "Создать",
                 {
                     type:"button",
                     class:"choice__btn",
@@ -25,7 +25,7 @@ export const model = [
     ),
     new TextBlock("Shareen - бесплатный веб-сервис для совместного просмотра видео.\
      Shareen предлагает на выбор такие популярные видеосервисы, как  YouTube, Twitch, ВКВидео и др.\
-     Создавайте комнаты, обменивайтесь сообщениями и наслаждайтесь совместным просмотром видео и фильмов с друзьями! ",
+     Создавайте комнаты, обменивайтесь сообщениями и наслаждайтесь совместным просмотром видео и фильмов с друзьями! ", //Текстовый блок с информацией
     {
         align:"center",
         class:"infotext"

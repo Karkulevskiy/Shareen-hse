@@ -8,8 +8,9 @@ export function loadLobby(LobbyEvent){
     Player.paused = LobbyEvent.pause;
     Player.timing = LobbyEvent.timing;
     localStorage.setItem("lobby_url",LobbyEvent.lobby_url);
-    const $app = document.querySelector("#app");
+    const $app = document.querySelector("#app"); //Собираем инфо о нашем лобби
 
+    //HTML-шаблон нашего лобби
     $app.innerHTML = `<form role="search" id="search-form" type="submit">
     <input placeholder="Enter the link..." class="search-form__txt" type="url">
     <button class="search-form__btn">
@@ -53,17 +54,17 @@ export function loadLobby(LobbyEvent){
     </div>
     </div>
     </div>`;
-    const $form = document.getElementById("search-form");
+    const $form = document.getElementById("search-form"); 
     $form.addEventListener("submit",takeButton);
 
     const $sendbtn = $app.querySelector(".send-btn");
     $sendbtn.addEventListener("click",takeButton);
 
-    configureLobby(LobbyEvent.users,LobbyEvent.chat);
+    configureLobby(LobbyEvent.users,LobbyEvent.chat); //Прорисовываем всех юзеров в лобби и все сообщения
 
-    insertVideo(LobbyEvent.video_url);
+    insertVideo(LobbyEvent.video_url); //Вставляем iframe играющего видео
 
-    addLobbyUrl();
+    addLobbyUrl(); //Добавляем снизу ссылку на лобби с возможностью копирования
 }
 
 export function configureLobby(users,chat){
@@ -75,7 +76,7 @@ export function configureLobby(users,chat){
     });
 }
 
-export function addUser(user){
+export function addUser(user){ //Добавление юзера при заходе в лобби 
     let userclass ="";
     if (user==localStorage.getItem("login")){
         userclass="me";
@@ -87,7 +88,7 @@ export function addUser(user){
     $memlist.insertAdjacentHTML("beforeend",elem);
 }
 
-export function removeUser(login){
+export function removeUser(login){ //Удаление юзера при его выходе из лобби
     const $memlist = document.querySelector(".member-list");
     $memlist.childNodes.forEach((span)=> {
         if (span.nodeName=="DIV" && span.innerText==login){
@@ -96,7 +97,7 @@ export function removeUser(login){
     })
 }
 
-export function addMessage(event){
+export function addMessage(event){ //Добавление сообщения в чат
     let userclass = ""
     if (event.login == localStorage.getItem("login")){
         userclass="me";
@@ -115,7 +116,7 @@ export function addMessage(event){
     $chatlist.innerHTML += tag;
 }
 
-export function insertVideo(url){
+export function insertVideo(url){ //Вставка iframe
     let playerdiv = document.querySelector("#player");
     playerdiv.innerHTML="";
     let options = {
@@ -124,7 +125,7 @@ export function insertVideo(url){
 
     }
     let vidID="";
-    if (url.indexOf("twitch.tv")!=-1){
+    if (url.indexOf("twitch.tv")!=-1){ //Twitch iframe
         vidID = takeTwitchChannel(url);
         options["channel"] = vidID;
         Player.player = new Twitch.Player("player", options);
@@ -133,7 +134,7 @@ export function insertVideo(url){
         Player.status = "twitch";
         
     }
-    else if (url.indexOf("youtube.com")!=-1){
+    else if (url.indexOf("youtube.com")!=-1){ //Youtube iframe
         let html = `<div id="player-yt"></div>`;
         document.querySelector("#player").insertAdjacentHTML("afterbegin",html);
         vidID = takeYoutubeVideo(url);
@@ -147,7 +148,7 @@ export function insertVideo(url){
         TimeChecker.startCheck();
 
     }
-    else if (url.indexOf("vk.com")!=-1){
+    else if (url.indexOf("vk.com")!=-1){ //vk iframe
         attrs = takeVKattributes(url);
         let iframe = `<iframe src="https://vk.com/video_ext.php?oid=${attrs.oid}&id=${attrs.id}&hd=2&js_api=1" width="1024" height="640" 
         allow="autoplay; encrypted-media; fullscreen; picture-in-picture;" frameborder="0" allowfullscreen ></iframe>`
@@ -164,7 +165,7 @@ export function insertVideo(url){
 
 }
 
-export function sendPauseState(event){
+export function sendPauseState(event){ //Обработчики VK для постановки на паузу и снятия с неё
     sendEvent("pause_video",{
         "lobby_url":localStorage.getItem("lobby_url"),
         "pause":true
@@ -178,7 +179,7 @@ export function sendPlayState(event){
     })
 }
 
-function onPlayerStateChange(event){
+function onPlayerStateChange(event){ //Обработчик ютуба для постановки на паузу и снятия с неё
     if (event.data == YT.PlayerState.PAUSED){
         sendPauseState(null);
         TimeChecker.endCheck();
@@ -189,7 +190,7 @@ function onPlayerStateChange(event){
     }
 }
 
-function onPlayerReady(event){
+function onPlayerReady(event){ //Действия при готовности плеера
     debugger;
     Player.rewindVideo(Player.timing);
     if (Player.paused==true){
@@ -200,7 +201,7 @@ function onPlayerReady(event){
     }
 }
 
-export function rewindVideo(event){
+export function rewindVideo(event){ //Перемотка видео 
     let old = Player.timing;
     Player.timing = event.time;
     if (Math.abs(Player.timing-old)>1){
@@ -212,7 +213,7 @@ export function rewindVideo(event){
     }
 }
 
-function takeTwitchChannel(url){
+function takeTwitchChannel(url){ //Парсинг твич-ссылки для корректного отображения iframe
     let channel = "";
     let idx = url.indexOf("twitch.tv/")+10;
     for (let i=idx;i<url.length;i++){
@@ -226,7 +227,7 @@ function takeTwitchChannel(url){
     return channel;
 }
 
-function takeVKattributes(url){
+function takeVKattributes(url){ //Парсинг вк-ссылки для корректного отображения iframe
     let regex = /-?\d*[0-9]_\d*[0-9]/
     let str =  url.match(regex)[0];
     let idx = str.indexOf("_");
@@ -237,7 +238,7 @@ function takeVKattributes(url){
     return attributes;
 }
 
-function takeYoutubeVideo(url){
+function takeYoutubeVideo(url){ //Парсинг yt-ссылки для корректного отображения iframe
     let idx = url.indexOf("watch?v=")+8;
     let vidID = "";
         for (let i=idx;i<url.length;i++){
@@ -264,7 +265,7 @@ function addLobbyUrl(){
     })
 }
 
-function convertTime(time){
+function convertTime(time){ //Конвертация времени для отображения времени каждого сообщения.
     let NewTime = time.substring(4,10);
     NewTime+=" " + time.substring(16,24);
     return NewTime;

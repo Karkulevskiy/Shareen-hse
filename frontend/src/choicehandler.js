@@ -16,10 +16,10 @@ export function choiceHandler(event){
         return;
     }
     const value = event.target.innerText;
-    if (value==="CREATE"){
+    if (value==="Создать"){
         createLobby();
     }
-    else if (value=="JOIN"){
+    else if (value=="Присоединиться"){
         if (document.getElementById("lobby-form")!=undefined){
             return;
         }

@@ -3,6 +3,7 @@ import {connection,routeEvent} from "./websocket.js"
 import { Event } from "./classes/events.js";
 import { MyAlert } from "./utils.js";
 
+//HTML формы для входа
 const signInHTML = `<div id="blur"></div>
         <form class="mui-form">
             <legend style="margin-top:10px;caret-color:transparent;">Authorization</legend>
@@ -22,6 +23,7 @@ const signInHTML = `<div id="blur"></div>
             <button style="color:blue;background-color:transparent;border:none;font-size:18px;margin-top:22px;caret-color:transparent;" id="registration-btn">Sign up!</button>
         </form>`
 
+//HTML формы для регистрации
         const signUpHTML = `<legend style="margin-top:10px">Registration</legend>
         <small style="font-size: 130%;">Enter your login and password</small>
         <div class="mui-textfield mui-textfield--float-label">
@@ -38,16 +40,16 @@ const signInHTML = `<div id="blur"></div>
         <br>
         <button style="color:blue;background-color:transparent;border:none;font-size:18px;margin-top:22px" id="registration-btn">Sign in!</button>`
 
-function signHandler(event){
+function signHandler(event){ //Обработчик нажатия на кнопку "Войти/Регистрация" в форме
     event.preventDefault();
     const $signbtn = document.querySelector("#submit-btn");
-    $signbtn.disabled = true;
+    $signbtn.disabled = true; //Временно морозим нажатую кнопку
     const data = event.target.getElementsByTagName("input");
-    let UserData = {
+    let UserData = { //Берём данные с инпута
         "login":data[0].value,
         "password":data[1].value
     }
-    if ($signbtn.textContent=="Sign in"){
+    if ($signbtn.textContent=="Sign in"){ //Если осуществлялся вход, то кидаем запрос на вход на бэкенд
         let MaxURL = "http://localhost:8080/login";
         axios.post(MaxURL,JSON.stringify(UserData))
         .then(response =>{
@@ -70,7 +72,7 @@ function signHandler(event){
             console.log("UNEXPECTED ERROR: "+error);
         });
     }
-    else{
+    else{ //Если осуществлялась регистрация, то кидаем запрос на регистрацию на бэкенд
         const MaxURL = "http://localhost:8080/register";
         axios.post(MaxURL,JSON.stringify(UserData))
         .then(response => {
@@ -89,10 +91,10 @@ function signHandler(event){
             console.log("Error: " + error);
         });
     }
-    $signbtn.disabled = false;
+    $signbtn.disabled = false; //Снова включаем кнопку
 }
 
-export function showSignInForm(event){
+export function showSignInForm(event){ //Показать форму входа и добавить обработчики событий на неё
     if (connection.length==1){
         MyAlert("You have already signed in!","error");
     }
@@ -119,7 +121,7 @@ export function showSignInForm(event){
     document.querySelector("#registration-btn").addEventListener("click",showSighUpForm);
 }
 
-function showSighUpForm(event){
+function showSighUpForm(event){ //Показать форму регистрации и добавить обработчики событий на неё
     event.preventDefault;
     const $form = event.target.form;
     const $back = document.getElementById("blur");
@@ -134,10 +136,10 @@ function showSighUpForm(event){
 
 function connectWebsocket(otp,login){
     if (window["WebSocket"]) {
-        // Connect to websocket using OTP as a GET parameter
+        // Подключаемся к вебсокету через одноразовый пароль
         const MaxURL = "ws://localhost:8080/ws?otp="+otp;
         conn = new WebSocket(MaxURL);
-        // Onopen
+        // При открытии вебсокета сохраняем данные юзера в localstorage
         conn.onopen = function (event) {
             localStorage.setItem("login",login);
             document.getElementById('blur').click();
@@ -148,12 +150,12 @@ function connectWebsocket(otp,login){
             console.log("Disconnected from WebSocket");
         }
 
-        // Add a listener to the onmessage event
+        // При появлении сообщения через вебсокет 
         
         conn.onmessage = function (event) {
-            // parse websocket message as JSON
+            // Парсим сообщение как JSON
             const eventData = JSON.parse(event.data);
-            // Assign JSON data to new Event Object
+            // Отправляем сообщение на определение типа события
             const NewEvent = Object.assign(new Event,eventData);
             routeEvent(NewEvent);
         }

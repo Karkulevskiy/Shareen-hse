@@ -2,7 +2,7 @@ import errorIcon from "./assets/icons/error.svg"
 import infoIcon from "./assets/icons/info.svg"
 import successIcon from "./assets/icons/success.svg"
 
-export function div(content,options){
+export function div(content,options){ //Функция для создания тэга div и его конвертации в HTML-строку
     const ToString = key => `${key}="${options[key]}"`;
     const Params = Object.keys(options).map(ToString).join(" ");
     return `
@@ -10,7 +10,7 @@ export function div(content,options){
     `
 }
 
-export function css(styles = {}){
+export function css(styles = {}){ //Добавление стилей
     if (typeof styles ==='string') {
         return styles
     }
@@ -19,7 +19,7 @@ export function css(styles = {}){
     
 }
 
-export function addScript(source){
+export function addScript(source){         //Добавление скрипта на HTML-страницу
         const tag = document.createElement('script');
         tag.setAttribute('src',source);
         
@@ -27,13 +27,13 @@ export function addScript(source){
         $app.append(tag);
 }
 
-export function loadLobby(lobbyLink = null){
-    let app = document.querySelector("#app");
+export function loadLobby(lobbyLink = null){  //Загрузка лобби
+    let app = document.querySelector("#app"); //Получаем содержимое лобби
     axios.get("lobby.html")
     .then(response => app.innerHTML=response);
 }
 
-export function sendRequest(method,URL,data=null){
+export function sendRequest(method,URL,data=null){ //Отправка запроса на определённый URL
     var xhr
     if (window.ActiveXObject)
     {
@@ -58,7 +58,7 @@ export function sendRequest(method,URL,data=null){
     xhr.send(data);
 }
 
-export function parseHTMLFile(content){
+export function parseHTMLFile(content){ //Парсинг HTML-страницы
     let BodyStart = content.search(/<body>/g)
     let BodyEnd = content.search(/<!-- Code/g)
     content = content.slice(BodyStart,BodyEnd);
@@ -66,7 +66,7 @@ export function parseHTMLFile(content){
     return content 
 }
 
-export function MyAlert(text,status){
+export function MyAlert(text,status){ //Самописный Alert с определённым цветом(З - OK, К - ERROR , С - INFO)
     let alert = `<div class="banner ${status} hidden">
                     <img src=${findIcon(status)} class="banner-icon">
                     <div class="banner-message">${text}
@@ -76,8 +76,8 @@ export function MyAlert(text,status){
                      <g data-name="close"><rect width="24" height="24" transform="rotate(180 12 12)" opacity="0"></rect>
                      <path d="M13.41 12l4.3-4.29a1 1 0 1 0-1.42-1.42L12 10.59l-4.29-4.3a1 1 0 0 0-1.42 1.42l4.3 4.29-4.3 4.29a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l4.29-4.3 4.29 4.3a1 1 0 0 0 1.42 0 1 1 0 0 0 0-1.42z"></path>
                      </g></g></svg></div>
-                </div>`
-    document.body.insertAdjacentHTML("afterbegin",alert);
+                </div>` //html алерта
+    document.body.insertAdjacentHTML("afterbegin",alert); //Появление алерта и добавление обработчика на кнопку закрытия
     const banner = document.querySelector(".banner");
     const closebtn = document.querySelector(".banner-close");
     closebtn.addEventListener("click",(()=>{
@@ -92,7 +92,7 @@ export function MyAlert(text,status){
       }, 2500);
 }
 
-function findIcon(status){
+function findIcon(status){ //Поиск подходящей иконки для алерта
     if (status=="error"){
         return errorIcon;
     }

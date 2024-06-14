@@ -1,16 +1,16 @@
 import { Event,NewMessageEvent,LobbyEvent } from "./classes/events";
-import { addMessage,loadLobby,insertVideo,addUser,removeUser, rewindVideo,sendPauseState,sendPlayState } from "./lobbyloader";
+import { addMessage,loadLobby,insertVideo,addUser,removeUser } from "./lobbyloader";
 import { MyAlert } from "./utils";
 import { Player } from "./classes/videoplayer";
 
-export let connection = [];
+export let connection = []; //Здесь будет храниться объект, отвечающей за соединение клиента с вебсокетом
 
-export function routeEvent(event) {
+export function routeEvent(event) {  //Определяем поступивший по вебсокету event
     if (event.type === undefined) {
         console.log("no 'type' field in event(report about that to the developer)");
         return;
     }
-    if (event.type=="join_lobby" && event.status==400){
+    if (event.type=="join_lobby" && event.status==400){ //Проверка на краевые случаи(отсутствие лобби или ошибка на сервере)
         MyAlert("Lobby with entered ID does not exist!","error");
         return;
     }
@@ -18,7 +18,7 @@ export function routeEvent(event) {
         console.log(`Unexpected websocket error(response status is ${event.status})`)
         return;
     }
-    switch (event.type) {
+    switch (event.type) { //Проверка на базовые случаи при статусе OK
         case "send_message":
             const messageEvent = Object.assign(new NewMessageEvent, event.payload);
             addMessage(messageEvent);
@@ -72,8 +72,7 @@ export function routeEvent(event) {
 
 }
 
-export function sendEvent(eventName, payload) {
-    debugger;
+export function sendEvent(eventName, payload) { //Отправка события на бэкенд через вебсокет
     const event = new Event(eventName, payload);
     connection[0].send(JSON.stringify(event));
 }
