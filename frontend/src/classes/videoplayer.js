@@ -1,15 +1,15 @@
 import { sendEvent } from "../websocket";
 
-class VideoPlayer{
-    player;
-    status;
-    paused;
-    timing;
+class VideoPlayer{ //Видеоплеер
+    player; //Класс предоставляемый api хостинга, к которому мы обращаемся
+    status; //Хостинг, к которому мы обращаемся
+    paused; //На паузе или нет
+    timing; //Тайминг
     constructor(player="",status=""){
         this.player = player;
         this.status = status;
     }
-    pause(){
+    pause(){ //Поставить на паузу
         this.paused=true;
         if (this.status=="youtube"){
             this.player.pauseVideo();
@@ -21,7 +21,7 @@ class VideoPlayer{
         }
 
     }
-    play(){
+    play(){ //Начать проигрывать
         this.paused = false;
         if (this.status=="youtube"){
             this.player.playVideo();
@@ -32,14 +32,14 @@ class VideoPlayer{
             this.player.play();
         }
     }
-    getTiming(){
+    getTiming(){ //Выяснить тайминг текущего плеера
         if (this.player==""){
             return 0;
         }
         this.timing = this.player.getCurrentTime();
         return this.timing;
     }
-    isPaused(){
+    isPaused(){ //Узнать состояние плеера(на паузе или нет)
         if (this.player==""){
             return true;
         }
@@ -62,7 +62,7 @@ class VideoPlayer{
                 }
         }
     }
-    rewindVideo(timing){
+    rewindVideo(timing){ //Перемотать видео в плеере
         switch(this.status){
             case "youtube":
                 this.player.seekTo(timing);
@@ -79,7 +79,7 @@ class VideoPlayer{
 
 export let Player = new VideoPlayer()
 
-class TimerChecker{
+class TimerChecker{ //Вспомогательный класс для реализации перемотки видео через youtube(т.к. у api youtube нет этого метода)
     TimeChecker
     constructor(){
 

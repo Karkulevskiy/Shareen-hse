@@ -1,16 +1,16 @@
 
-class Block{
+class Block{ //Общий интерфейс блока
     constructor(value,options){
         this.value = value;
         this.options = options;
     }
 
-    ToObj(){
+    ToObj(){ //Делает из экземпляра нашего класса полноценный JavaScript-объект
         throw new Error("Метод ToObj не реализован в этом классе");
     }
 }
 
-export class ScriptBlock extends Block{
+export class ScriptBlock extends Block{ //Скрипт
     constructor(options={},inside=[]){
         super(inside,options);
     }
@@ -26,7 +26,7 @@ export class ScriptBlock extends Block{
     }
 }
 
-export class FormBlock extends Block{
+export class FormBlock extends Block{ //Форма
     constructor(options={},inside=[]){
         super(inside,options);
     }
@@ -48,7 +48,7 @@ export class FormBlock extends Block{
     }
 }
 
-export class DivBlock extends Block{
+export class DivBlock extends Block{ //Тэг див
     constructor(options={},inside=[]){
         super(inside,options);
     }
@@ -70,7 +70,7 @@ export class DivBlock extends Block{
     }
 }
 
-export class TextBlock extends Block{
+export class TextBlock extends Block{ //Текст
     constructor(value,options){
         super(value,options)
     }
@@ -88,7 +88,7 @@ export class TextBlock extends Block{
     }
 }
 
-export class InputBlock extends Block{
+export class InputBlock extends Block{ //input-форма
     constructor(value="",options={}){
         super(value,options)
     }
@@ -105,7 +105,7 @@ export class InputBlock extends Block{
     }
 }
 
-export class ButtonBlock extends Block{
+export class ButtonBlock extends Block{ //Кнопка
     constructor(value="",options={},inside=[]){
         super(value,options);
         this.inside=inside;
@@ -129,7 +129,7 @@ export class ButtonBlock extends Block{
     }
 }
 
-export class ImageBlock extends Block{
+export class ImageBlock extends Block{ //Картинка
     constructor(value,options){
         super(value,options)
     }
