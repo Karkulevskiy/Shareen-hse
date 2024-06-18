@@ -41,6 +41,7 @@ const signInHTML = `<div id="blur"></div>
         <button style="color:blue;background-color:transparent;border:none;font-size:18px;margin-top:22px" id="registration-btn">Sign in!</button>`
 
 function signHandler(event){ //Обработчик нажатия на кнопку "Войти/Регистрация" в форме
+    debugger;
     event.preventDefault();
     const $signbtn = document.querySelector("#submit-btn");
     $signbtn.disabled = true; //Временно морозим нажатую кнопку
